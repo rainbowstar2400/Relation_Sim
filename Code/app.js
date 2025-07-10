@@ -6,6 +6,25 @@ let characters = [ // letに変更して、後から追加できるようにす�
 ];
 let currentlyEditingId = null;
 
+const mbtiDescriptions = {
+    INFP: "控えめだけど思慮深く、感受性豊かなタイプのようです。",
+    INFJ: "物静かですが、強い信念を内に秘めている理想主義者です。",
+    INTP: "知的な探求心が旺盛で、ユニークな視点を持つアイデアマンです。",
+    INTJ: "戦略的な思考が得意で、計画を立てて物事を進める完璧主義者です。",
+    ISFP: "柔軟な考え方を持ち、芸術的なセンスに優れた冒険家です。",
+    ISFJ: "献身的で、大切な人を守ろうとする心温かい擁護者です。",
+    ISTP: "大胆で実践的な思考を持ち、物事の仕組みを探求する職人です。",
+    ISTJ: "実直で責任感が強く、伝統や秩序を重んじる管理者です。",
+    ENFP: "情熱的で想像力豊か、常に新しい可能性を追い求める運動家です。",
+    ENFJ: "カリスマ性と共感力を兼ね備え、人々を導く主人公タイプです。",
+    ENTP: "頭の回転が速く、知的な挑戦を好む、鋭い論客です。",
+    ENTJ: "リーダーシップに優れ、大胆な決断力で道を切り開く指揮官です。",
+    ESFP: "陽気でエネルギッシュ、その場の注目を集めるエンターテイナーです。",
+    ESFJ: "社交的で思いやりがあり、人々をサポートすることに喜びを感じる領事官です。",
+    ESTP: "賢く、エネルギッシュで、リスクを恐れない起業家精神の持ち主です。",
+    ESTJ: "優れた管理能力を持ち、物事を着実に実行していく、頼れる幹部タイプです。",
+};
+
 // --- DOM要素の取得 ---
 // HTMLの各要素をJavaScriptで操作するために、あらかじめ取得しておきます。
 // メイン画面の要素
@@ -17,6 +36,7 @@ const mbtiInputs = {}; // ▼▼▼ MBTIスライダー用のオブジェクト�
 for (let i = 1; i <= 16; i++) {
     mbtiInputs[`q${i}`] = document.getElementById(`mbti-q${i}`);
 }
+const mbtiManualSelect = document.getElementById('mbti-manual-select');
 
 // 管理室画面の要素
 const managementRoomView = document.getElementById('management-room');
@@ -246,6 +266,34 @@ startDiagButton.addEventListener('click', () => {
     
     // スライダーが正しく描画されるように、少し遅らせて再計算を実行
     setTimeout(alignAllSliderTicks, 0);
+});
+
+// 「診断する」ボタンの処理
+executeDiagButton.addEventListener('click', () => {
+    // 16個のスライダーの値を取得
+    const sliderValues = [];
+    for (let i = 1; i <= 16; i++) {
+        sliderValues.push(parseInt(mbtiInputs[`q${i}`].value));
+    }
+
+    // 性格パラメータの値も取得（タイブレーク用）
+    const personality = {
+        social: parseInt(personalityInputs.social.value),
+        kindness: parseInt(personalityInputs.kindness.value),
+        stubbornness: parseInt(personalityInputs.stubbornness.value),
+        activity: parseInt(personalityInputs.activity.value),
+        expressiveness: parseInt(personalityInputs.expressiveness.value),
+    };
+
+    // MBTIを計算
+    const mbtiResult = calculateMbti(sliderValues, personality);
+    
+    // 説明文を取得（見つからない場合のデフォルト文も用意）
+    const description = mbtiDescriptions[mbtiResult] || "説明文が見つかりませんでした。";
+
+    // 結果を表示
+    mbtiResultText.innerHTML = `この人の性格タイプは <strong>${mbtiResult}</strong> と診断されました。<br>${description}`;
+    mbtiResultArea.style.display = 'block';
 });
 
 mbtiDiagModeBtn.addEventListener('click', () => {

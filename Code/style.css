@@ -364,3 +364,13 @@ input[type="range"]::-moz-range-thumb {
     font-size: 16px;
     line-height: 1.6;
 }
+
+/* MBTI手動選択 */
+.manual-mbti-selectors select {
+    padding: 8px;
+    margin-right: 10px;
+    background-color: #3d3d3d;
+    color: #e0e0e0;
+    border: 1px solid #777;
+    border-radius: 4px;
+}
