@@ -4,6 +4,7 @@ let characters = [ // letに変更して、後から追加できるようにす�
     { id: 'char_002', name: '彩花', personality: { social: 5, kindness: 4, stubbornness: 1, activity: 3, expressiveness: 5 } },
     { id: 'char_003', name: '志音', personality: { social: 2, kindness: 5, stubbornness: 4, activity: 2, expressiveness: 2 } },
 ];
+let currentlyEditingId = null;
 
 // --- DOM要素の取得 ---
 // HTMLの各要素をJavaScriptで操作するために、あらかじめ取得しておきます。
@@ -21,7 +22,9 @@ const managementButton = document.querySelector('.top-menu button:first-child');
 
 const addCharacterForm = document.getElementById('add-character-form');
 const charNameInput = document.getElementById('char-name');
-const managementCharacterList = document.getElementById('character-list-in-mgmt'); // ▼▼▼ 追加 ▼▼▼
+const managementCharacterList = document.getElementById('character-list-in-mgmt');
+const formTitle = document.getElementById('form-title');
+const submitButton = document.querySelector('#add-character-form button[type="submit"]');
 
 // 性格スライダーの要素
 const personalityInputs = {
@@ -108,6 +111,7 @@ function renderManagementList() {
 
         const editButton = document.createElement('button');
         editButton.textContent = '編集';
+        editButton.className = 'edit-button';
         editButton.dataset.id = char.id;
         const deleteButton = document.createElement('button');
         deleteButton.textContent = '削除';
@@ -141,7 +145,22 @@ function switchView(viewToShow) {
         managementRoomView.style.display = 'none';
         // メイン画面のセクションをすべて表示
         mainViewSections.forEach(section => section.style.display = 'block');
+        resetFormState(); // メイン画面に戻るときにフォームの状態をリセット
     }
+}
+
+// ▼▼▼ 新しい関数 ▼▼▼
+/**
+ * フォームの状態を「追加モード」にリセットする関数
+ */
+function resetFormState() {
+    formTitle.textContent = 'キャラクター追加フォーム';
+    submitButton.textContent = '追加する';
+    addCharacterForm.reset();
+    for (const key in personalityValues) {
+        personalityValues[key].textContent = '3';
+    }
+    currentlyEditingId = null; // 編集モードを解除
 }
 
 /**
@@ -246,6 +265,32 @@ managementCharacterList.addEventListener('click', (event) => {
             renderCharacters(); // メイン画面のカード一覧も更新
         }
     }
+    // ▼▼▼ ここから追加 ▼▼▼
+    // 編集ボタンがクリックされた場合
+    else if (event.target.classList.contains('edit-button')) {
+        const idToEdit = event.target.dataset.id;
+        
+        // 編集対象のキャラクターデータを取得
+        const characterToEdit = characters.find(char => char.id === idToEdit);
+        
+        if (characterToEdit) {
+            // フォームのタイトルを変更
+            formTitle.textContent = 'キャラクター編集';
+
+            // フォームに既存のデータを入力
+            charNameInput.value = characterToEdit.name;
+            
+            // スライダーにも既存のデータを反映
+            for (const key in personalityInputs) {
+                personalityInputs[key].value = characterToEdit.personality[key];
+                personalityValues[key].textContent = characterToEdit.personality[key];
+            }
+            
+            // フォームが見えるようにスクロールする（UX向上のため）
+            addCharacterForm.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+    // ▲▲▲ ここまで追加 ▲▲▲
 });
 
 // 画面のリサイズ時にも再計算する
