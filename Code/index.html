@@ -54,7 +54,7 @@
 
             <form id="add-character-form">
                 <h3 id="form-title">キャラクター追加</h3>
-                
+
                 <div class="form-item">
                     <label for="char-name">名前:</label>
                     <input type="text" id="char-name" required>
@@ -106,7 +106,39 @@
                         </div>
                     </div>
                 </div>
+                
+                <h4>MBTIタイプ</h4>
+                <div class="mbti-mode-switch">
+                    <button type="button" id="mbti-diag-mode-btn" class="active">診断で決定</button>
+                    <button type="button" id="mbti-manual-mode-btn">手動で設定</button>
+                </div>
 
+                <div id="mbti-diagnosis-view">
+                    <p>各質問にスライダーで回答してください。</p>
+                    
+                    <div class="form-item">
+                        <label for="mbti-q1">Q1: 初対面の人とすぐ話せる ⇔ 少し様子を見る</label>
+                        <div class="slider-container">
+                            <input type="range" id="mbti-q1" min="0" max="4" value="2">
+                            <div class="slider-ticks">
+                                <span></span><span></span><span></span><span></span><span></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <label for="mbti-q2">Q2: 話は具体的 ⇔ 抽象的</label>
+                        <div class="slider-container">
+                            <input type="range" id="mbti-q2" min="0" max="4" value="2">
+                            <div class="slider-ticks">
+                                <span></span><span></span><span></span><span></span><span></span>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+
+                <div id="mbti-manual-view" style="display: none;">
+                    <p>4つの指標を直接選択してください。（後で実装します）</p>
+                </div>
                 <button type="submit">追加する</button>
             </form>
 

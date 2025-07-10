@@ -196,6 +196,26 @@ function alignAllSliderTicks() {
 managementButton.addEventListener('click', () => switchView('management'));
 backToMainButton.addEventListener('click', () => switchView('main'));
 
+// ▼▼▼ MBTIタブ切り替え用のイベントリスナーを追加 ▼▼▼
+const mbtiDiagModeBtn = document.getElementById('mbti-diag-mode-btn');
+const mbtiManualModeBtn = document.getElementById('mbti-manual-mode-btn');
+const mbtiDiagnosisView = document.getElementById('mbti-diagnosis-view');
+const mbtiManualView = document.getElementById('mbti-manual-view');
+
+mbtiDiagModeBtn.addEventListener('click', () => {
+    mbtiDiagnosisView.style.display = 'block';
+    mbtiManualView.style.display = 'none';
+    mbtiDiagModeBtn.classList.add('active');
+    mbtiManualModeBtn.classList.remove('active');
+});
+
+mbtiManualModeBtn.addEventListener('click', () => {
+    mbtiDiagnosisView.style.display = 'none';
+    mbtiManualView.style.display = 'block';
+    mbtiDiagModeBtn.classList.remove('active');
+    mbtiManualModeBtn.classList.add('active');
+});
+
 // フォームが送信されたときの処理
 addCharacterForm.addEventListener('submit', (event) => {
     event.preventDefault(); // フォームのデフォルトの送信動作をキャンセル

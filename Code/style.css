@@ -301,3 +301,47 @@ input[type="range"]::-moz-range-thumb {
 .character-actions .delete-button:hover {
     background-color: #dc3545;
 }
+
+/* MBTIモード切り替えタブ */
+.mbti-mode-switch {
+    margin-bottom: 15px;
+    display: flex; /* Flexboxを有効化 */
+    width: 100%;
+}
+.mbti-mode-switch button {
+    flex: 1; /* flex: 1; は要素が均等にスペースを分け合うようにする */
+    padding: 8px 12px;
+    border-bottom: 3px solid transparent;
+    background-color: transparent;
+    border-color: transparent;
+    text-align: center; /* テキストを中央揃え */
+}
+.mbti-mode-switch button.active {
+    border-bottom-color: #ffb74d;
+    font-weight: bold;
+}
+
+/* MBTIの質問テキスト */
+.mbti-question {
+    font-size: 14px;
+    color: #ccc;
+    margin-top: 15px;
+}
+/* MBTIスライダーのコンテナ */
+.mbti-slider {
+    height: 15px !important; /* 通常のスライダーより高さを詰める */
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+/* MBTI診断の質問とスライダーを縦に並べるためのスタイル */
+#mbti-diagnosis-view .form-item {
+    flex-direction: column; /* 要素を縦に積むように変更 */
+    align-items: stretch;   /* 横幅いっぱいまで要素を伸ばす */
+    margin-bottom: 20px;    /* 各質問の間のスペース */
+}
+
+#mbti-diagnosis-view .form-item label {
+    flex-basis: auto; /* 横並びの時に設定した幅をリセット */
+    margin-bottom: 8px; /* 質問文とスライダーの間のスペース */
+}
