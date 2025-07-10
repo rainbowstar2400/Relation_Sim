@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>テキストベース人間関係シミュレーション</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app-container">
+        <header class="top-menu">
+            <button>管理室</button>
+            <button>日報</button>
+            <div class="datetime">
+                <span id="time">19:00:00</span>
+                <span id="date">2025/06/29</span>
+            </div>
+        </header>
+
+        <main>
+            <section class="character-observer">
+                <h2>▼ みんなの様子</h2>
+                <div class="character-list">
+                    </div>
+            </section>
+
+            <section class="consultation-area">
+                <h2>▼ 困りごと相談エリア</h2>
+                <div class="consultation-item">
+                    <span>・彩花から相談があります</span>
+                    <button>対応する</button>
+                </div>
+                <div class="consultation-item">
+                    <span>・志音が困っているようです</span>
+                    <button>対応する</button>
+                </div>
+                <button class="add-consultation">+ 相談をさらに受ける</button>
+            </section>
+
+            <section class="log-display">
+                <h2>▼ ログ表示エリア (CLI風)</h2>
+                <div class="log-content">
+                    <p><span class="log-time">[08:42]</span> <span class="log-event">EVENT:</span> 莉音と咲が会話中.....</p>
+                    <p class="log-dialogue">莉音「ねぇ、あの本、読んだ？」</p>
+                    <p class="log-dialogue">咲「えっ、まだだけど、面白かった？」</p>
+                    <p><span class="log-time">[08:45]</span> <span class="log-system">SYSTEM:</span> 信頼度が上昇しました。</p>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="app.js" defer></script> </body>
+</html>
