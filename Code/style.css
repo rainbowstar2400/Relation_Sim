@@ -249,3 +249,29 @@ input[type="range"]::-moz-range-thumb {
     font-weight: bold;
     color: #4eb0db;
 }
+
+/* 管理室の既存キャラクター一覧のスタイル */
+#character-list-in-mgmt {
+    list-style-type: none; /* リストの黒丸（・）を消す */
+    padding: 0;
+    margin-top: 10px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    overflow: hidden; /* 角丸に合わせて中身をクリップ */
+}
+
+#character-list-in-mgmt li {
+    padding: 12px 15px;
+    background-color: #4a4a4a;
+    border-bottom: 1px solid #555; /* 各項目の区切り線 */
+}
+
+/* 最後の項目だけ、下の線を消す */
+#character-list-in-mgmt li:last-child {
+    border-bottom: none;
+}
+
+/* マウスを乗せたときに背景色を変える */
+#character-list-in-mgmt li:hover {
+    background-color: #5a5a5a;
+}

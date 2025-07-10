@@ -21,6 +21,7 @@ const managementButton = document.querySelector('.top-menu button:first-child');
 
 const addCharacterForm = document.getElementById('add-character-form');
 const charNameInput = document.getElementById('char-name');
+const managementCharacterList = document.getElementById('character-list-in-mgmt'); // ▼▼▼ 追加 ▼▼▼
 
 // 性格スライダーの要素
 const personalityInputs = {
@@ -81,6 +82,22 @@ function renderCharacters() {
     });
 }
 
+// ▼▼▼ 新しい関数 ▼▼▼
+/**
+ * 管理室の既存キャラクター一覧を描画する関数
+ */
+function renderManagementList() {
+    // 一覧を空にする
+    managementCharacterList.innerHTML = '';
+    // キャラクターごとにリスト項目を作成
+    characters.forEach(char => {
+        const listItem = document.createElement('li');
+        listItem.textContent = char.name;
+        // listItem.dataset.characterId = char.id; // 後で編集・削除機能に使うID
+        managementCharacterList.appendChild(listItem);
+    });
+}
+
 function switchView(viewToShow) {
     if (viewToShow === 'management') {
         // メイン画面のセクションをすべて非表示に
@@ -88,6 +105,7 @@ function switchView(viewToShow) {
         // 管理室だけを表示
         managementRoomView.style.display = 'block';
         alignAllSliderTicks(); // 管理室表示時に再計算
+        renderManagementList(); // ▼▼▼ 追加 ▼▼▼ 管理室表示時に一覧を更新        
     } else { // 'main' を表示する場合
         // 管理室を非表示に
         managementRoomView.style.display = 'none';
@@ -96,7 +114,6 @@ function switchView(viewToShow) {
     }
 }
 
-// ▼▼▼ 新しい関数 ▼▼▼
 /**
  * 全てのスライダーの目盛りを正しい位置に配置する関数
  */
@@ -114,7 +131,6 @@ function alignAllSliderTicks() {
         // ツマミが移動できる実際の幅を計算
         const trackWidth = sliderWidth - thumbWidth;
         const numTicks = tickSpans.length;
-
         tickSpans.forEach((span, index) => {
             // 各目盛りの位置を計算
             // (ツマミの半分の幅) + (区間ごとの幅) * index
@@ -189,6 +205,5 @@ setInterval(updateDateTime, 1000);
 // 最初に一度、関数を呼び出して画面に表示する
 updateDateTime();
 renderCharacters();
-// アプリケーション開始時はメイン画面を表示
 switchView('main');
 alignAllSliderTicks(); // 初回読み込み時にも実行
