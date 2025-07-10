@@ -345,3 +345,22 @@ input[type="range"]::-moz-range-thumb {
     flex-basis: auto; /* 横並びの時に設定した幅をリセット */
     margin-bottom: 8px; /* 質問文とスライダーの間のスペース */
 }
+
+/* MBTI診断の各ボタン */
+#start-diag-button,
+#execute-diag-button {
+    margin-top: 10px;
+}
+
+/* MBTI結果表示エリア */
+#mbti-result-area {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #3d3d3d;
+    border: 1px solid #555;
+    border-radius: 4px;
+}
+#mbti-result-text {
+    font-size: 16px;
+    line-height: 1.6;
+}

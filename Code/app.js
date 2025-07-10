@@ -230,6 +230,24 @@ const mbtiManualModeBtn = document.getElementById('mbti-manual-mode-btn');
 const mbtiDiagnosisView = document.getElementById('mbti-diagnosis-view');
 const mbtiManualView = document.getElementById('mbti-manual-view');
 
+// ▼▼▼ MBTI診断フロー用のイベントリスナーを追加 ▼▼▼
+const startDiagButton = document.getElementById('start-diag-button');
+const executeDiagButton = document.getElementById('execute-diag-button');
+const mbtiQuestionsArea = document.getElementById('mbti-questions-area');
+const mbtiResultArea = document.getElementById('mbti-result-area');
+const mbtiResultText = document.getElementById('mbti-result-text'); // 結果表示用のpタグも取得
+
+
+// 「診断スタート」ボタンの処理
+startDiagButton.addEventListener('click', () => {
+    mbtiQuestionsArea.style.display = 'block'; // 質問エリアを表示
+    startDiagButton.style.display = 'none';    // スタートボタン自体は隠す
+    mbtiResultArea.style.display = 'none';   // もし結果が表示されていたら隠す
+    
+    // スライダーが正しく描画されるように、少し遅らせて再計算を実行
+    setTimeout(alignAllSliderTicks, 0);
+});
+
 mbtiDiagModeBtn.addEventListener('click', () => {
     mbtiDiagnosisView.style.display = 'block';
     mbtiManualView.style.display = 'none';
