@@ -10,7 +10,7 @@ const characters = [
 // --- DOM要素の取得 ---
 // HTMLの各要素をJavaScriptで操作するために、あらかじめ取得しておきます。
 // メイン画面の要素
-const mainView = document.querySelector('main'); // main全体を取得
+const mainViewSections = document.querySelectorAll('.character-observer, .consultation-area, .log-display');
 const timeElement = document.getElementById('time');
 const dateElement = document.getElementById('date');
 const characterListElement = document.querySelector('.character-list');
@@ -67,18 +67,17 @@ function renderCharacters() {
  */
 function switchView(viewToShow) {
     if (viewToShow === 'management') {
-        // mainの中の直接の子要素（section）をすべて非表示に
-        mainView.querySelectorAll(':scope > section').forEach(s => s.style.display = 'none');
+        // メイン画面のセクションをすべて非表示に
+        mainViewSections.forEach(section => section.style.display = 'none');
         // 管理室だけを表示
         managementRoomView.style.display = 'block';
     } else { // 'main' を表示する場合
         // 管理室を非表示に
         managementRoomView.style.display = 'none';
-        // mainの中の直接の子要素（section）をすべて表示
-        mainView.querySelectorAll(':scope > section').forEach(s => s.style.display = 'block');
+        // メイン画面のセクションをすべて表示
+        mainViewSections.forEach(section => section.style.display = 'block');
     }
 }
-
 
 // --- イベントリスナーの設定 ---
 managementButton.addEventListener('click', () => {
@@ -88,7 +87,6 @@ managementButton.addEventListener('click', () => {
 backToMainButton.addEventListener('click', () => {
     switchView('main');
 });
-
 
 // --- 初期化処理 ---
 
