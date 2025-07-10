@@ -329,6 +329,20 @@ addCharacterForm.addEventListener('submit', (event) => {
     }
     const mbtiResult = calculateMbti(mbtiSliderValues, personality);
 
+    // 診断モードが選択されている場合
+    if (mbtiDiagModeRadio.checked) {
+        for (let i = 1; i <= 16; i++) {
+            mbtiSliderValues.push(parseInt(mbtiInputs[`q${i}`].value));
+        }
+        mbtiResult = calculateMbti(mbtiSliderValues, personality);
+    } 
+    // 手動モードが選択されている場合
+    else {
+        mbtiResult = mbtiManualSelect.value;
+        // 手動設定の場合、スライダーの値は空にする
+        mbtiSliderValues = []; 
+    }
+
     // 編集モードの場合の処理
     if (currentlyEditingId) {
         // 更新対象のキャラクターを探す
@@ -344,23 +358,20 @@ addCharacterForm.addEventListener('submit', (event) => {
     } else {
         // 新しいキャラクターのIDを生成 (簡易的)
         const newId = 'char_' + Date.now();
-        const newCharacter = {
+        characters.push({
             id: newId,
             name: charNameInput.value,
-            personality: personality,
+            personality,
             mbti: mbtiResult,
             mbti_slider: mbtiSliderValues,
-        };
-        // characters配列に新しいキャラクターを追加
-        characters.push(newCharacter);
+        });
     }
     
     // 画面を再描画
     renderCharacters();
     renderManagementList();
 
-    // フォームの状態をリセット
-    resetFormState();
+    switchView('main'); // mainへの切り替えはresetFormStateの前に行う
 });
 
 // スライダーを動かしたときに値表示を更新する処理
@@ -421,6 +432,11 @@ managementCharacterList.addEventListener('click', (event) => {
                     mbtiInputs[`q${i+1}`].value = characterToEdit.mbti_slider[i];
                 }
             }
+
+            // 手動選択プルダウンにも値を反映
+                if (characterToEdit.mbti) {
+                    mbtiManualSelect.value = characterToEdit.mbti;
+                }
             
             // フォームが見えるようにスクロールする（UX向上のため）
             addCharacterForm.scrollIntoView({ behavior: 'smooth' });
