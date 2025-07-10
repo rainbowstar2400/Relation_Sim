@@ -200,41 +200,47 @@ backToMainButton.addEventListener('click', () => switchView('main'));
 addCharacterForm.addEventListener('submit', (event) => {
     event.preventDefault(); // フォームのデフォルトの送信動作をキャンセル
 
-    // 新しいキャラクターのIDを生成 (簡易的)
-    const newId = 'char_' + Date.now();
-
-    // 新しいキャラクターオブジェクトを作成
-    const newCharacter = {
-        id: newId,
-        name: charNameInput.value,
-        personality: {
-            social: parseInt(personalityInputs.social.value),
-            kindness: parseInt(personalityInputs.kindness.value),
-            stubbornness: parseInt(personalityInputs.stubbornness.value),
-            activity: parseInt(personalityInputs.activity.value),
-            expressiveness: parseInt(personalityInputs.expressiveness.value),
+    // 編集モードの場合の処理
+    if (currentlyEditingId) {
+        // 更新対象のキャラクターを探す
+        const charToUpdate = characters.find(char => char.id === currentlyEditingId);
+        if (charToUpdate) {
+            // データを更新
+            charToUpdate.name = charNameInput.value;
+            charToUpdate.personality.social = parseInt(personalityInputs.social.value);
+            charToUpdate.personality.kindness = parseInt(personalityInputs.kindness.value);
+            charToUpdate.personality.stubbornness = parseInt(personalityInputs.stubbornness.value);
+            charToUpdate.personality.activity = parseInt(personalityInputs.activity.value);
+            charToUpdate.personality.expressiveness = parseInt(personalityInputs.expressiveness.value);
         }
-    };
+    } 
+    // 追加モードの場合の処理
+    else {
+
+        // 新しいキャラクターのIDを生成 (簡易的)
+        const newId = 'char_' + Date.now();
+        const newCharacter = {
+            id: newId,
+            name: charNameInput.value,
+            personality: {
+                social: parseInt(personalityInputs.social.value),
+                kindness: parseInt(personalityInputs.kindness.value),
+                stubbornness: parseInt(personalityInputs.stubbornness.value),
+                activity: parseInt(personalityInputs.activity.value),
+                expressiveness: parseInt(personalityInputs.expressiveness.value),
+            }
+        };
 
     // characters配列に新しいキャラクターを追加
     characters.push(newCharacter);
-    
-    // メイン画面のキャラクター一覧を再描画
-    renderCharacters();
-
-    // フォームの内容をリセット
-    addCharacterForm.reset();
-    // スライダーの値表示もリセット
-    for (const key in personalityValues) {
-        personalityValues[key].textContent = '3';
     }
+    
+    // 画面を再描画
+    renderCharacters();
+    renderManagementList();
 
-    // メイン画面に戻る
-    switchView('main');
-
-    // ログで確認
-    console.log('新しいキャラクターが追加されました:', newCharacter);
-    console.log('現在のキャラクターリスト:', characters);
+    // フォームの状態をリセット
+    resetFormState();
 });
 
 // スライダーを動かしたときに値表示を更新する処理
@@ -259,23 +265,26 @@ managementCharacterList.addEventListener('click', (event) => {
         if (confirm('本当にこのキャラクターを削除しますか？')) {
             // characters配列から、指定されたIDのキャラクターを除外した新しい配列を作成
             characters = characters.filter(char => char.id !== idToDelete);
-            
+
             // 画面を再描画して、変更を反映
             renderManagementList(); // 管理室のリストを更新
             renderCharacters(); // メイン画面のカード一覧も更新
         }
     }
-    // ▼▼▼ ここから追加 ▼▼▼
+
     // 編集ボタンがクリックされた場合
     else if (event.target.classList.contains('edit-button')) {
         const idToEdit = event.target.dataset.id;
-        
+
         // 編集対象のキャラクターデータを取得
         const characterToEdit = characters.find(char => char.id === idToEdit);
         
         if (characterToEdit) {
             // フォームのタイトルを変更
             formTitle.textContent = 'キャラクター編集';
+            
+            submitButton.textContent = '更新する'; // ボタンのテキストを変更
+            currentlyEditingId = idToEdit; // 編集モードに設定
 
             // フォームに既存のデータを入力
             charNameInput.value = characterToEdit.name;
@@ -290,7 +299,6 @@ managementCharacterList.addEventListener('click', (event) => {
             addCharacterForm.scrollIntoView({ behavior: 'smooth' });
         }
     }
-    // ▲▲▲ ここまで追加 ▲▲▲
 });
 
 // 画面のリサイズ時にも再計算する
