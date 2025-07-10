@@ -92,7 +92,7 @@ function renderManagementList() {
     // キャラクターごとにリスト項目を作成
     characters.forEach(char => {
         const listItem = document.createElement('li');
-        // ▼▼▼ ここから変更 ▼▼▼
+        
         // キャラクター名を格納するspan
         const nameSpan = document.createElement('span');
         nameSpan.textContent = char.name;
@@ -109,7 +109,6 @@ function renderManagementList() {
         const editButton = document.createElement('button');
         editButton.textContent = '編集';
         editButton.dataset.id = char.id;
-
         const deleteButton = document.createElement('button');
         deleteButton.textContent = '削除';
         deleteButton.className = 'delete-button'; // 削除ボタンだけ少しデザインを変えるため
@@ -153,6 +152,7 @@ function alignAllSliderTicks() {
     document.querySelectorAll('.slider-container').forEach(container => {
         const slider = container.querySelector('input[type="range"]');
         const ticksContainer = container.querySelector('.slider-ticks');
+        if (!ticksContainer) return;
         const tickSpans = ticksContainer.querySelectorAll('span');
         
         // スライダーの実際の幅を取得
@@ -224,6 +224,29 @@ for (const key in personalityInputs) {
         personalityValues[key].textContent = event.target.value;
     });
 }
+
+// ▼▼▼ 新しいイベントリスナー ▼▼▼
+/**
+ * 管理室のキャラクターリストがクリックされたときの処理
+ * (イベント委任)
+ */
+managementCharacterList.addEventListener('click', (event) => {
+    // クリックされたのが削除ボタンかどうかを判定
+    if (event.target.classList.contains('delete-button')) {
+        // どのキャラクターのボタンかIDを取得
+        const idToDelete = event.target.dataset.id;
+        
+        // 仕様書(2.6.4)通り、確認ダイアログを表示
+        if (confirm('本当にこのキャラクターを削除しますか？')) {
+            // characters配列から、指定されたIDのキャラクターを除外した新しい配列を作成
+            characters = characters.filter(char => char.id !== idToDelete);
+            
+            // 画面を再描画して、変更を反映
+            renderManagementList(); // 管理室のリストを更新
+            renderCharacters(); // メイン画面のカード一覧も更新
+        }
+    }
+});
 
 // 画面のリサイズ時にも再計算する
 window.addEventListener('resize', alignAllSliderTicks);
