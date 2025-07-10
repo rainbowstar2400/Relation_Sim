@@ -275,3 +275,29 @@ input[type="range"]::-moz-range-thumb {
 #character-list-in-mgmt li:hover {
     background-color: #5a5a5a;
 }
+
+/* 管理室リスト項目のレイアウト */
+#character-list-in-mgmt li {
+    display: flex; /* Flexboxを使い、中身を横並びに */
+    justify-content: space-between; /* 両端に寄せる */
+    align-items: center; /* 上下中央揃え */
+    padding: 12px 15px;
+    background-color: #4a4a4a;
+    border-bottom: 1px solid #555;
+}
+
+/* リスト内のボタンのスタイル */
+.character-actions button {
+    margin-left: 8px; /* ボタン同士の間隔 */
+    padding: 4px 8px; /* ボタンを少し小さく */
+    font-size: 12px;
+}
+
+/* 削除ボタンだけ色を変える */
+.character-actions .delete-button {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+.character-actions .delete-button:hover {
+    background-color: #dc3545;
+}

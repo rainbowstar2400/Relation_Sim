@@ -82,18 +82,49 @@ function renderCharacters() {
     });
 }
 
-// ▼▼▼ 新しい関数 ▼▼▼
 /**
  * 管理室の既存キャラクター一覧を描画する関数
  */
 function renderManagementList() {
     // 一覧を空にする
     managementCharacterList.innerHTML = '';
+
     // キャラクターごとにリスト項目を作成
     characters.forEach(char => {
         const listItem = document.createElement('li');
-        listItem.textContent = char.name;
-        // listItem.dataset.characterId = char.id; // 後で編集・削除機能に使うID
+        // ▼▼▼ ここから変更 ▼▼▼
+        // キャラクター名を格納するspan
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = char.name;
+
+        // ボタンを格納するdiv
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'character-actions';
+
+        // [情報] [編集] [削除] ボタンを作成
+        const infoButton = document.createElement('button');
+        infoButton.textContent = '情報';
+        infoButton.dataset.id = char.id; // どのキャラのボタンか分かるようにIDを設定
+
+        const editButton = document.createElement('button');
+        editButton.textContent = '編集';
+        editButton.dataset.id = char.id;
+
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = '削除';
+        deleteButton.className = 'delete-button'; // 削除ボタンだけ少しデザインを変えるため
+        deleteButton.dataset.id = char.id;
+        
+        // divにボタンを追加
+        actionsDiv.appendChild(infoButton);
+        actionsDiv.appendChild(editButton);
+        actionsDiv.appendChild(deleteButton);
+        
+        // liに名前とボタンのdivを追加
+        listItem.appendChild(nameSpan);
+        listItem.appendChild(actionsDiv);
+        
+        // 全体をリストに追加
         managementCharacterList.appendChild(listItem);
     });
 }
