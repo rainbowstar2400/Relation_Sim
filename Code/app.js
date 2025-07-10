@@ -40,7 +40,6 @@ const personalityValues = {
     activity: document.getElementById('activity-value'),
     expressiveness: document.getElementById('expressiveness-value'),
 };
-// ▲▲▲ ここまで追加 ▲▲▲
 
 // --- 関数定義 ---
 
