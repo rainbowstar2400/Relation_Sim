@@ -13,6 +13,10 @@ const mainViewSections = document.querySelectorAll('.character-observer, .consul
 const timeElement = document.getElementById('time');
 const dateElement = document.getElementById('date');
 const characterListElement = document.querySelector('.character-list');
+const mbtiInputs = {}; // ▼▼▼ MBTIスライダー用のオブジェクトを初期化
+for (let i = 1; i <= 16; i++) {
+    mbtiInputs[`q${i}`] = document.getElementById(`mbti-q${i}`);
+}
 
 // 管理室画面の要素
 const managementRoomView = document.getElementById('management-room');
@@ -149,7 +153,6 @@ function switchView(viewToShow) {
     }
 }
 
-// ▼▼▼ 新しい関数 ▼▼▼
 /**
  * フォームの状態を「追加モード」にリセットする関数
  */
@@ -192,6 +195,31 @@ function alignAllSliderTicks() {
     });
 }
 
+// ▼▼▼ MBTI計算用の新しい関数 ▼▼▼
+/**
+ * スライダーの値と性格特性からMBTIタイプを計算する
+ * @param {number[]} sliderValues - 16個のスライダーの値(0-4)の配列
+ * @param {object} personality - 性格パラメータオブジェクト
+ * @returns {string} 4文字のMBTIタイプ (例: "INFP")
+ */
+function calculateMbti(sliderValues, personality) {
+    const scores = {
+        ei: sliderValues[0] + sliderValues[4] + sliderValues[8] + sliderValues[12],  // Q1,5,9,13
+        sn: sliderValues[1] + sliderValues[5] + sliderValues[9] + sliderValues[13],  // Q2,6,10,14
+        tf: sliderValues[2] + sliderValues[6] + sliderValues[10] + sliderValues[14], // Q3,7,11,15
+        jp: sliderValues[3] + sliderValues[7] + sliderValues[11] + sliderValues[15], // Q4,8,12,16
+    };
+
+    // 仕様書7.1.2のスコア判定ロジック
+    let result = '';
+    result += scores.ei <= 3 ? 'E' : scores.ei >= 5 ? 'I' : (personality.social >= 4 ? 'E' : 'I');
+    result += scores.sn <= 3 ? 'S' : scores.sn >= 5 ? 'N' : (personality.expressiveness >= 4 ? 'N' : 'S');
+    result += scores.tf <= 3 ? 'T' : scores.tf >= 5 ? 'F' : (personality.kindness >= 4 ? 'F' : 'T');
+    result += scores.jp <= 3 ? 'J' : scores.jp >= 5 ? 'P' : (personality.activity >= 4 ? 'J' : 'P');
+
+    return result;
+}
+
 // --- イベントリスナーの設定 ---
 managementButton.addEventListener('click', () => switchView('management'));
 backToMainButton.addEventListener('click', () => switchView('main'));
@@ -220,6 +248,21 @@ mbtiManualModeBtn.addEventListener('click', () => {
 addCharacterForm.addEventListener('submit', (event) => {
     event.preventDefault(); // フォームのデフォルトの送信動作をキャンセル
 
+    const personality = {
+        social: parseInt(personalityInputs.social.value),
+        kindness: parseInt(personalityInputs.kindness.value),
+        stubbornness: parseInt(personalityInputs.stubbornness.value),
+        activity: parseInt(personalityInputs.activity.value),
+        expressiveness: parseInt(personalityInputs.expressiveness.value),
+    };
+    
+    // MBTIの値を収集・計算
+    const mbtiSliderValues = [];
+    for (let i = 1; i <= 16; i++) {
+        mbtiSliderValues.push(parseInt(mbtiInputs[`q${i}`].value));
+    }
+    const mbtiResult = calculateMbti(mbtiSliderValues, personality);
+
     // 編集モードの場合の処理
     if (currentlyEditingId) {
         // 更新対象のキャラクターを探す
@@ -227,32 +270,23 @@ addCharacterForm.addEventListener('submit', (event) => {
         if (charToUpdate) {
             // データを更新
             charToUpdate.name = charNameInput.value;
-            charToUpdate.personality.social = parseInt(personalityInputs.social.value);
-            charToUpdate.personality.kindness = parseInt(personalityInputs.kindness.value);
-            charToUpdate.personality.stubbornness = parseInt(personalityInputs.stubbornness.value);
-            charToUpdate.personality.activity = parseInt(personalityInputs.activity.value);
-            charToUpdate.personality.expressiveness = parseInt(personalityInputs.expressiveness.value);
+            charToUpdate.personality = personality;
+            charToUpdate.mbti = mbtiResult;
+            charToUpdate.mbti_slider = mbtiSliderValues;
         }
-    } 
     // 追加モードの場合の処理
-    else {
-
+    } else {
         // 新しいキャラクターのIDを生成 (簡易的)
         const newId = 'char_' + Date.now();
         const newCharacter = {
             id: newId,
             name: charNameInput.value,
-            personality: {
-                social: parseInt(personalityInputs.social.value),
-                kindness: parseInt(personalityInputs.kindness.value),
-                stubbornness: parseInt(personalityInputs.stubbornness.value),
-                activity: parseInt(personalityInputs.activity.value),
-                expressiveness: parseInt(personalityInputs.expressiveness.value),
-            }
+            personality: personality,
+            mbti: mbtiResult,
+            mbti_slider: mbtiSliderValues,
         };
-
-    // characters配列に新しいキャラクターを追加
-    characters.push(newCharacter);
+        // characters配列に新しいキャラクターを追加
+        characters.push(newCharacter);
     }
     
     // 画面を再描画
@@ -313,6 +347,13 @@ managementCharacterList.addEventListener('click', (event) => {
             for (const key in personalityInputs) {
                 personalityInputs[key].value = characterToEdit.personality[key];
                 personalityValues[key].textContent = characterToEdit.personality[key];
+            }
+
+            // MBTIスライダーにも値を反映
+            if (characterToEdit.mbti_slider && characterToEdit.mbti_slider.length === 16) {
+                for (let i = 0; i < 16; i++) {
+                    mbtiInputs[`q${i+1}`].value = characterToEdit.mbti_slider[i];
+                }
             }
             
             // フォームが見えるようにスクロールする（UX向上のため）
