@@ -1,10 +1,8 @@
 // --- データ定義 ---
-const characters = [
-    { id: 'char_001', name: '碧' },
-    { id: 'char_002', name: '彩花' },
-    { id: 'char_003', name: '志音' },
-    { id: 'char_004', name: '莉音' },
-    { id: 'char_005', name: '咲' },
+let characters = [ // letに変更して、後から追加できるようにする
+    { id: 'char_001', name: '碧', personality: { social: 4, kindness: 3, stubbornness: 2, activity: 5, expressiveness: 4 } },
+    { id: 'char_002', name: '彩花', personality: { social: 5, kindness: 4, stubbornness: 1, activity: 3, expressiveness: 5 } },
+    { id: 'char_003', name: '志音', personality: { social: 2, kindness: 5, stubbornness: 4, activity: 2, expressiveness: 2 } },
 ];
 
 // --- DOM要素の取得 ---
@@ -19,6 +17,30 @@ const characterListElement = document.querySelector('.character-list');
 const managementRoomView = document.getElementById('management-room');
 const backToMainButton = document.getElementById('back-to-main-button');
 const managementButton = document.querySelector('.top-menu button:first-child'); // 上部メニューの「管理室」ボタン
+
+
+// ▼▼▼ ここから追加 ▼▼▼
+const addCharacterForm = document.getElementById('add-character-form');
+const charNameInput = document.getElementById('char-name');
+
+// 性格スライダーの要素
+const personalityInputs = {
+    social: document.getElementById('social'),
+    kindness: document.getElementById('kindness'),
+    stubbornness: document.getElementById('stubbornness'),
+    activity: document.getElementById('activity'),
+    expressiveness: document.getElementById('expressiveness'),
+};
+
+// スライダーの値表示用span要素
+const personalityValues = {
+    social: document.getElementById('social-value'),
+    kindness: document.getElementById('kindness-value'),
+    stubbornness: document.getElementById('stubbornness-value'),
+    activity: document.getElementById('activity-value'),
+    expressiveness: document.getElementById('expressiveness-value'),
+};
+// ▲▲▲ ここまで追加 ▲▲▲
 
 // --- 関数定義 ---
 
@@ -60,11 +82,6 @@ function renderCharacters() {
         characterListElement.appendChild(card);
     });
 }
-
-/**
- * 画面を切り替える関数
- * @param {string} viewToShow - 'main' または 'management'
- */
 function switchView(viewToShow) {
     if (viewToShow === 'management') {
         // メイン画面のセクションをすべて非表示に
@@ -80,13 +97,58 @@ function switchView(viewToShow) {
 }
 
 // --- イベントリスナーの設定 ---
-managementButton.addEventListener('click', () => {
-    switchView('management');
+managementButton.addEventListener('click', () => switchView('management'));
+backToMainButton.addEventListener('click', () => switchView('main'));
+
+// ▼▼▼ ここから追加 ▼▼▼
+// フォームが送信されたときの処理
+addCharacterForm.addEventListener('submit', (event) => {
+    event.preventDefault(); // フォームのデフォルトの送信動作をキャンセル
+
+    // 新しいキャラクターのIDを生成 (簡易的)
+    const newId = 'char_' + Date.now();
+
+    // 新しいキャラクターオブジェクトを作成
+    const newCharacter = {
+        id: newId,
+        name: charNameInput.value,
+        personality: {
+            social: parseInt(personalityInputs.social.value),
+            kindness: parseInt(personalityInputs.kindness.value),
+            stubbornness: parseInt(personalityInputs.stubbornness.value),
+            activity: parseInt(personalityInputs.activity.value),
+            expressiveness: parseInt(personalityInputs.expressiveness.value),
+        }
+    };
+
+    // characters配列に新しいキャラクターを追加
+    characters.push(newCharacter);
+    
+    // メイン画面のキャラクター一覧を再描画
+    renderCharacters();
+
+    // フォームの内容をリセット
+    addCharacterForm.reset();
+    // スライダーの値表示もリセット
+    for (const key in personalityValues) {
+        personalityValues[key].textContent = '3';
+    }
+
+    // メイン画面に戻る
+    switchView('main');
+
+    // ログで確認
+    console.log('新しいキャラクターが追加されました:', newCharacter);
+    console.log('現在のキャラクターリスト:', characters);
 });
 
-backToMainButton.addEventListener('click', () => {
-    switchView('main');
-});
+// スライダーを動かしたときに値表示を更新する処理
+for (const key in personalityInputs) {
+    personalityInputs[key].addEventListener('input', (event) => {
+        personalityValues[key].textContent = event.target.value;
+    });
+}
+// ▲▲▲ ここまで追加 ▲▲▲
 
 // --- 初期化処理 ---
 

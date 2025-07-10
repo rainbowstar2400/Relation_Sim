@@ -155,3 +155,16 @@ button:hover {
     color: #e0e0e0;
     border-radius: 4px;
 }
+
+/* スライダーのスタイル */
+.form-item input[type="range"] {
+    width: 95%;
+    vertical-align: middle;
+}
+
+.form-item label span {
+    display: inline-block;
+    width: 20px;
+    font-weight: bold;
+    color: #ffb74d;
+}

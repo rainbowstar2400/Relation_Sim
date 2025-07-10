@@ -60,6 +60,27 @@
                     <input type="text" id="char-name" required>
                 </div>
                 
+                <h4>性格パラメータ (1-5)</h4>
+                <div class="form-item">
+                    <label for="social">社交性: <span id="social-value">3</span></label>
+                    <input type="range" id="social" min="1" max="5" value="3">
+                </div>
+                <div class="form-item">
+                    <label for="kindness">気配り傾向: <span id="kindness-value">3</span></label>
+                    <input type="range" id="kindness" min="1" max="5" value="3">
+                </div>
+                <div class="form-item">
+                    <label for="stubbornness">頑固さ: <span id="stubbornness-value">3</span></label>
+                    <input type="range" id="stubbornness" min="1" max="5" value="3">
+                </div>
+                <div class="form-item">
+                    <label for="activity">行動力: <span id="activity-value">3</span></label>
+                    <input type="range" id="activity" min="1" max="5" value="3">
+                </div>
+                <div class="form-item">
+                    <label for="expressiveness">表現力: <span id="expressiveness-value">3</span></label>
+                    <input type="range" id="expressiveness" min="1" max="5" value="3">
+                </div>
                 <button type="submit">追加する</button>
             </form>
 
@@ -68,7 +89,7 @@
                 </ul>
             <button id="back-to-main-button">メイン画面に戻る</button>
         </section>
-        
+
         </main>
     </div>
     <script src="app.js" defer></script> </body>
