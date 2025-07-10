@@ -158,26 +158,28 @@ button:hover {
     flex-grow: 1;
 }
 
-/* ▼▼▼ スライダーの新しいスタイル (最終修正版) ▼▼▼ */
+/* ▼▼▼ スライダーの新しいスタイル (JS制御版) ▼▼▼ */
 
 /* スライダー全体を囲むコンテナ */
 .slider-container {
     position: relative; /* 子要素を絶対配置するための基準 */
     flex-grow: 1;
-    height: 35px; /* 高さを確保 */
+    height: 35px;
 }
 
-/* 目盛りの数字のスタイル */
+/* 目盛りの「数字」のスタイル */
 .slider-ticks {
-    position: absolute;
+    height: 20px; /* 数字と線の高さを確保 */
+    position: relative;
     top: 0;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: space-between;
     pointer-events: none;
-    font-size: 12px;
+    font-size: 16px;
     color: #999;
+}
+
+.slider-ticks span {
+    position: absolute; /* JSでleftの位置を決定する */
+    transform: translateX(-50%); /* 中央揃え */
 }
 
 /* 目盛りの「線」のスタイル */
@@ -188,7 +190,7 @@ button:hover {
     left: 50%;
     transform: translateX(-50%);
     width: 1px;
-    height: 4px;
+    height: 16px;
     background-color: #777;
 }
 
@@ -197,8 +199,7 @@ input[type="range"] {
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
-    height: 20px; /* ツマミの高さと合わせる */
-    background: transparent; /* デフォルトの背景は透明に */
+    background: transparent;
     position: absolute;
     bottom: 0;
     left: 0;
@@ -211,14 +212,14 @@ input[type="range"]::-webkit-slider-runnable-track {
     width: 100%;
     height: 3px;
     background: #555;
-    border-radius: 2px;
 }
+/* (Firefox用も同様) */
 input[type="range"]::-moz-range-track {
     width: 100%;
     height: 3px;
     background: #555;
-    border-radius: 2px;
 }
+
 
 /* スライダーの「ツマミ」の部分 */
 input[type="range"]::-webkit-slider-thumb {
@@ -226,12 +227,12 @@ input[type="range"]::-webkit-slider-thumb {
     appearance: none;
     width: 10px;
     height: 20px;
-    background: #ffb74d;
+    background: #4eb0db;
     cursor: pointer;
     border-radius: 2px;
-    /* トラックの真ん中に来るように、ネガティブマージンで調整 */
-    margin-top: -8.5px;
+    margin-top: -8.5px; /* (3px - 20px) / 2 */
 }
+/* (Firefox用も同様) */
 input[type="range"]::-moz-range-thumb {
     width: 10px;
     height: 20px;
@@ -246,5 +247,5 @@ input[type="range"]::-moz-range-thumb {
     display: inline-block;
     width: 20px;
     font-weight: bold;
-    color: #ffb74d;
+    color: #4eb0db;
 }

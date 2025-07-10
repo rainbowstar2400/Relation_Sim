@@ -19,7 +19,6 @@ const backToMainButton = document.getElementById('back-to-main-button');
 const managementButton = document.querySelector('.top-menu button:first-child'); // 上部メニューの「管理室」ボタン
 
 
-// ▼▼▼ ここから追加 ▼▼▼
 const addCharacterForm = document.getElementById('add-character-form');
 const charNameInput = document.getElementById('char-name');
 
@@ -81,12 +80,14 @@ function renderCharacters() {
         characterListElement.appendChild(card);
     });
 }
+
 function switchView(viewToShow) {
     if (viewToShow === 'management') {
         // メイン画面のセクションをすべて非表示に
         mainViewSections.forEach(section => section.style.display = 'none');
         // 管理室だけを表示
         managementRoomView.style.display = 'block';
+        alignAllSliderTicks(); // 管理室表示時に再計算
     } else { // 'main' を表示する場合
         // 管理室を非表示に
         managementRoomView.style.display = 'none';
@@ -95,11 +96,40 @@ function switchView(viewToShow) {
     }
 }
 
+// ▼▼▼ 新しい関数 ▼▼▼
+/**
+ * 全てのスライダーの目盛りを正しい位置に配置する関数
+ */
+function alignAllSliderTicks() {
+    // 全ての.slider-containerに対して処理を実行
+    document.querySelectorAll('.slider-container').forEach(container => {
+        const slider = container.querySelector('input[type="range"]');
+        const ticksContainer = container.querySelector('.slider-ticks');
+        const tickSpans = ticksContainer.querySelectorAll('span');
+        
+        // スライダーの実際の幅を取得
+        const sliderWidth = slider.offsetWidth;
+        const thumbWidth = 10; // ツマミの幅（CSSで指定したもの）
+        
+        // ツマミが移動できる実際の幅を計算
+        const trackWidth = sliderWidth - thumbWidth;
+        const numTicks = tickSpans.length;
+
+        tickSpans.forEach((span, index) => {
+            // 各目盛りの位置を計算
+            // (ツマミの半分の幅) + (区間ごとの幅) * index
+            const position = (thumbWidth / 2) + (trackWidth / (numTicks - 1)) * index;
+            
+            // 計算した位置をCSSのleftプロパティに設定
+            span.style.left = `${position}px`;
+        });
+    });
+}
+
 // --- イベントリスナーの設定 ---
 managementButton.addEventListener('click', () => switchView('management'));
 backToMainButton.addEventListener('click', () => switchView('main'));
 
-// ▼▼▼ ここから追加 ▼▼▼
 // フォームが送信されたときの処理
 addCharacterForm.addEventListener('submit', (event) => {
     event.preventDefault(); // フォームのデフォルトの送信動作をキャンセル
@@ -147,7 +177,9 @@ for (const key in personalityInputs) {
         personalityValues[key].textContent = event.target.value;
     });
 }
-// ▲▲▲ ここまで追加 ▲▲▲
+
+// 画面のリサイズ時にも再計算する
+window.addEventListener('resize', alignAllSliderTicks);
 
 // --- 初期化処理 ---
 
@@ -159,3 +191,4 @@ updateDateTime();
 renderCharacters();
 // アプリケーション開始時はメイン画面を表示
 switchView('main');
+alignAllSliderTicks(); // 初回読み込み時にも実行
