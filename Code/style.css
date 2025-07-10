@@ -124,3 +124,34 @@ button {
 button:hover {
     background-color: #7a7a7a;
 }
+
+/* 画面切り替え用のスタイル */
+.view {
+    display: none; /* .viewクラスを持つ要素は初期状態で非表示 */
+}
+
+/* 管理室のフォームスタイル */
+#add-character-form {
+    background-color: #4f4f4f;
+    padding: 15px;
+    border-radius: 4px;
+    margin: 15px 0;
+}
+
+.form-item {
+    margin-bottom: 10px;
+}
+
+.form-item label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-item input {
+    width: 95%;
+    padding: 8px;
+    background-color: #3d3d3d;
+    border: 1px solid #777;
+    color: #e0e0e0;
+    border-radius: 4px;
+}

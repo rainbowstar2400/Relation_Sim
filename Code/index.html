@@ -46,6 +46,29 @@
                     <p><span class="log-time">[08:45]</span> <span class="log-system">SYSTEM:</span> 信頼度が上昇しました。</p>
                 </div>
             </section>
+
+            <section id="management-room" class="view">
+            <h2>▼ 管理室</h2>
+
+            <button id="show-add-form-button">+ キャラクター追加</button>
+
+            <form id="add-character-form">
+                <h3>キャラクター追加フォーム</h3>
+                
+                <div class="form-item">
+                    <label for="char-name">名前:</label>
+                    <input type="text" id="char-name" required>
+                </div>
+                
+                <button type="submit">追加する</button>
+            </form>
+
+            <h3>▼ 既存キャラクター一覧</h3>
+            <ul id="character-list-in-mgmt">
+                </ul>
+            <button id="back-to-main-button">メイン画面に戻る</button>
+        </section>
+        
         </main>
     </div>
     <script src="app.js" defer></script> </body>

@@ -1,6 +1,4 @@
 // --- データ定義 ---
-// 仕様書 6.2 を参考に、キャラクターの元になるデータを作成します。
-// まずは名前だけを持つシンプルな形で定義します。
 const characters = [
     { id: 'char_001', name: '碧' },
     { id: 'char_002', name: '彩花' },
@@ -11,9 +9,16 @@ const characters = [
 
 // --- DOM要素の取得 ---
 // HTMLの各要素をJavaScriptで操作するために、あらかじめ取得しておきます。
+// メイン画面の要素
+const mainView = document.querySelector('main'); // main全体を取得
 const timeElement = document.getElementById('time');
 const dateElement = document.getElementById('date');
 const characterListElement = document.querySelector('.character-list');
+
+// 管理室画面の要素
+const managementRoomView = document.getElementById('management-room');
+const backToMainButton = document.getElementById('back-to-main-button');
+const managementButton = document.querySelector('.top-menu button:first-child'); // 上部メニューの「管理室」ボタン
 
 // --- 関数定義 ---
 
@@ -56,6 +61,35 @@ function renderCharacters() {
     });
 }
 
+/**
+ * 画面を切り替える関数
+ * @param {string} viewToShow - 'main' または 'management'
+ */
+function switchView(viewToShow) {
+    if (viewToShow === 'management') {
+        // mainの中の直接の子要素（section）をすべて非表示に
+        mainView.querySelectorAll(':scope > section').forEach(s => s.style.display = 'none');
+        // 管理室だけを表示
+        managementRoomView.style.display = 'block';
+    } else { // 'main' を表示する場合
+        // 管理室を非表示に
+        managementRoomView.style.display = 'none';
+        // mainの中の直接の子要素（section）をすべて表示
+        mainView.querySelectorAll(':scope > section').forEach(s => s.style.display = 'block');
+    }
+}
+
+
+// --- イベントリスナーの設定 ---
+managementButton.addEventListener('click', () => {
+    switchView('management');
+});
+
+backToMainButton.addEventListener('click', () => {
+    switchView('main');
+});
+
+
 // --- 初期化処理 ---
 
 // 1秒ごと（1000ミリ秒）に updateDateTime 関数を呼び出し、時計を動かす
@@ -64,3 +98,5 @@ setInterval(updateDateTime, 1000);
 // 最初に一度、関数を呼び出して画面に表示する
 updateDateTime();
 renderCharacters();
+// アプリケーション開始時はメイン画面を表示
+switchView('main');
