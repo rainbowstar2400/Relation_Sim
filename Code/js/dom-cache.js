@@ -70,4 +70,23 @@ export function initDomCache() {
     dom.mbtiQuestionsArea = document.getElementById('mbti-questions-area');
     dom.mbtiResultArea = document.getElementById('mbti-result-area');
     dom.mbtiResultText = document.getElementById('mbti-result-text');
+
+    // ステータス画面要素
+    dom.statusView = document.getElementById('character-status-view');
+    dom.statusBackButton = document.getElementById('back-to-main-from-status');
+    dom.statusName = document.getElementById('status-name');
+    dom.statusMbti = document.getElementById('status-mbti');
+    dom.statusTalkPreset = document.getElementById('status-talk-preset');
+    dom.statusFirstPerson = document.getElementById('status-first-person');
+    dom.statusSuffix = document.getElementById('status-suffix');
+    dom.statusCondition = document.getElementById('status-condition');
+    dom.statusPersonality = {
+        social: document.getElementById('status-social'),
+        kindness: document.getElementById('status-kindness'),
+        stubbornness: document.getElementById('status-stubbornness'),
+        activity: document.getElementById('status-activity'),
+        expressiveness: document.getElementById('status-expressiveness'),
+    };
+    dom.statusRelations = document.getElementById('status-relations');
+    dom.statusEvents = document.getElementById('status-events');
 }

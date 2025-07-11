@@ -9,6 +9,7 @@ import { exportState, importStateFromFile } from './storage.js';
 export function setupEventListeners() {
     dom.managementButton.addEventListener('click', () => switchView('management'));
     dom.backToMainButton.addEventListener('click', () => switchView('main'));
+    dom.statusBackButton.addEventListener('click', () => switchView('main'));
     dom.saveButton.addEventListener('click', () => exportState(state));
     dom.loadButton.addEventListener('click', () => dom.loadFileInput.click());
     dom.loadFileInput.addEventListener('change', (e) => {
