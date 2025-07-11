@@ -2,7 +2,7 @@ import { dom } from './dom-cache.js';
 import { state, defaultAffections, mbtiDescriptions } from './state.js';
 import { calculateMbti } from './mbti-diagnosis.js';
 import { renderCharacters, renderManagementList } from './character-render.js';
-import { renderRelationshipEditor, updateConfiguredRelationshipsList, clearRelationshipInputs } from './relationship-editor.js';
+import { renderRelationshipEditor } from './relationship-editor.js';
 import { switchView, resetFormState, alignAllSliderTicks } from './view-switcher.js';
 import { saveState } from './storage.js';
 
@@ -175,6 +175,31 @@ export function setupFormHandlers() {
         dom.relationshipEditor.affectionFromOtherValue.textContent = defaultValue;
     });
 
+    dom.relationshipEditor.targetSelect.addEventListener('change', (event) => {
+        const targetId = event.target.value;
+        if (!targetId) return;
+        const targetChar = state.characters.find(c => c.id === targetId);
+        const currentChar = state.characters.find(c => c.id === state.currentlyEditingId);
+        const existing = state.tempRelations[targetId];
+        if (existing) {
+            dom.relationshipEditor.typeSelect.value = existing.type;
+            dom.relationshipEditor.nicknameToOtherInput.value = existing.nicknameTo;
+            dom.relationshipEditor.nicknameFromOtherInput.value = existing.nicknameFrom;
+            dom.relationshipEditor.affectionToOtherSlider.value = existing.affectionTo;
+            dom.relationshipEditor.affectionFromOtherSlider.value = existing.affectionFrom;
+            dom.relationshipEditor.affectionToOtherValue.textContent = existing.affectionTo;
+            dom.relationshipEditor.affectionFromOtherValue.textContent = existing.affectionFrom;
+        } else {
+            dom.relationshipEditor.nicknameToOtherInput.value = targetChar ? targetChar.name : '';
+            dom.relationshipEditor.nicknameFromOtherInput.value = currentChar ? currentChar.name : '';
+            const defaultValue = defaultAffections[dom.relationshipEditor.typeSelect.value] || 0;
+            dom.relationshipEditor.affectionToOtherSlider.value = defaultValue;
+            dom.relationshipEditor.affectionFromOtherSlider.value = defaultValue;
+            dom.relationshipEditor.affectionToOtherValue.textContent = defaultValue;
+            dom.relationshipEditor.affectionFromOtherValue.textContent = defaultValue;
+        }
+    });
+
     dom.relationshipEditor.affectionToOtherSlider.addEventListener('input', (e) => {
         dom.relationshipEditor.affectionToOtherValue.textContent = e.target.value;
     });
@@ -196,8 +221,36 @@ export function setupFormHandlers() {
             affectionFrom: parseInt(dom.relationshipEditor.affectionFromOtherSlider.value)
         };
         alert(`「${state.characters.find(c => c.id === targetId).name}」との関係を一時保存しました。`);
-        updateConfiguredRelationshipsList();
-        clearRelationshipInputs();
+        renderRelationshipEditor();
+    });
+
+    dom.relationshipEditor.displayList.addEventListener('click', (e) => {
+        if (e.target.classList.contains('edit-relation-button')) {
+            const targetId = e.target.dataset.id;
+            const data = state.tempRelations[targetId];
+            if (data) {
+                if (!Array.from(dom.relationshipEditor.targetSelect.options).some(o => o.value === targetId)) {
+                    const option = document.createElement('option');
+                    option.value = targetId;
+                    option.textContent = state.characters.find(c => c.id === targetId)?.name || '';
+                    dom.relationshipEditor.targetSelect.appendChild(option);
+                }
+                dom.relationshipEditor.targetSelect.value = targetId;
+                dom.relationshipEditor.typeSelect.value = data.type;
+                dom.relationshipEditor.nicknameToOtherInput.value = data.nicknameTo;
+                dom.relationshipEditor.nicknameFromOtherInput.value = data.nicknameFrom;
+                dom.relationshipEditor.affectionToOtherSlider.value = data.affectionTo;
+                dom.relationshipEditor.affectionFromOtherSlider.value = data.affectionFrom;
+                dom.relationshipEditor.affectionToOtherValue.textContent = data.affectionTo;
+                dom.relationshipEditor.affectionFromOtherValue.textContent = data.affectionFrom;
+            }
+        } else if (e.target.classList.contains('delete-relation-button')) {
+            const targetId = e.target.dataset.id;
+            if (confirm('この関係を削除してもよろしいですか？')) {
+                delete state.tempRelations[targetId];
+                renderRelationshipEditor();
+            }
+        }
     });
 
     window.addEventListener('resize', alignAllSliderTicks);
