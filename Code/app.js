@@ -345,6 +345,7 @@ const mbtiDiagModeBtn = document.getElementById('mbti-diag-mode-btn');
 const mbtiManualModeBtn = document.getElementById('mbti-manual-mode-btn');
 const mbtiDiagnosisView = document.getElementById('mbti-diagnosis-view');
 const mbtiManualView = document.getElementById('mbti-manual-view');
+let mbtiMode = 'diag'; // 現在のMBTI入力モードを保持
 
 // ▼▼▼ MBTI診断フロー用のイベントリスナーを追加 ▼▼▼
 const startDiagButton = document.getElementById('start-diag-button');
@@ -396,6 +397,7 @@ mbtiDiagModeBtn.addEventListener('click', () => {
     mbtiManualView.style.display = 'none';
     mbtiDiagModeBtn.classList.add('active');
     mbtiManualModeBtn.classList.remove('active');
+    mbtiMode = 'diag';
 });
 
 mbtiManualModeBtn.addEventListener('click', () => {
@@ -403,6 +405,7 @@ mbtiManualModeBtn.addEventListener('click', () => {
     mbtiManualView.style.display = 'block';
     mbtiDiagModeBtn.classList.remove('active');
     mbtiManualModeBtn.classList.add('active');
+    mbtiMode = 'manual';
 });
 
 // フォームが送信されたときの処理
@@ -418,23 +421,16 @@ addCharacterForm.addEventListener('submit', (event) => {
     };
 
     // MBTIの値を収集・計算
-    const mbtiSliderValues = [];
+    let mbtiSliderValues = [];
     for (let i = 1; i <= 16; i++) {
         mbtiSliderValues.push(parseInt(mbtiInputs[`q${i}`].value));
     }
-    const mbtiResult = calculateMbti(mbtiSliderValues, personality);
 
-    // 診断モードが選択されている場合
-    if (mbtiDiagModeRadio.checked) {
-        for (let i = 1; i <= 16; i++) {
-            mbtiSliderValues.push(parseInt(mbtiInputs[`q${i}`].value));
-        }
+    let mbtiResult;
+    if (mbtiMode === 'diag') {
         mbtiResult = calculateMbti(mbtiSliderValues, personality);
-    }
-    // 手動モードが選択されている場合
-    else {
+    } else {
         mbtiResult = mbtiManualSelect.value;
-        // 手動設定の場合、スライダーの値は空にする
         mbtiSliderValues = [];
     }
 
@@ -683,22 +679,6 @@ relationshipEditor.saveButton.addEventListener('click', () => {
     clearRelationshipInputs();
 });
 
-relationshipEditor.saveButton.addEventListener('click', () => {
-    const selfId = currentlyEditingId || `new_${addCharacterForm.dataset.newId}`;
-    const targetId = relationshipEditor.targetSelect.value;
-    const type = relationshipEditor.typeSelect.value;
-
-    if (!targetId) {
-        alert('相手を選択してください。');
-        return;
-    }
-
-    // TODO: ここでrelationshipsとnicknames配列を更新する処理を追加
-    alert(`「${selfId}」と「${targetId}」の関係を「${type}」に設定します。（保存処理は未実装）`);
-
-    // UIを更新（仮）
-    updateConfiguredRelationshipsList();
-});
 
 // 画面のリサイズ時にも再計算する
 window.addEventListener('resize', alignAllSliderTicks);
