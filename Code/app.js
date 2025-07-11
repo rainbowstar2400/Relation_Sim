@@ -410,6 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // フォームが送信されたときの処理
     addCharacterForm.addEventListener('submit', (event) => {
         event.preventDefault(); // フォームのデフォルトの送信動作をキャンセル
+        const isDiagMode = mbtiDiagModeBtn.classList.contains('active');
 
         const personality = {
             social: parseInt(personalityInputs.social.value),
@@ -424,7 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let mbtiResult;
 
         // 診断モードが選択されている場合
-        if (mbtiDiagModeRadio.checked) {
+        if (isDiagMode) {
             for (let i = 1; i <= 16; i++) {
                 mbtiSliderValues.push(parseInt(mbtiInputs[`q${i}`].value));
             }
