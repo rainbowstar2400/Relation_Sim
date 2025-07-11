@@ -255,7 +255,7 @@ export function initializeApp() {
         const displayList = relationshipEditor.displayList;
         displayList.innerHTML = '';
         // "自分"のID (追加モードなら新しいID、編集モードなら既存ID)
-        const configuredIds = Object.keys(tempRelations);
+        const configuredIds = Object.keys(state.tempRelations);
 
         if (configuredIds.length === 0) {
             displayList.innerHTML = '<p>設定済みの関係はありません。</p>';
