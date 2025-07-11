@@ -7,6 +7,14 @@ let characters = [ // letに変更して、後から追加できるようにす�
 let currentlyEditingId = null;
 let relationships = []; // 関係ラベルを保存
 let nicknames = []; // 呼び方を保存
+const defaultAffections = {
+    'なし': 0,
+    '認知': 5,
+    '友達': 20,
+    '親友': 40,
+    '恋人': 50,
+    '家族': 50
+};
 let tempRelations = {}; // ▼▼▼ 追加: フォーム内で設定した関係を一時保存するオブジェクト
 const mbtiDescriptions = {
     INFP: "控えめだけど思慮深く、感受性豊かなタイプのようです。",
@@ -58,6 +66,12 @@ const showAddFormButton = document.getElementById('show-add-form-button'); // �
 const relationshipEditor = {
     targetSelect: document.getElementById('relationship-target-select'),
     typeSelect: document.getElementById('relationship-type-select'),
+    // ▼▼▼ 以下を追加 ▼▼▼
+    affectionToOtherSlider: document.getElementById('affection-to-other'),
+    affectionToOtherValue: document.getElementById('affection-to-other-value'),
+    affectionFromOtherSlider: document.getElementById('affection-from-other'),
+    affectionFromOtherValue: document.getElementById('affection-from-other-value'),
+    // ▲▲▲ ここまで追加 ▲▲▲
     nicknameToOtherInput: document.getElementById('nickname-to-other-input'),
     nicknameFromOtherInput: document.getElementById('nickname-from-other-input'),
     saveButton: document.getElementById('save-relationship-button'),
@@ -594,6 +608,28 @@ managementCharacterList.addEventListener('click', (event) => {
 
         renderRelationshipEditor();
     }
+});
+
+// ▼▼▼ 新しいイベントリスナーを追加 ▼▼▼
+relationshipEditor.typeSelect.addEventListener('change', (event) => {
+    const selectedType = event.target.value;
+    const defaultValue = defaultAffections[selectedType] || 0;
+
+    // スライダーの値を更新
+    relationshipEditor.affectionToOtherSlider.value = defaultValue;
+    relationshipEditor.affectionFromOtherSlider.value = defaultValue;
+
+    // スライダー横の数値表示も更新
+    relationshipEditor.affectionToOtherValue.textContent = defaultValue;
+    relationshipEditor.affectionFromOtherValue.textContent = defaultValue;
+});
+
+// スライダーを動かした時に横の数値を更新する処理も追加
+relationshipEditor.affectionToOtherSlider.addEventListener('input', (e) => {
+    relationshipEditor.affectionToOtherValue.textContent = e.target.value;
+});
+relationshipEditor.affectionFromOtherSlider.addEventListener('input', (e) => {
+    relationshipEditor.affectionFromOtherValue.textContent = e.target.value;
 });
 
 // ▼▼▼ `relationshipEditor.saveButton` のイベントリスナーを実装 ▼▼▼
