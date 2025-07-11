@@ -1,11 +1,10 @@
 // --- データ定義 ---
 let characters = [ // letに変更して、後から追加できるようにする
-    { id: 'char_001', name: '碧', personality: { social: 4, kindness: 3, stubbornness: 2, activity: 5, expressiveness: 4 } },
-    { id: 'char_002', name: '彩花', personality: { social: 5, kindness: 4, stubbornness: 1, activity: 3, expressiveness: 5 } },
-    { id: 'char_003', name: '志音', personality: { social: 2, kindness: 5, stubbornness: 4, activity: 2, expressiveness: 2 } },
+    { id: 'char_001', name: '碧', personality: { social: 4, kindness: 3, stubbornness: 2, activity: 5, expressiveness: 4 }, mbti: 'INFP', mbti_slider: [], talk_style: { preset: 'くだけた', first_person: '俺', suffix: '〜じゃん' }, activityPattern: '夜型' },
+    { id: 'char_002', name: '彩花', personality: { social: 5, kindness: 4, stubbornness: 1, activity: 3, expressiveness: 5 }, mbti: 'ESFJ', mbti_slider: [], talk_style: { preset: '丁寧', first_person: '私', suffix: '〜です' }, activityPattern: '朝型' },
+    { id: 'char_003', name: '志音', personality: { social: 2, kindness: 5, stubbornness: 4, activity: 2, expressiveness: 2 }, mbti: 'ISFP', mbti_slider: [], talk_style: { preset: 'くだけた', first_person: 'ボク', suffix: '〜だよ' }, activityPattern: '通常' },
 ];
 let currentlyEditingId = null;
-
 const mbtiDescriptions = {
     INFP: "控えめだけど思慮深く、感受性豊かなタイプのようです。",
     INFJ: "物静かですが、強い信念を内に秘めている理想主義者です。",
@@ -43,12 +42,19 @@ const managementRoomView = document.getElementById('management-room');
 const backToMainButton = document.getElementById('back-to-main-button');
 const managementButton = document.querySelector('.top-menu button:first-child'); // 上部メニューの「管理室」ボタン
 
-
 const addCharacterForm = document.getElementById('add-character-form');
 const charNameInput = document.getElementById('char-name');
 const managementCharacterList = document.getElementById('character-list-in-mgmt');
 const formTitle = document.getElementById('form-title');
 const submitButton = document.querySelector('#add-character-form button[type="submit"]');
+
+// 話し方の要素
+const talkStylePreset = document.querySelector('input[name="talk-preset"]:checked'); // この時点ではまだないため、後で取得
+const talkFirstPersonInput = document.getElementById('talk-first-person');
+const talkSuffixInput = document.getElementById('talk-suffix');
+
+// 活動パターンの要素
+const activityPattern = document.querySelector('input[name="activity-pattern"]:checked'); // この時点ではまだないため、後で取得
 
 // 性格スライダーの要素
 const personalityInputs = {
@@ -335,13 +341,21 @@ addCharacterForm.addEventListener('submit', (event) => {
             mbtiSliderValues.push(parseInt(mbtiInputs[`q${i}`].value));
         }
         mbtiResult = calculateMbti(mbtiSliderValues, personality);
-    } 
+    }
     // 手動モードが選択されている場合
     else {
         mbtiResult = mbtiManualSelect.value;
         // 手動設定の場合、スライダーの値は空にする
         mbtiSliderValues = []; 
     }
+
+    // ▼▼▼ 追加: 新しいフォームの値を取得 ▼▼▼
+    const talkStyle = {
+            preset: document.querySelector('input[name="talk-preset"]:checked').value,
+            first_person: talkFirstPersonInput.value,
+            suffix: talkSuffixInput.value,
+        };
+        const activityPatternValue = document.querySelector('input[name="activity-pattern"]:checked').value;
 
     // 編集モードの場合の処理
     if (currentlyEditingId) {
@@ -353,6 +367,8 @@ addCharacterForm.addEventListener('submit', (event) => {
             charToUpdate.personality = personality;
             charToUpdate.mbti = mbtiResult;
             charToUpdate.mbti_slider = mbtiSliderValues;
+            charToUpdate.talk_style = talkStyle;
+            charToUpdate.activityPattern = activityPatternValue;
         }
     // 追加モードの場合の処理
     } else {
@@ -364,6 +380,8 @@ addCharacterForm.addEventListener('submit', (event) => {
             personality,
             mbti: mbtiResult,
             mbti_slider: mbtiSliderValues,
+            talk_style: talkStyle, // ▼▼▼ 追加
+            activityPattern: activityPatternValue, // ▼▼▼ 追加
         });
     }
     
@@ -434,10 +452,16 @@ managementCharacterList.addEventListener('click', (event) => {
             }
 
             // 手動選択プルダウンにも値を反映
-                if (characterToEdit.mbti) {
-                    mbtiManualSelect.value = characterToEdit.mbti;
-                }
-            
+            if (characterToEdit.mbti) {
+                mbtiManualSelect.value = characterToEdit.mbti;
+            }
+                
+            // ▼▼▼ 追加: 新しいフォームに値を設定 ▼▼▼
+            document.querySelector(`input[name="talk-preset"][value="${characterToEdit.talk_style.preset}"]`).checked = true;
+            talkFirstPersonInput.value = characterToEdit.talk_style.first_person;
+            talkSuffixInput.value = characterToEdit.talk_style.suffix;
+            document.querySelector(`input[name="activity-pattern"][value="${characterToEdit.activityPattern}"]`).checked = true;
+
             // フォームが見えるようにスクロールする（UX向上のため）
             addCharacterForm.scrollIntoView({ behavior: 'smooth' });
         }

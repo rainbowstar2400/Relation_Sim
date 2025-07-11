@@ -374,3 +374,12 @@ input[type="range"]::-moz-range-thumb {
     border: 1px solid #777;
     border-radius: 4px;
 }
+
+/* ラジオボタンのグループスタイル */
+.radio-group label {
+    flex-basis: auto; /* 幅を自動に */
+    margin-right: 20px;
+}
+.radio-group input[type="radio"] {
+    margin-right: 5px;
+}
