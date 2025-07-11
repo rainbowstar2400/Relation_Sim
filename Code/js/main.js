@@ -1,3 +1,9 @@
+import {
+  state,
+  defaultAffections,
+  mbtiDescriptions
+} from './data.js';
+
 export function initializeApp() {
 
     // --- DOM要素の取得 ---
@@ -101,7 +107,7 @@ export function initializeApp() {
         characterListElement.innerHTML = '';
 
         // characters配列の各キャラクターデータに対して処理を行う
-        characters.forEach(char => {
+        state.characters.forEach(char => {
             // 新しいdiv要素（キャラクターカード）を作成
             const card = document.createElement('div');
             // CSSで定義した 'character-card' クラスを適用
@@ -121,7 +127,7 @@ export function initializeApp() {
         managementCharacterList.innerHTML = '';
 
         // キャラクターごとにリスト項目を作成
-        characters.forEach(char => {
+        state.characters.forEach(char => {
             const listItem = document.createElement('li');
 
             // キャラクター名を格納するspan
@@ -186,7 +192,7 @@ export function initializeApp() {
         targetSelect.innerHTML = '<option value="">--選択してください--</option>';
 
         // 自分以外のキャラクターを取得
-        const otherCharacters = characters.filter(c => c.id !== currentlyEditingId);
+        const otherCharacters = state.characters.filter(c => c.id !== state.currentlyEditingId);
         otherCharacters.forEach(char => {
             const option = document.createElement('option');
             option.value = char.id;
@@ -208,12 +214,12 @@ export function initializeApp() {
         for (const key in personalityValues) {
             personalityValues[key].textContent = '3';
         }
-        currentlyEditingId = null; // 編集モードを解除
+        state.currentlyEditingId = null; // 編集モードを解除
 
         addCharacterForm.style.display = 'none'; // フォームを隠す
         showAddFormButton.style.display = 'block'; // 「＋」ボタンを表示
 
-        tempRelations = {}; // ▼▼▼ 追加: 一時的な関係データもリセット
+        state.tempRelations = {}; // ▼▼▼ 追加: 一時的な関係データもリセット
     }
 
     /**
@@ -488,14 +494,14 @@ export function initializeApp() {
 
     // ▼▼▼ 「＋キャラクター追加」ボタンのイベントリスナーを追加 ▼▼▼
     showAddFormButton.addEventListener('click', () => {
-        currentlyEditingId = null; // 必ず追加モードにする
+        state.currentlyEditingId = null; // 必ず追加モードにする
         resetFormState(); // フォームの中身をリセット
         formTitle.textContent = 'キャラクター追加フォーム';
         submitButton.textContent = '追加する';
         addCharacterForm.style.display = 'block'; // フォームを表示
         showAddFormButton.style.display = 'none'; // 「＋」ボタンを隠す
         addCharacterForm.dataset.newId = 'char_' + Date.now(); // 追加モード用に仮IDを振る
-        tempRelations = {}; // ▼▼▼ 追加: 追加モード開始時にリセット
+        state.tempRelations = {}; // ▼▼▼ 追加: 追加モード開始時にリセット
         renderRelationshipEditor(); // 関係設定フォームを描画
     });
 

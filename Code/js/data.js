@@ -1,13 +1,47 @@
 // --- データ定義 ---
-let characters = [ // letに変更して、後から追加できるようにする
-    { id: 'char_001', name: '碧', personality: { social: 4, kindness: 3, stubbornness: 2, activity: 5, expressiveness: 4 }, mbti: 'INFP', mbti_slider: [], talk_style: { preset: 'くだけた', first_person: '俺', suffix: '〜じゃん' }, activityPattern: '夜型', interests: ['読書', '散歩'] },
-    { id: 'char_002', name: '彩花', personality: { social: 5, kindness: 4, stubbornness: 1, activity: 3, expressiveness: 5 }, mbti: 'ESFJ', mbti_slider: [], talk_style: { preset: '丁寧', first_person: '私', suffix: '〜です' }, activityPattern: '朝型', interests: ['お菓子作り', 'カフェ巡り'] },
-    { id: 'char_003', name: '志音', personality: { social: 2, kindness: 5, stubbornness: 4, activity: 2, expressiveness: 2 }, mbti: 'ISFP', mbti_slider: [], talk_style: { preset: 'くだけた', first_person: 'ボク', suffix: '〜だよ' }, activityPattern: '通常', interests: ['音楽鑑賞'] },
-];
-let currentlyEditingId = null;
-let relationships = []; // 関係ラベルを保存
-let nicknames = []; // 呼び方を保存
-const defaultAffections = {
+export let state = {
+
+    characters: [
+        {
+            id: 'char_001',
+            name: '碧',
+            personality: { social: 4, kindness: 3, stubbornness: 2, activity: 5, expressiveness: 4 },
+            mbti: 'INFP',
+            mbti_slider: [],
+            talk_style: { preset: 'くだけた', first_person: '俺', suffix: '〜じゃん' },
+            activityPattern: '夜型',
+            interests: ['読書', '散歩']
+        },
+        {
+            id: 'char_002',
+            name: '彩花',
+            personality: { social: 5, kindness: 4, stubbornness: 1, activity: 3, expressiveness: 5 },
+            mbti: 'ESFJ',
+            mbti_slider: [],
+            talk_style: { preset: '丁寧', first_person: '私', suffix: '〜です' },
+            activityPattern: '朝型',
+            interests: ['お菓子作り', 'カフェ巡り']
+        },
+        {
+            id: 'char_003',
+            name: '志音',
+            personality: { social: 2, kindness: 5, stubbornness: 4, activity: 2, expressiveness: 2 },
+            mbti: 'ISFP',
+            mbti_slider: [],
+            talk_style: { preset: 'くだけた', first_person: 'ボク', suffix: '〜だよ' },
+            activityPattern: '通常',
+            interests: ['音楽鑑賞']
+        }
+    ],
+
+    relationships: [], // 関係ラベルを保存
+    nicknames: [], // 呼び方を保存
+    affections: [], // 好感度を保存
+    currentlyEditingId: null,
+    tempRelations: {},
+};
+
+export const defaultAffections = {
     'なし': 0,
     '認知': 5,
     '友達': 20,
@@ -15,9 +49,8 @@ const defaultAffections = {
     '恋人': 50,
     '家族': 50
 };
-let affections = []; // ▼▼▼ 好感度を保存する配列を追加
-let tempRelations = {}; // ▼▼▼ 追加: フォーム内で設定した関係を一時保存するオブジェクト
-const mbtiDescriptions = {
+
+export const mbtiDescriptions = {
     INFP: "控えめだけど思慮深く、感受性豊かなタイプのようです。",
     INFJ: "物静かですが、強い信念を内に秘めている理想主義者です。",
     INTP: "知的な探求心が旺盛で、ユニークな視点を持つアイデアマンです。",
