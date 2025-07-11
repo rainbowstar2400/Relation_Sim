@@ -1,0 +1,160 @@
+/* 全体のスタイル (中間テーマ) */
+body {
+    background-color: #454545; /* 少し明るいグレーの背景 */
+    color: #e0e0e0; /* 文字色も少し柔らかく */
+    font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+#app-container {
+    max-width: 800px;
+    margin: 0 auto;
+    border: 1px solid #666;
+    background-color: #3d3d3d; /* コンテナも少し明るく */
+    padding: 15px;
+    border-radius: 8px;
+}
+
+/* 上部メニュー */
+.top-menu {
+    display: flex;
+    align-items: center;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #555;
+    margin-bottom: 20px;
+}
+
+.datetime {
+    margin-left: auto;
+    text-align: right;
+}
+
+#time {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+/* 各セクションの共通スタイル */
+section {
+    margin-bottom: 25px;
+}
+
+h2 {
+    font-size: 1em;
+    color: #b0b0b0; /* ヘッダー文字を少し明るく */
+    border-bottom: 1px solid #555;
+    padding-bottom: 5px;
+}
+
+/* みんなの様子エリア */
+.character-list {
+    display: flex;
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+
+.character-card {
+    flex-shrink: 0;
+    width: 100px;
+    height: 60px;
+    background-color: #555555;
+    border: 1px solid #777;
+    border-radius: 4px;
+    margin-right: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 困りごと相談エリア */
+.consultation-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px;
+    background-color: #4f4f4f;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+/* ログ表示エリア (CLI風) - ここは黒を維持してメリハリをつけます */
+.log-display .log-content {
+    background-color: #1e1e1e;
+    border: 1px solid #555;
+    padding: 15px;
+    height: 200px;
+    overflow-y: auto;
+    font-family: 'Consolas', 'Monaco', monospace;
+    border-radius: 4px;
+    color: #f0f0f0;
+}
+
+.log-content p {
+    margin: 0 0 5px 0;
+}
+
+.log-time {
+    color: #999;
+}
+
+.log-event {
+    color: #4eb0db;
+    font-weight: bold;
+}
+
+.log-system {
+    color: #ffb74d; /* 少し優しいオレンジに */
+    font-weight: bold;
+}
+
+.log-dialogue {
+    padding-left: 20px;
+}
+
+/* ボタンの共通スタイル */
+button {
+    background-color: #686868;
+    color: #f0f0f0;
+    border: 1px solid #888;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #7a7a7a;
+}
+
+/* 画面切り替え用のスタイル */
+.view {
+    display: none; /* .viewクラスを持つ要素は初期状態で非表示 */
+}
+
+/* 管理室のフォームスタイル */
+#add-character-form {
+    background-color: #4f4f4f;
+    padding: 15px;
+    border-radius: 4px;
+    margin: 15px 0;
+}
+
+#add-character-form h4 {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.form-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px; /* スライダー間の余白を広げる */
+}
+
+.form-item label {
+    flex-basis: 180px;
+    flex-shrink: 0;
+}
+
+.form-item input[type="text"] {
+    flex-grow: 1;
+}
+
