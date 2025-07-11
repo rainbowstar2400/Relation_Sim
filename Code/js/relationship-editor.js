@@ -4,7 +4,8 @@ import { state } from './state.js';
 export function renderRelationshipEditor() {
     const targetSelect = dom.relationshipEditor.targetSelect;
     targetSelect.innerHTML = '<option value="">--選択してください--</option>';
-    const otherCharacters = state.characters.filter(c => c.id !== state.currentlyEditingId);
+    const existingIds = Object.keys(state.tempRelations);
+    const otherCharacters = state.characters.filter(c => c.id !== state.currentlyEditingId && !existingIds.includes(c.id));
     otherCharacters.forEach(char => {
         const option = document.createElement('option');
         option.value = char.id;
@@ -31,10 +32,18 @@ export function updateConfiguredRelationshipsList() {
                 const li = document.createElement('li');
                 li.innerHTML = `<strong>${otherChar.name}</strong>: ${relData.type}<br> (好感度: ${relData.affectionTo} / ${relData.affectionFrom} | 呼び方: ${relData.nicknameTo} / 呼ばれ方: ${relData.nicknameFrom})`;
                 const editBtn = document.createElement('button');
-                editBtn.textContent = '編集';
+                editBtn.type = 'button';
+                editBtn.textContent = '関係を編集';
                 editBtn.classList.add('edit-relation-button');
                 editBtn.dataset.id = id;
                 li.appendChild(editBtn);
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.type = 'button';
+                deleteBtn.textContent = '削除';
+                deleteBtn.classList.add('delete-relation-button');
+                deleteBtn.dataset.id = id;
+                li.appendChild(deleteBtn);
                 ul.appendChild(li);
             }
         });

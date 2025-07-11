@@ -2,7 +2,7 @@ import { dom } from './dom-cache.js';
 import { state, defaultAffections, mbtiDescriptions } from './state.js';
 import { calculateMbti } from './mbti-diagnosis.js';
 import { renderCharacters, renderManagementList } from './character-render.js';
-import { renderRelationshipEditor, updateConfiguredRelationshipsList, clearRelationshipInputs } from './relationship-editor.js';
+import { renderRelationshipEditor } from './relationship-editor.js';
 import { switchView, resetFormState, alignAllSliderTicks } from './view-switcher.js';
 import { saveState } from './storage.js';
 
@@ -221,8 +221,7 @@ export function setupFormHandlers() {
             affectionFrom: parseInt(dom.relationshipEditor.affectionFromOtherSlider.value)
         };
         alert(`「${state.characters.find(c => c.id === targetId).name}」との関係を一時保存しました。`);
-        updateConfiguredRelationshipsList();
-        clearRelationshipInputs();
+        renderRelationshipEditor();
     });
 
     dom.relationshipEditor.displayList.addEventListener('click', (e) => {
@@ -230,6 +229,12 @@ export function setupFormHandlers() {
             const targetId = e.target.dataset.id;
             const data = state.tempRelations[targetId];
             if (data) {
+                if (!Array.from(dom.relationshipEditor.targetSelect.options).some(o => o.value === targetId)) {
+                    const option = document.createElement('option');
+                    option.value = targetId;
+                    option.textContent = state.characters.find(c => c.id === targetId)?.name || '';
+                    dom.relationshipEditor.targetSelect.appendChild(option);
+                }
                 dom.relationshipEditor.targetSelect.value = targetId;
                 dom.relationshipEditor.typeSelect.value = data.type;
                 dom.relationshipEditor.nicknameToOtherInput.value = data.nicknameTo;
@@ -238,6 +243,12 @@ export function setupFormHandlers() {
                 dom.relationshipEditor.affectionFromOtherSlider.value = data.affectionFrom;
                 dom.relationshipEditor.affectionToOtherValue.textContent = data.affectionTo;
                 dom.relationshipEditor.affectionFromOtherValue.textContent = data.affectionFrom;
+            }
+        } else if (e.target.classList.contains('delete-relation-button')) {
+            const targetId = e.target.dataset.id;
+            if (confirm('この関係を削除してもよろしいですか？')) {
+                delete state.tempRelations[targetId];
+                renderRelationshipEditor();
             }
         }
     });

@@ -292,3 +292,6 @@ input[type="range"]::-moz-range-thumb {
 #configured-relationships-list .edit-relation-button {
     margin-left: 10px;
 }
+#configured-relationships-list .delete-relation-button {
+    margin-left: 5px;
+}
