@@ -15,6 +15,7 @@ const defaultAffections = {
     '恋人': 50,
     '家族': 50
 };
+let affections = []; // ▼▼▼ 好感度を保存する配列を追加
 let tempRelations = {}; // ▼▼▼ 追加: フォーム内で設定した関係を一時保存するオブジェクト
 const mbtiDescriptions = {
     INFP: "控えめだけど思慮深く、感受性豊かなタイプのようです。",
@@ -295,7 +296,7 @@ function updateConfiguredRelationshipsList() {
             const relData = tempRelations[id];
             if (otherChar) {
                 const li = document.createElement('li');
-                li.textContent = `${otherChar.name}: ${relData.type} (呼び方: ${relData.nicknameTo} / 呼ばれ方: ${relData.nicknameFrom})`;
+                li.innerHTML = `<strong>${otherChar.name}</strong>: ${relData.type}<br> (好感度: ${relData.affectionTo} / ${relData.affectionFrom} | 呼び方: ${relData.nicknameTo} / 呼ばれ方: ${relData.nicknameFrom})`;
                 ul.appendChild(li);
             }
         });
@@ -464,13 +465,16 @@ addCharacterForm.addEventListener('submit', (event) => {
             charToUpdate.activityPattern = activityPatternValue;
             charToUpdate.interests = interestsValue; // ▼▼▼ 追加
         }
+        // ▼▼▼ 編集時は、古い関係データを一度すべて削除 ▼▼▼
+        relationships = relationships.filter(r => !r.pair.includes(characterId));
+        nicknames = nicknames.filter(n => n.from !== characterId && n.to !== characterId);
+        affections = affections.filter(a => a.from !== characterId && a.to !== characterId);
 
     // 追加モードの場合の処理
     } else {
         characterId = 'char_' + Date.now();
-        const newId = 'char_' + Date.now();
         characters.push({
-            id: newId,
+            id: characterId,
             name: charNameInput.value,
             personality,
             mbti: mbtiResult,
@@ -497,11 +501,14 @@ addCharacterForm.addEventListener('submit', (event) => {
         if (relData.nicknameFrom) {
             nicknames.push({ from: targetId, to: characterId, nickname: relData.nicknameFrom });
         }
+        affections.push({ from: characterId, to: targetId, score: relData.affectionTo });
+        affections.push({ from: targetId, to: characterId, score: relData.affectionFrom });
     });
 
     console.log("Characters:", characters);
     console.log("Relationships:", relationships);
     console.log("Nicknames:", nicknames);
+    console.log("Affections:", affections);
 
     // 画面を再描画
     renderCharacters();
@@ -605,8 +612,27 @@ managementCharacterList.addEventListener('click', (event) => {
         }
 
         tempRelations = {}; // ▼▼▼ 追加: 編集モード開始時にリセット
+        
+        // ▼▼▼ 既存の関係・呼び方・好感度を読み込んでtempRelationsを構築 ▼▼▼
+        const existingRelations = relationships.filter(r => r.pair.includes(idToEdit));
+        existingRelations.forEach(rel => {
+            const targetId = rel.pair.find(id => id !== idToEdit);
+            const affectionTo = affections.find(a => a.from === idToEdit && a.to === targetId)?.score || 0;
+            const affectionFrom = affections.find(a => a.from === targetId && a.to === idToEdit)?.score || 0;
+            const nicknameTo = nicknames.find(n => n.from === idToEdit && n.to === targetId)?.nickname || '';
+            const nicknameFrom = nicknames.find(n => n.from === targetId && n.to === idToEdit)?.nickname || '';
+
+            tempRelations[targetId] = {
+                type: rel.label,
+                nicknameTo: nicknameTo,
+                nicknameFrom: nicknameFrom,
+                affectionTo: affectionTo,
+                affectionFrom: affectionFrom,
+            };
+        });
 
         renderRelationshipEditor();
+        addCharacterForm.scrollIntoView({ behavior: 'smooth' });
     }
 });
 
@@ -645,9 +671,11 @@ relationshipEditor.saveButton.addEventListener('click', () => {
         type: relationshipEditor.typeSelect.value,
         nicknameTo: relationshipEditor.nicknameToOtherInput.value,
         nicknameFrom: relationshipEditor.nicknameFromOtherInput.value,
+        affectionTo: parseInt(relationshipEditor.affectionToOtherSlider.value),
+        affectionFrom: parseInt(relationshipEditor.affectionFromOtherSlider.value)
     };
 
-    alert(`「${characters.find(c => c.id === targetId).name}」との関係を一時保存しました。`);
+    alert(`「${characters.find(c=>c.id === targetId).name}」との関係を一時保存しました。`);
 
     // UIを更新して、設定済みの関係一覧に表示
     updateConfiguredRelationshipsList();
