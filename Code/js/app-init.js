@@ -34,7 +34,7 @@ export async function initializeApp() {
     updateDateTime();
     renderCharacters();
     switchView('main');
-    alignAllSliderTicks();
+    requestAnimationFrame(alignAllSliderTicks);
 }
 
 export async function setupApp() {

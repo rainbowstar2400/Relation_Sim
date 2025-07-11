@@ -103,6 +103,7 @@ export function setupFormHandlers() {
         dom.addCharacterForm.dataset.newId = 'char_' + Date.now();
         state.tempRelations = {};
         renderRelationshipEditor();
+        requestAnimationFrame(alignAllSliderTicks);
     });
 
     dom.managementCharacterList.addEventListener('click', (event) => {
@@ -142,6 +143,7 @@ export function setupFormHandlers() {
                 dom.showAddFormButton.style.display = 'none';
                 dom.interestsInput.value = characterToEdit.interests ? characterToEdit.interests.join(', ') : '';
                 dom.addCharacterForm.scrollIntoView({ behavior: 'smooth' });
+                requestAnimationFrame(alignAllSliderTicks);
             }
             state.tempRelations = {};
             const existingRelations = state.relationships.filter(r => r.pair.includes(idToEdit));
