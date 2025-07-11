@@ -418,7 +418,7 @@ export function initializeApp() {
         let characterId;
 
         // 編集モードの場合の処理
-        if (currentlyEditingId) {
+        if (state.currentlyEditingId) {
             characterId = currentlyEditingId;
 
             // 更新対象のキャラクターを探す
@@ -440,8 +440,8 @@ export function initializeApp() {
 
             // 追加モードの場合の処理
         } else {
-            characterId = 'char_' + Date.now();
-            characters.push({
+            state.characterId = 'char_' + Date.now();
+            state.characters.push({
                 id: characterId,
                 name: charNameInput.value,
                 personality,
@@ -454,7 +454,7 @@ export function initializeApp() {
         }
 
         // ▼▼▼ 追加: 一時保存した関係を、正式なデータに登録 ▼▼▼
-        Object.keys(tempRelations).forEach(targetId => {
+        Object.keys(state.tempRelations).forEach(targetId => {
             const relData = tempRelations[targetId];
 
             // 関係データを保存
@@ -473,10 +473,10 @@ export function initializeApp() {
             affections.push({ from: targetId, to: characterId, score: relData.affectionFrom });
         });
 
-        console.log("Characters:", characters);
-        console.log("Relationships:", relationships);
-        console.log("Nicknames:", nicknames);
-        console.log("Affections:", affections);
+        console.log("Characters:", state.characters);
+        console.log("Relationships:", state.relationships);
+        console.log("Nicknames:", state.nicknames);
+        console.log("Affections:", state.affections);
 
         // 画面を再描画
         renderCharacters();
