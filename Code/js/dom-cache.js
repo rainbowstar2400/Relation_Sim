@@ -16,6 +16,9 @@ export function initDomCache() {
     dom.managementRoomView = document.getElementById('management-room');
     dom.backToMainButton = document.getElementById('back-to-main-button');
     dom.managementButton = document.querySelector('.top-menu button:first-child');
+    dom.saveButton = document.getElementById('save-button');
+    dom.loadButton = document.getElementById('load-button');
+    dom.loadFileInput = document.getElementById('load-file-input');
 
     dom.addCharacterForm = document.getElementById('add-character-form');
     dom.charNameInput = document.getElementById('char-name');

@@ -2,6 +2,8 @@ import { initDomCache, dom } from './dom-cache.js';
 import { setupEventListeners } from './event-listeners.js';
 import { renderCharacters } from './character-render.js';
 import { switchView, alignAllSliderTicks } from './view-switcher.js';
+import { loadState } from './storage.js';
+import { state } from './state.js';
 
 function updateDateTime() {
     const now = new Date();
@@ -23,6 +25,10 @@ export async function loadHTML(id, file) {
 
 export async function initializeApp() {
     initDomCache();
+    const saved = loadState();
+    if (saved) {
+        Object.assign(state, saved);
+    }
     setupEventListeners();
     setInterval(updateDateTime, 1000);
     updateDateTime();
