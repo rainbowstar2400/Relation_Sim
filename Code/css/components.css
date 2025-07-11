@@ -107,6 +107,29 @@ input[type="range"]::-moz-range-thumb {
     padding-left: 0;
 }
 
+/* 関係一覧レイアウト */
+.relation-list .relation-item {
+    border: 1px solid #666;
+    border-radius: 4px;
+    padding: 6px 8px;
+    margin-bottom: 8px;
+}
+.relation-item .other-name {
+    font-weight: bold;
+    color: #ffd166;
+}
+.relation-direction {
+    margin-left: 1em;
+    margin-top: 4px;
+}
+.relation-direction progress {
+    width: 120px;
+    vertical-align: middle;
+}
+.relation-direction .aff-score {
+    margin-left: 6px;
+}
+
 #character-list-in-mgmt li {
     padding: 12px 15px;
     background-color: #4a4a4a;
