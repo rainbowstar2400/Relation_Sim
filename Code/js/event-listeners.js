@@ -30,7 +30,7 @@ export function setupEventListeners() {
         dom.mbtiQuestionsArea.style.display = 'block';
         dom.startDiagButton.style.display = 'none';
         dom.mbtiResultArea.style.display = 'none';
-        setTimeout(alignAllSliderTicks, 0);
+        requestAnimationFrame(alignAllSliderTicks);
     });
 
     dom.executeDiagButton.addEventListener('click', () => {

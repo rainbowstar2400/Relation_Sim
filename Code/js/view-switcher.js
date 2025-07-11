@@ -6,7 +6,7 @@ export function switchView(viewToShow) {
     if (viewToShow === 'management') {
         dom.mainViewSections.forEach(section => section.style.display = 'none');
         dom.managementRoomView.style.display = 'block';
-        alignAllSliderTicks();
+        requestAnimationFrame(alignAllSliderTicks);
         renderManagementList();
         resetFormState();
     } else {
