@@ -280,3 +280,15 @@ input[type="range"]::-moz-range-thumb {
 .radio-group input[type="radio"] {
     margin-right: 5px;
 }
+
+/* 関係一覧のリストスタイル */
+#configured-relationships-list ul {
+    list-style: none;
+    padding-left: 0;
+}
+#configured-relationships-list li {
+    margin-bottom: 6px;
+}
+#configured-relationships-list .edit-relation-button {
+    margin-left: 10px;
+}

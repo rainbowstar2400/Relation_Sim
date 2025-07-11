@@ -23,12 +23,18 @@ export function updateConfiguredRelationshipsList() {
         displayList.innerHTML = '<p>設定済みの関係はありません。</p>';
     } else {
         const ul = document.createElement('ul');
+        ul.classList.add('configured-relationship-list');
         configuredIds.forEach(id => {
             const otherChar = state.characters.find(c => c.id === id);
             const relData = state.tempRelations[id];
             if (otherChar) {
                 const li = document.createElement('li');
                 li.innerHTML = `<strong>${otherChar.name}</strong>: ${relData.type}<br> (好感度: ${relData.affectionTo} / ${relData.affectionFrom} | 呼び方: ${relData.nicknameTo} / 呼ばれ方: ${relData.nicknameFrom})`;
+                const editBtn = document.createElement('button');
+                editBtn.textContent = '編集';
+                editBtn.classList.add('edit-relation-button');
+                editBtn.dataset.id = id;
+                li.appendChild(editBtn);
                 ul.appendChild(li);
             }
         });

@@ -175,6 +175,31 @@ export function setupFormHandlers() {
         dom.relationshipEditor.affectionFromOtherValue.textContent = defaultValue;
     });
 
+    dom.relationshipEditor.targetSelect.addEventListener('change', (event) => {
+        const targetId = event.target.value;
+        if (!targetId) return;
+        const targetChar = state.characters.find(c => c.id === targetId);
+        const currentChar = state.characters.find(c => c.id === state.currentlyEditingId);
+        const existing = state.tempRelations[targetId];
+        if (existing) {
+            dom.relationshipEditor.typeSelect.value = existing.type;
+            dom.relationshipEditor.nicknameToOtherInput.value = existing.nicknameTo;
+            dom.relationshipEditor.nicknameFromOtherInput.value = existing.nicknameFrom;
+            dom.relationshipEditor.affectionToOtherSlider.value = existing.affectionTo;
+            dom.relationshipEditor.affectionFromOtherSlider.value = existing.affectionFrom;
+            dom.relationshipEditor.affectionToOtherValue.textContent = existing.affectionTo;
+            dom.relationshipEditor.affectionFromOtherValue.textContent = existing.affectionFrom;
+        } else {
+            dom.relationshipEditor.nicknameToOtherInput.value = targetChar ? targetChar.name : '';
+            dom.relationshipEditor.nicknameFromOtherInput.value = currentChar ? currentChar.name : '';
+            const defaultValue = defaultAffections[dom.relationshipEditor.typeSelect.value] || 0;
+            dom.relationshipEditor.affectionToOtherSlider.value = defaultValue;
+            dom.relationshipEditor.affectionFromOtherSlider.value = defaultValue;
+            dom.relationshipEditor.affectionToOtherValue.textContent = defaultValue;
+            dom.relationshipEditor.affectionFromOtherValue.textContent = defaultValue;
+        }
+    });
+
     dom.relationshipEditor.affectionToOtherSlider.addEventListener('input', (e) => {
         dom.relationshipEditor.affectionToOtherValue.textContent = e.target.value;
     });
@@ -198,6 +223,23 @@ export function setupFormHandlers() {
         alert(`「${state.characters.find(c => c.id === targetId).name}」との関係を一時保存しました。`);
         updateConfiguredRelationshipsList();
         clearRelationshipInputs();
+    });
+
+    dom.relationshipEditor.displayList.addEventListener('click', (e) => {
+        if (e.target.classList.contains('edit-relation-button')) {
+            const targetId = e.target.dataset.id;
+            const data = state.tempRelations[targetId];
+            if (data) {
+                dom.relationshipEditor.targetSelect.value = targetId;
+                dom.relationshipEditor.typeSelect.value = data.type;
+                dom.relationshipEditor.nicknameToOtherInput.value = data.nicknameTo;
+                dom.relationshipEditor.nicknameFromOtherInput.value = data.nicknameFrom;
+                dom.relationshipEditor.affectionToOtherSlider.value = data.affectionTo;
+                dom.relationshipEditor.affectionFromOtherSlider.value = data.affectionFrom;
+                dom.relationshipEditor.affectionToOtherValue.textContent = data.affectionTo;
+                dom.relationshipEditor.affectionFromOtherValue.textContent = data.affectionFrom;
+            }
+        }
     });
 
     window.addEventListener('resize', alignAllSliderTicks);
