@@ -1,8 +1,8 @@
 // --- データ定義 ---
 let characters = [ // letに変更して、後から追加できるようにする
-    { id: 'char_001', name: '碧', personality: { social: 4, kindness: 3, stubbornness: 2, activity: 5, expressiveness: 4 }, mbti: 'INFP', mbti_slider: [], talk_style: { preset: 'くだけた', first_person: '俺', suffix: '〜じゃん' }, activityPattern: '夜型' },
-    { id: 'char_002', name: '彩花', personality: { social: 5, kindness: 4, stubbornness: 1, activity: 3, expressiveness: 5 }, mbti: 'ESFJ', mbti_slider: [], talk_style: { preset: '丁寧', first_person: '私', suffix: '〜です' }, activityPattern: '朝型' },
-    { id: 'char_003', name: '志音', personality: { social: 2, kindness: 5, stubbornness: 4, activity: 2, expressiveness: 2 }, mbti: 'ISFP', mbti_slider: [], talk_style: { preset: 'くだけた', first_person: 'ボク', suffix: '〜だよ' }, activityPattern: '通常' },
+        { id: 'char_001', name: '碧', personality: { social: 4, kindness: 3, stubbornness: 2, activity: 5, expressiveness: 4 }, mbti: 'INFP', mbti_slider: [], talk_style: { preset: 'くだけた', first_person: '俺', suffix: '〜じゃん' }, activityPattern: '夜型', interests: ['読書', '散歩'] },
+        { id: 'char_002', name: '彩花', personality: { social: 5, kindness: 4, stubbornness: 1, activity: 3, expressiveness: 5 }, mbti: 'ESFJ', mbti_slider: [], talk_style: { preset: '丁寧', first_person: '私', suffix: '〜です' }, activityPattern: '朝型', interests: ['お菓子作り', 'カフェ巡り'] },
+        { id: 'char_003', name: '志音', personality: { social: 2, kindness: 5, stubbornness: 4, activity: 2, expressiveness: 2 }, mbti: 'ISFP', mbti_slider: [], talk_style: { preset: 'くだけた', first_person: 'ボク', suffix: '〜だよ' }, activityPattern: '通常', interests: ['音楽鑑賞'] },
 ];
 let currentlyEditingId = null;
 const mbtiDescriptions = {
@@ -52,6 +52,9 @@ const submitButton = document.querySelector('#add-character-form button[type="su
 const talkStylePreset = document.querySelector('input[name="talk-preset"]:checked'); // この時点ではまだないため、後で取得
 const talkFirstPersonInput = document.getElementById('talk-first-person');
 const talkSuffixInput = document.getElementById('talk-suffix');
+
+// 興味関心ジャンルの要素
+const interestsInput = document.getElementById('interests'); // ▼▼▼ 追加
 
 // 活動パターンの要素
 const activityPattern = document.querySelector('input[name="activity-pattern"]:checked'); // この時点ではまだないため、後で取得
@@ -356,6 +359,7 @@ addCharacterForm.addEventListener('submit', (event) => {
             suffix: talkSuffixInput.value,
         };
         const activityPatternValue = document.querySelector('input[name="activity-pattern"]:checked').value;
+        const interestsValue = interestsInput.value.split(',').map(item => item.trim()).filter(item => item); // ▼▼▼ 追加
 
     // 編集モードの場合の処理
     if (currentlyEditingId) {
@@ -369,6 +373,7 @@ addCharacterForm.addEventListener('submit', (event) => {
             charToUpdate.mbti_slider = mbtiSliderValues;
             charToUpdate.talk_style = talkStyle;
             charToUpdate.activityPattern = activityPatternValue;
+            charToUpdate.interests = interestsValue; // ▼▼▼ 追加
         }
     // 追加モードの場合の処理
     } else {
@@ -382,6 +387,7 @@ addCharacterForm.addEventListener('submit', (event) => {
             mbti_slider: mbtiSliderValues,
             talk_style: talkStyle, // ▼▼▼ 追加
             activityPattern: activityPatternValue, // ▼▼▼ 追加
+            interests: interestsValue, // ▼▼▼ 追加
         });
     }
     
@@ -461,6 +467,8 @@ managementCharacterList.addEventListener('click', (event) => {
             talkFirstPersonInput.value = characterToEdit.talk_style.first_person;
             talkSuffixInput.value = characterToEdit.talk_style.suffix;
             document.querySelector(`input[name="activity-pattern"][value="${characterToEdit.activityPattern}"]`).checked = true;
+            
+            interestsInput.value = characterToEdit.interests ? characterToEdit.interests.join(', ') : ''; // ▼▼▼ 追加
 
             // フォームが見えるようにスクロールする（UX向上のため）
             addCharacterForm.scrollIntoView({ behavior: 'smooth' });
