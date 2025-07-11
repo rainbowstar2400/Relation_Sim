@@ -62,10 +62,13 @@ function createDirectionBlock(labelText, score, nickname) {
 
     const affectionP = document.createElement('p');
     affectionP.textContent = '好感度: ';
+    const wrapper = document.createElement('span');
+    wrapper.className = 'affection-wrapper';
     const prog = document.createElement('progress');
     prog.max = 100;
     prog.value = affectionToPercent(score);
-    affectionP.appendChild(prog);
+    wrapper.appendChild(prog);
+    affectionP.appendChild(wrapper);
     div.appendChild(affectionP);
 
     const nickP = document.createElement('p');

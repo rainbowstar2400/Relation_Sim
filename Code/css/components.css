@@ -122,9 +122,39 @@ input[type="range"]::-moz-range-thumb {
     margin-left: 1em;
     margin-top: 4px;
 }
-.relation-direction progress {
+.relation-direction .affection-wrapper {
+    position: relative;
+    display: inline-block;
+}
+.relation-direction .affection-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+        to right,
+        transparent,
+        transparent calc(25% - 1px),
+        #666 calc(25% - 1px),
+        #666 calc(25%),
+        transparent 25%,
+        transparent calc(50% - 1px),
+        #666 calc(50% - 1px),
+        #666 50%,
+        transparent 50%,
+        transparent calc(75% - 1px),
+        #666 calc(75% - 1px),
+        #666 75%,
+        transparent 75%
+    );
+}
+.relation-direction .affection-wrapper progress {
     width: 240px;
     vertical-align: middle;
+    display: block;
 }
 
 #character-list-in-mgmt li {
