@@ -420,11 +420,8 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         // MBTIの値を収集・計算
-        const mbtiSliderValues = [];
-        for (let i = 1; i <= 16; i++) {
-            mbtiSliderValues.push(parseInt(mbtiInputs[`q${i}`].value));
-        }
-        const mbtiResult = calculateMbti(mbtiSliderValues, personality);
+        let mbtiSliderValues = [];
+        let mbtiResult;
 
         // 診断モードが選択されている場合
         if (mbtiDiagModeRadio.checked) {
