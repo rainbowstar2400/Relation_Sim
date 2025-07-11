@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+export function initializeApp() {
 
     // --- DOM要素の取得 ---
     // HTMLの各要素をJavaScriptで操作するために、あらかじめ取得しておきます。
@@ -676,4 +676,4 @@ document.addEventListener('DOMContentLoaded', () => {
     switchView('main');
     alignAllSliderTicks(); // 初回読み込み時にも実行
 
-});
+}
