@@ -1,13 +1,30 @@
 import { dom, initDomCache } from './dom-cache.js';
 import { switchView, alignAllSliderTicks } from './view-switcher.js';
 import { calculateMbti } from './mbti-diagnosis.js';
-import { renderCharacters } from './character-render.js';
+import { renderCharacters, renderManagementList } from './character-render.js';
 import { setupFormHandlers } from './form-handler.js';
 import { state, mbtiDescriptions } from './state.js';
+import { exportState, importStateFromFile } from './storage.js';
 
 export function setupEventListeners() {
     dom.managementButton.addEventListener('click', () => switchView('management'));
     dom.backToMainButton.addEventListener('click', () => switchView('main'));
+    dom.saveButton.addEventListener('click', () => exportState(state));
+    dom.loadButton.addEventListener('click', () => dom.loadFileInput.click());
+    dom.loadFileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        importStateFromFile(file)
+            .then(loaded => {
+                Object.assign(state, loaded);
+                renderCharacters();
+                renderManagementList();
+            })
+            .catch(() => alert('読み込みに失敗しました。'))
+            .finally(() => {
+                dom.loadFileInput.value = '';
+            });
+    });
 
     dom.startDiagButton.addEventListener('click', () => {
         dom.mbtiQuestionsArea.style.display = 'block';

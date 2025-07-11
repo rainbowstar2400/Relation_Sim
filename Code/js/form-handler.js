@@ -4,6 +4,7 @@ import { calculateMbti } from './mbti-diagnosis.js';
 import { renderCharacters, renderManagementList } from './character-render.js';
 import { renderRelationshipEditor, updateConfiguredRelationshipsList, clearRelationshipInputs } from './relationship-editor.js';
 import { switchView, resetFormState, alignAllSliderTicks } from './view-switcher.js';
+import { saveState } from './storage.js';
 
 export function setupFormHandlers() {
     dom.addCharacterForm.addEventListener('submit', (event) => {
@@ -82,6 +83,7 @@ export function setupFormHandlers() {
 
         renderCharacters();
         renderManagementList();
+        saveState(state);
         switchView('main');
     });
 
@@ -110,6 +112,7 @@ export function setupFormHandlers() {
                 state.characters = state.characters.filter(char => char.id !== idToDelete);
                 renderManagementList();
                 renderCharacters();
+                saveState(state);
             }
         } else if (event.target.classList.contains('edit-button')) {
             const idToEdit = event.target.dataset.id;
