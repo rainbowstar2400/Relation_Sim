@@ -76,7 +76,9 @@ export function initDomCache() {
     dom.statusBackButton = document.getElementById('back-to-main-from-status');
     dom.statusName = document.getElementById('status-name');
     dom.statusMbti = document.getElementById('status-mbti');
-    dom.statusTalk = document.getElementById('status-talk');
+    dom.statusTalkPreset = document.getElementById('status-talk-preset');
+    dom.statusFirstPerson = document.getElementById('status-first-person');
+    dom.statusSuffix = document.getElementById('status-suffix');
     dom.statusCondition = document.getElementById('status-condition');
     dom.statusPersonality = {
         social: document.getElementById('status-social'),

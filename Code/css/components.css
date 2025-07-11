@@ -100,6 +100,13 @@ input[type="range"]::-moz-range-thumb {
     overflow: hidden; /* 角丸に合わせて中身をクリップ */
 }
 
+/* ステータス画面のリスト */
+.personality-list,
+.relation-list {
+    list-style: none;
+    padding-left: 0;
+}
+
 #character-list-in-mgmt li {
     padding: 12px 15px;
     background-color: #4a4a4a;

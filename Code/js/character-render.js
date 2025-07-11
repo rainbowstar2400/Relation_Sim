@@ -51,7 +51,9 @@ function showCharacterStatus(char) {
     dom.statusName.textContent = char.name;
     dom.statusMbti.textContent = char.mbti;
     const style = char.talk_style;
-    dom.statusTalk.textContent = `${style.preset}（${style.first_person}, ${style.suffix}）`;
+    dom.statusTalkPreset.textContent = style.preset;
+    dom.statusFirstPerson.textContent = style.first_person;
+    dom.statusSuffix.textContent = style.suffix;
     dom.statusCondition.textContent = '活動中';
     const p = char.personality;
     dom.statusPersonality.social.textContent = levelToBars(p.social);
@@ -59,8 +61,23 @@ function showCharacterStatus(char) {
     dom.statusPersonality.stubbornness.textContent = levelToBars(p.stubbornness);
     dom.statusPersonality.activity.textContent = levelToBars(p.activity);
     dom.statusPersonality.expressiveness.textContent = levelToBars(p.expressiveness);
-    // 関係・イベントは未実装のため空にする
-    dom.statusRelations.textContent = '';
+
+    const relations = state.relationships.filter(r => r.pair.includes(char.id));
+    dom.statusRelations.innerHTML = '';
+    if (relations.length === 0) {
+        const li = document.createElement('li');
+        li.textContent = '関係なし';
+        dom.statusRelations.appendChild(li);
+    } else {
+        relations.forEach(rel => {
+            const otherId = rel.pair.find(id => id !== char.id);
+            const other = state.characters.find(c => c.id === otherId);
+            const li = document.createElement('li');
+            li.textContent = `${other ? other.name : otherId}: ${rel.label}`;
+            dom.statusRelations.appendChild(li);
+        });
+    }
+
     dom.statusEvents.textContent = '';
     switchView('status');
 }
