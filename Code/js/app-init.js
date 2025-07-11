@@ -41,5 +41,6 @@ export async function setupApp() {
     await loadHTML('header-placeholder', 'header.html');
     await loadHTML('main-view-placeholder', 'main-view.html');
     await loadHTML('management-room-placeholder', 'management-view.html');
+    await loadHTML('status-view-placeholder', 'character-status.html');
     await initializeApp();
 }
