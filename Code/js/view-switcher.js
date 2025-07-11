@@ -6,6 +6,7 @@ export function switchView(viewToShow) {
     if (viewToShow === 'management') {
         dom.mainViewSections.forEach(section => section.style.display = 'none');
         dom.statusView.style.display = 'none';
+        dom.dailyReportView.style.display = 'none';
         dom.managementRoomView.style.display = 'block';
         requestAnimationFrame(alignAllSliderTicks);
         renderManagementList();
@@ -13,10 +14,17 @@ export function switchView(viewToShow) {
     } else if (viewToShow === 'status') {
         dom.mainViewSections.forEach(section => section.style.display = 'none');
         dom.managementRoomView.style.display = 'none';
+        dom.dailyReportView.style.display = 'none';
         dom.statusView.style.display = 'block';
+    } else if (viewToShow === 'daily-report') {
+        dom.mainViewSections.forEach(section => section.style.display = 'none');
+        dom.managementRoomView.style.display = 'none';
+        dom.statusView.style.display = 'none';
+        dom.dailyReportView.style.display = 'block';
     } else {
         dom.managementRoomView.style.display = 'none';
         dom.statusView.style.display = 'none';
+        dom.dailyReportView.style.display = 'none';
         dom.mainViewSections.forEach(section => section.style.display = 'block');
         resetFormState();
     }

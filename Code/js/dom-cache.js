@@ -15,7 +15,8 @@ export function initDomCache() {
     // 管理室画面の要素
     dom.managementRoomView = document.getElementById('management-room');
     dom.backToMainButton = document.getElementById('back-to-main-button');
-    dom.managementButton = document.querySelector('.top-menu button:first-child');
+    dom.managementButton = document.getElementById('management-button');
+    dom.dailyReportButton = document.getElementById('daily-report-button');
     dom.saveButton = document.getElementById('save-button');
     dom.loadButton = document.getElementById('load-button');
     dom.loadFileInput = document.getElementById('load-file-input');
@@ -89,4 +90,10 @@ export function initDomCache() {
     };
     dom.statusRelations = document.getElementById('status-relations');
     dom.statusEvents = document.getElementById('status-events');
+
+    // 日報画面要素
+    dom.dailyReportView = document.getElementById('daily-report-view');
+    dom.dailyReportList = document.getElementById('daily-report-list');
+    dom.reportDateInput = document.getElementById('report-date');
+    dom.reportBackButton = document.getElementById('back-to-main-from-report');
 }
