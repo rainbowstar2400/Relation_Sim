@@ -1,12 +1,13 @@
 // --- データ定義 ---
 let characters = [ // letに変更して、後から追加できるようにする
-        { id: 'char_001', name: '碧', personality: { social: 4, kindness: 3, stubbornness: 2, activity: 5, expressiveness: 4 }, mbti: 'INFP', mbti_slider: [], talk_style: { preset: 'くだけた', first_person: '俺', suffix: '〜じゃん' }, activityPattern: '夜型', interests: ['読書', '散歩'] },
-        { id: 'char_002', name: '彩花', personality: { social: 5, kindness: 4, stubbornness: 1, activity: 3, expressiveness: 5 }, mbti: 'ESFJ', mbti_slider: [], talk_style: { preset: '丁寧', first_person: '私', suffix: '〜です' }, activityPattern: '朝型', interests: ['お菓子作り', 'カフェ巡り'] },
-        { id: 'char_003', name: '志音', personality: { social: 2, kindness: 5, stubbornness: 4, activity: 2, expressiveness: 2 }, mbti: 'ISFP', mbti_slider: [], talk_style: { preset: 'くだけた', first_person: 'ボク', suffix: '〜だよ' }, activityPattern: '通常', interests: ['音楽鑑賞'] },
+    { id: 'char_001', name: '碧', personality: { social: 4, kindness: 3, stubbornness: 2, activity: 5, expressiveness: 4 }, mbti: 'INFP', mbti_slider: [], talk_style: { preset: 'くだけた', first_person: '俺', suffix: '〜じゃん' }, activityPattern: '夜型', interests: ['読書', '散歩'] },
+    { id: 'char_002', name: '彩花', personality: { social: 5, kindness: 4, stubbornness: 1, activity: 3, expressiveness: 5 }, mbti: 'ESFJ', mbti_slider: [], talk_style: { preset: '丁寧', first_person: '私', suffix: '〜です' }, activityPattern: '朝型', interests: ['お菓子作り', 'カフェ巡り'] },
+    { id: 'char_003', name: '志音', personality: { social: 2, kindness: 5, stubbornness: 4, activity: 2, expressiveness: 2 }, mbti: 'ISFP', mbti_slider: [], talk_style: { preset: 'くだけた', first_person: 'ボク', suffix: '〜だよ' }, activityPattern: '通常', interests: ['音楽鑑賞'] },
 ];
 let currentlyEditingId = null;
 let relationships = []; // 関係ラベルを保存
 let nicknames = []; // 呼び方を保存
+let tempRelations = {}; // ▼▼▼ 追加: フォーム内で設定した関係を一時保存するオブジェクト
 const mbtiDescriptions = {
     INFP: "控えめだけど思慮深く、感受性豊かなタイプのようです。",
     INFJ: "物静かですが、強い信念を内に秘めている理想主義者です。",
@@ -99,7 +100,7 @@ const personalityValues = {
  */
 function updateDateTime() {
     const now = new Date();
-    
+
     // 時刻を HH:mm:ss 形式にフォーマット
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
@@ -143,7 +144,7 @@ function renderManagementList() {
     // キャラクターごとにリスト項目を作成
     characters.forEach(char => {
         const listItem = document.createElement('li');
-        
+
         // キャラクター名を格納するspan
         const nameSpan = document.createElement('span');
         nameSpan.textContent = char.name;
@@ -165,16 +166,16 @@ function renderManagementList() {
         deleteButton.textContent = '削除';
         deleteButton.className = 'delete-button'; // 削除ボタンだけ少しデザインを変えるため
         deleteButton.dataset.id = char.id;
-        
+
         // divにボタンを追加
         actionsDiv.appendChild(infoButton);
         actionsDiv.appendChild(editButton);
         actionsDiv.appendChild(deleteButton);
-        
+
         // liに名前とボタンのdivを追加
         listItem.appendChild(nameSpan);
         listItem.appendChild(actionsDiv);
-        
+
         // 全体をリストに追加
         managementCharacterList.appendChild(listItem);
     });
@@ -201,22 +202,22 @@ function switchView(viewToShow) {
 /**
  * 初期関係設定フォームを描画する関数
  */
-    function renderRelationshipEditor() {
-        const targetSelect = relationshipEditor.targetSelect;
-        targetSelect.innerHTML = '<option value="">--選択してください--</option>';
-        
-        // 自分以外のキャラクターを取得
-        const otherCharacters = characters.filter(c => c.id !== currentlyEditingId);
-        otherCharacters.forEach(char => {
-            const option = document.createElement('option');
-            option.value = char.id;
-            option.textContent = char.name;
-            targetSelect.appendChild(option);
-        });
+function renderRelationshipEditor() {
+    const targetSelect = relationshipEditor.targetSelect;
+    targetSelect.innerHTML = '<option value="">--選択してください--</option>';
 
-        updateConfiguredRelationshipsList();
-        clearRelationshipInputs();
-    }
+    // 自分以外のキャラクターを取得
+    const otherCharacters = characters.filter(c => c.id !== currentlyEditingId);
+    otherCharacters.forEach(char => {
+        const option = document.createElement('option');
+        option.value = char.id;
+        option.textContent = char.name;
+        targetSelect.appendChild(option);
+    });
+
+    updateConfiguredRelationshipsList();
+    clearRelationshipInputs();
+}
 
 /**
  * フォームの状態を「追加モード」にリセットする関数
@@ -233,6 +234,7 @@ function resetFormState() {
     addCharacterForm.style.display = 'none'; // フォームを隠す
     showAddFormButton.style.display = 'block'; // 「＋」ボタンを表示
 
+    tempRelations = {}; // ▼▼▼ 追加: 一時的な関係データもリセット
 }
 
 /**
@@ -245,11 +247,11 @@ function alignAllSliderTicks() {
         const ticksContainer = container.querySelector('.slider-ticks');
         if (!ticksContainer) return;
         const tickSpans = ticksContainer.querySelectorAll('span');
-        
+
         // スライダーの実際の幅を取得
         const sliderWidth = slider.offsetWidth;
         const thumbWidth = 10; // ツマミの幅（CSSで指定したもの）
-        
+
         // ツマミが移動できる実際の幅を計算
         const trackWidth = sliderWidth - thumbWidth;
         const numTicks = tickSpans.length;
@@ -257,7 +259,7 @@ function alignAllSliderTicks() {
             // 各目盛りの位置を計算
             // (ツマミの半分の幅) + (区間ごとの幅) * index
             const position = (thumbWidth / 2) + (trackWidth / (numTicks - 1)) * index;
-            
+
             // 計算した位置をCSSのleftプロパティに設定
             span.style.left = `${position}px`;
         });
@@ -268,19 +270,18 @@ function updateConfiguredRelationshipsList() {
     const displayList = relationshipEditor.displayList;
     displayList.innerHTML = '';
     // "自分"のID (追加モードなら新しいID、編集モードなら既存ID)
-    const selfId = currentlyEditingId || `new_${addCharacterForm.dataset.newId}`;
+    const configuredIds = Object.keys(tempRelations);
 
-    const relatedPairs = relationships.filter(r => r.pair.includes(selfId));
-    if (relatedPairs.length === 0) {
+    if (configuredIds.length === 0) {
         displayList.innerHTML = '<p>設定済みの関係はありません。</p>';
     } else {
         const ul = document.createElement('ul');
-        relatedPairs.forEach(rel => {
-            const otherId = rel.pair.find(id => id !== selfId);
-            const otherChar = characters.find(c => c.id === otherId);
+        configuredIds.forEach(id => {
+            const otherChar = characters.find(c => c.id === id);
+            const relData = tempRelations[id];
             if (otherChar) {
                 const li = document.createElement('li');
-                li.textContent = `${otherChar.name}: ${rel.label}`;
+                li.textContent = `${otherChar.name}: ${relData.type} (呼び方: ${relData.nicknameTo} / 呼ばれ方: ${relData.nicknameFrom})`;
                 ul.appendChild(li);
             }
         });
@@ -342,7 +343,7 @@ startDiagButton.addEventListener('click', () => {
     mbtiQuestionsArea.style.display = 'block'; // 質問エリアを表示
     startDiagButton.style.display = 'none';    // スタートボタン自体は隠す
     mbtiResultArea.style.display = 'none';   // もし結果が表示されていたら隠す
-    
+
     // スライダーが正しく描画されるように、少し遅らせて再計算を実行
     setTimeout(alignAllSliderTicks, 0);
 });
@@ -366,7 +367,7 @@ executeDiagButton.addEventListener('click', () => {
 
     // MBTIを計算
     const mbtiResult = calculateMbti(sliderValues, personality);
-    
+
     // 説明文を取得（見つからない場合のデフォルト文も用意）
     const description = mbtiDescriptions[mbtiResult] || "説明文が見つかりませんでした。";
 
@@ -400,7 +401,7 @@ addCharacterForm.addEventListener('submit', (event) => {
         activity: parseInt(personalityInputs.activity.value),
         expressiveness: parseInt(personalityInputs.expressiveness.value),
     };
-    
+
     // MBTIの値を収集・計算
     const mbtiSliderValues = [];
     for (let i = 1; i <= 16; i++) {
@@ -419,22 +420,26 @@ addCharacterForm.addEventListener('submit', (event) => {
     else {
         mbtiResult = mbtiManualSelect.value;
         // 手動設定の場合、スライダーの値は空にする
-        mbtiSliderValues = []; 
+        mbtiSliderValues = [];
     }
 
     // ▼▼▼ 追加: 新しいフォームの値を取得 ▼▼▼
     const talkStyle = {
-            preset: document.querySelector('input[name="talk-preset"]:checked').value,
-            first_person: talkFirstPersonInput.value,
-            suffix: talkSuffixInput.value,
-        };
-        const activityPatternValue = document.querySelector('input[name="activity-pattern"]:checked').value;
-        const interestsValue = interestsInput.value.split(',').map(item => item.trim()).filter(item => item); // ▼▼▼ 追加
+        preset: document.querySelector('input[name="talk-preset"]:checked').value,
+        first_person: talkFirstPersonInput.value,
+        suffix: talkSuffixInput.value,
+    };
+    const activityPatternValue = document.querySelector('input[name="activity-pattern"]:checked').value;
+    const interestsValue = interestsInput.value.split(',').map(item => item.trim()).filter(item => item); // ▼▼▼ 追加
+
+    let characterId;
 
     // 編集モードの場合の処理
     if (currentlyEditingId) {
+        characterId = currentlyEditingId;
+
         // 更新対象のキャラクターを探す
-        const charToUpdate = characters.find(char => char.id === currentlyEditingId);
+        const charToUpdate = characters.find(char => char.id === characterId);
         if (charToUpdate) {
             // データを更新
             charToUpdate.name = charNameInput.value;
@@ -445,9 +450,10 @@ addCharacterForm.addEventListener('submit', (event) => {
             charToUpdate.activityPattern = activityPatternValue;
             charToUpdate.interests = interestsValue; // ▼▼▼ 追加
         }
+
     // 追加モードの場合の処理
     } else {
-        // 新しいキャラクターのIDを生成 (簡易的)
+        characterId = 'char_' + Date.now();
         const newId = 'char_' + Date.now();
         characters.push({
             id: newId,
@@ -460,7 +466,29 @@ addCharacterForm.addEventListener('submit', (event) => {
             interests: interestsValue, // ▼▼▼ 追加
         });
     }
-    
+
+    // ▼▼▼ 追加: 一時保存した関係を、正式なデータに登録 ▼▼▼
+    Object.keys(tempRelations).forEach(targetId => {
+        const relData = tempRelations[targetId];
+
+        // 関係データを保存
+        if (relData.type !== 'なし') {
+            relationships.push({ pair: [characterId, targetId], label: relData.type });
+        }
+        // 呼び方データを保存
+        if (relData.nicknameTo) {
+            nicknames.push({ from: characterId, to: targetId, nickname: relData.nicknameTo });
+        }
+        // 呼ばれ方データを保存
+        if (relData.nicknameFrom) {
+            nicknames.push({ from: targetId, to: characterId, nickname: relData.nicknameFrom });
+        }
+    });
+
+    console.log("Characters:", characters);
+    console.log("Relationships:", relationships);
+    console.log("Nicknames:", nicknames);
+
     // 画面を再描画
     renderCharacters();
     renderManagementList();
@@ -484,6 +512,7 @@ showAddFormButton.addEventListener('click', () => {
     addCharacterForm.style.display = 'block'; // フォームを表示
     showAddFormButton.style.display = 'none'; // 「＋」ボタンを隠す
     addCharacterForm.dataset.newId = 'char_' + Date.now(); // 追加モード用に仮IDを振る
+    tempRelations = {}; // ▼▼▼ 追加: 追加モード開始時にリセット
     renderRelationshipEditor(); // 関係設定フォームを描画
 });
 
@@ -497,7 +526,7 @@ managementCharacterList.addEventListener('click', (event) => {
     if (event.target.classList.contains('delete-button')) {
         // どのキャラクターのボタンかIDを取得
         const idToDelete = event.target.dataset.id;
-        
+
         // 仕様書(2.6.4)通り、確認ダイアログを表示
         if (confirm('本当にこのキャラクターを削除しますか？')) {
             // characters配列から、指定されたIDのキャラクターを除外した新しい配列を作成
@@ -515,17 +544,17 @@ managementCharacterList.addEventListener('click', (event) => {
 
         // 編集対象のキャラクターデータを取得
         const characterToEdit = characters.find(char => char.id === idToEdit);
-        
+
         if (characterToEdit) {
             // フォームのタイトルを変更
             formTitle.textContent = 'キャラクター編集';
-            
+
             submitButton.textContent = '更新する'; // ボタンのテキストを変更
             currentlyEditingId = idToEdit; // 編集モードに設定
 
             // フォームに既存のデータを入力
             charNameInput.value = characterToEdit.name;
-            
+
             // スライダーにも既存のデータを反映
             for (const key in personalityInputs) {
                 personalityInputs[key].value = characterToEdit.personality[key];
@@ -535,7 +564,7 @@ managementCharacterList.addEventListener('click', (event) => {
             // MBTIスライダーにも値を反映
             if (characterToEdit.mbti_slider && characterToEdit.mbti_slider.length === 16) {
                 for (let i = 0; i < 16; i++) {
-                    mbtiInputs[`q${i+1}`].value = characterToEdit.mbti_slider[i];
+                    mbtiInputs[`q${i + 1}`].value = characterToEdit.mbti_slider[i];
                 }
             }
 
@@ -543,7 +572,7 @@ managementCharacterList.addEventListener('click', (event) => {
             if (characterToEdit.mbti) {
                 mbtiManualSelect.value = characterToEdit.mbti;
             }
-                
+
             // ▼▼▼ 追加: 新しいフォームに値を設定 ▼▼▼
             document.querySelector(`input[name="talk-preset"][value="${characterToEdit.talk_style.preset}"]`).checked = true;
             talkFirstPersonInput.value = characterToEdit.talk_style.first_person;
@@ -554,14 +583,40 @@ managementCharacterList.addEventListener('click', (event) => {
             addCharacterForm.style.display = 'block'; // フォームを表示
             showAddFormButton.style.display = 'none'; // 「＋」ボタンを隠す
             renderRelationshipForm(); // 関係設定フォームを描画
-            
+
             interestsInput.value = characterToEdit.interests ? characterToEdit.interests.join(', ') : ''; // ▼▼▼ 追加
 
             // フォームが見えるようにスクロールする（UX向上のため）
             addCharacterForm.scrollIntoView({ behavior: 'smooth' });
         }
+
+        tempRelations = {}; // ▼▼▼ 追加: 編集モード開始時にリセット
+
         renderRelationshipEditor();
     }
+});
+
+// ▼▼▼ `relationshipEditor.saveButton` のイベントリスナーを実装 ▼▼▼
+relationshipEditor.saveButton.addEventListener('click', () => {
+    const targetId = relationshipEditor.targetSelect.value;
+    if (!targetId) {
+        alert('相手を選択してください。');
+        return;
+    }
+
+    // フォームから値を取得
+    tempRelations[targetId] = {
+        type: relationshipEditor.typeSelect.value,
+        nicknameTo: relationshipEditor.nicknameToOtherInput.value,
+        nicknameFrom: relationshipEditor.nicknameFromOtherInput.value,
+    };
+
+    alert(`「${characters.find(c => c.id === targetId).name}」との関係を一時保存しました。`);
+
+    // UIを更新して、設定済みの関係一覧に表示
+    updateConfiguredRelationshipsList();
+    // 入力欄をクリア
+    clearRelationshipInputs();
 });
 
 relationshipEditor.saveButton.addEventListener('click', () => {
