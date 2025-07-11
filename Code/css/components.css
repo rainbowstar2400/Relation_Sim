@@ -123,11 +123,8 @@ input[type="range"]::-moz-range-thumb {
     margin-top: 4px;
 }
 .relation-direction progress {
-    width: 120px;
+    width: 240px;
     vertical-align: middle;
-}
-.relation-direction .aff-score {
-    margin-left: 6px;
 }
 
 #character-list-in-mgmt li {

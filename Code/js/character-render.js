@@ -66,10 +66,6 @@ function createDirectionBlock(labelText, score, nickname) {
     prog.max = 100;
     prog.value = affectionToPercent(score);
     affectionP.appendChild(prog);
-    const scoreSpan = document.createElement('span');
-    scoreSpan.className = 'aff-score';
-    scoreSpan.textContent = score;
-    affectionP.appendChild(scoreSpan);
     div.appendChild(affectionP);
 
     const nickP = document.createElement('p');
