@@ -50,9 +50,18 @@ const managementCharacterList = document.getElementById('character-list-in-mgmt'
 const formTitle = document.getElementById('form-title');
 const submitButton = document.querySelector('#add-character-form button[type="submit"]');
 
-// 追加フォームを表示するボタンと初期関係設定エリア
+// 追加フォームを表示するボタン
 const showAddFormButton = document.getElementById('show-add-form-button'); // ▼▼▼ 追加
-const initialRelationshipsArea = document.getElementById('initial-relationships-area'); // ▼▼▼ 追加
+
+// 初期関係設定エリア
+const relationshipEditor = {
+    targetSelect: document.getElementById('relationship-target-select'),
+    typeSelect: document.getElementById('relationship-type-select'),
+    nicknameToOtherInput: document.getElementById('nickname-to-other-input'),
+    nicknameFromOtherInput: document.getElementById('nickname-from-other-input'),
+    saveButton: document.getElementById('save-relationship-button'),
+    displayList: document.getElementById('configured-relationships-list')
+};
 
 // 話し方の要素
 const talkStylePreset = document.querySelector('input[name="talk-preset"]:checked'); // この時点ではまだないため、後で取得
@@ -192,37 +201,22 @@ function switchView(viewToShow) {
 /**
  * 初期関係設定フォームを描画する関数
  */
-function renderRelationshipForm() {
-    initialRelationshipsArea.innerHTML = ''; // 中身をリセット
-
-    // 自分以外のキャラクターを取得
-    const otherCharacters = characters.filter(c => c.id !== currentlyEditingId);
-
-    if (otherCharacters.length === 0) {
-        initialRelationshipsArea.innerHTML = '<p>他に関係を設定できるキャラクターがいません。</p>';
-        return;
-    }
-
-    otherCharacters.forEach(otherChar => {
-        const row = document.createElement('div');
-        row.className = 'relationship-form-row form-item';
+    function renderRelationshipEditor() {
+        const targetSelect = relationshipEditor.targetSelect;
+        targetSelect.innerHTML = '<option value="">--選択してください--</option>';
         
-        // 仕様書の関係ラベルに合わせて選択肢を作成
-        const relationshipOptions = ['なし', '認知', '友達', '親友', '恋人', '家族'].map(label => `<option value="${label}">${label}</option>`).join('');
+        // 自分以外のキャラクターを取得
+        const otherCharacters = characters.filter(c => c.id !== currentlyEditingId);
+        otherCharacters.forEach(char => {
+            const option = document.createElement('option');
+            option.value = char.id;
+            option.textContent = char.name;
+            targetSelect.appendChild(option);
+        });
 
-        row.innerHTML = `
-            <label>${otherChar.name} との関係:</label>
-            <div class="relationship-inputs">
-                <select data-target-id="${otherChar.id}" class="relationship-select">
-                    ${relationshipOptions}
-                </select>
-                <input type="text" placeholder="相手の呼び方" data-target-id="${otherChar.id}" class="nickname-to-other">
-                <input type="text" placeholder="相手からの呼ばれ方" data-target-id="${otherChar.id}" class="nickname-from-other">
-            </div>
-        `;
-        initialRelationshipsArea.appendChild(row);
-    });
-}
+        updateConfiguredRelationshipsList();
+        clearRelationshipInputs();
+    }
 
 /**
  * フォームの状態を「追加モード」にリセットする関数
@@ -268,6 +262,37 @@ function alignAllSliderTicks() {
             span.style.left = `${position}px`;
         });
     });
+}
+
+function updateConfiguredRelationshipsList() {
+    const displayList = relationshipEditor.displayList;
+    displayList.innerHTML = '';
+    // "自分"のID (追加モードなら新しいID、編集モードなら既存ID)
+    const selfId = currentlyEditingId || `new_${addCharacterForm.dataset.newId}`;
+
+    const relatedPairs = relationships.filter(r => r.pair.includes(selfId));
+    if (relatedPairs.length === 0) {
+        displayList.innerHTML = '<p>設定済みの関係はありません。</p>';
+    } else {
+        const ul = document.createElement('ul');
+        relatedPairs.forEach(rel => {
+            const otherId = rel.pair.find(id => id !== selfId);
+            const otherChar = characters.find(c => c.id === otherId);
+            if (otherChar) {
+                const li = document.createElement('li');
+                li.textContent = `${otherChar.name}: ${rel.label}`;
+                ul.appendChild(li);
+            }
+        });
+        displayList.appendChild(ul);
+    }
+}
+
+function clearRelationshipInputs() {
+    relationshipEditor.targetSelect.value = '';
+    relationshipEditor.typeSelect.value = 'なし';
+    relationshipEditor.nicknameToOtherInput.value = '';
+    relationshipEditor.nicknameFromOtherInput.value = '';
 }
 
 // ▼▼▼ MBTI計算用の新しい関数 ▼▼▼
@@ -458,7 +483,8 @@ showAddFormButton.addEventListener('click', () => {
     submitButton.textContent = '追加する';
     addCharacterForm.style.display = 'block'; // フォームを表示
     showAddFormButton.style.display = 'none'; // 「＋」ボタンを隠す
-    renderRelationshipForm(); // 関係設定フォームを描画
+    addCharacterForm.dataset.newId = 'char_' + Date.now(); // 追加モード用に仮IDを振る
+    renderRelationshipEditor(); // 関係設定フォームを描画
 });
 
 // ▼▼▼ 新しいイベントリスナー ▼▼▼
@@ -534,7 +560,25 @@ managementCharacterList.addEventListener('click', (event) => {
             // フォームが見えるようにスクロールする（UX向上のため）
             addCharacterForm.scrollIntoView({ behavior: 'smooth' });
         }
+        renderRelationshipEditor();
     }
+});
+
+relationshipEditor.saveButton.addEventListener('click', () => {
+    const selfId = currentlyEditingId || `new_${addCharacterForm.dataset.newId}`;
+    const targetId = relationshipEditor.targetSelect.value;
+    const type = relationshipEditor.typeSelect.value;
+
+    if (!targetId) {
+        alert('相手を選択してください。');
+        return;
+    }
+
+    // TODO: ここでrelationshipsとnicknames配列を更新する処理を追加
+    alert(`「${selfId}」と「${targetId}」の関係を「${type}」に設定します。（保存処理は未実装）`);
+
+    // UIを更新（仮）
+    updateConfiguredRelationshipsList();
 });
 
 // 画面のリサイズ時にも再計算する

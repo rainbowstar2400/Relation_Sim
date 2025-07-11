@@ -138,9 +138,37 @@
                     <label for="interests">興味・関心:</label>
                     <input type="text" id="interests" placeholder="例: 読書, 映画鑑賞, ゲーム">
                 </div>
-
                 <h4>初期関係設定</h4>
-                <div id="initial-relationships-area">
+                <div id="relationship-editor">
+                    <div class="form-item">
+                        <label for="relationship-target-select">相手を選択:</label>
+                        <select id="relationship-target-select">
+                            </select>
+                    </div>
+                    <div class="form-item">
+                        <label for="relationship-type-select">関係:</label>
+                        <select id="relationship-type-select">
+                            <option value="なし">なし</option>
+                            <option value="認知">認知</option>
+                            <option value="友達">友達</option>
+                            <option value="親友">親友</option>
+                            <option value="恋人">恋人</option>
+                            <option value="家族">家族</option>
+                        </select>
+                    </div>
+                    <div class="form-item">
+                        <label for="nickname-to-other-input">相手の呼び方:</label>
+                        <input type="text" id="nickname-to-other-input">
+                    </div>
+                    <div class="form-item">
+                        <label for="nickname-from-other-input">相手からの呼ばれ方:</label>
+                        <input type="text" id="nickname-from-other-input">
+                    </div>
+                    <button type="button" id="save-relationship-button">この関係を保存</button>
+                </div>
+                
+                <h4>設定済みの関係</h4>
+                <div id="configured-relationships-list">
                     </div>
                 
                 <h4>MBTIタイプ</h4>
