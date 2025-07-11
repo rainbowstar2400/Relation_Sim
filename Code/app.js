@@ -5,6 +5,8 @@ let characters = [ // letに変更して、後から追加できるようにす�
         { id: 'char_003', name: '志音', personality: { social: 2, kindness: 5, stubbornness: 4, activity: 2, expressiveness: 2 }, mbti: 'ISFP', mbti_slider: [], talk_style: { preset: 'くだけた', first_person: 'ボク', suffix: '〜だよ' }, activityPattern: '通常', interests: ['音楽鑑賞'] },
 ];
 let currentlyEditingId = null;
+let relationships = []; // 関係ラベルを保存
+let nicknames = []; // 呼び方を保存
 const mbtiDescriptions = {
     INFP: "控えめだけど思慮深く、感受性豊かなタイプのようです。",
     INFJ: "物静かですが、強い信念を内に秘めている理想主義者です。",
@@ -47,6 +49,10 @@ const charNameInput = document.getElementById('char-name');
 const managementCharacterList = document.getElementById('character-list-in-mgmt');
 const formTitle = document.getElementById('form-title');
 const submitButton = document.querySelector('#add-character-form button[type="submit"]');
+
+// 追加フォームを表示するボタンと初期関係設定エリア
+const showAddFormButton = document.getElementById('show-add-form-button'); // ▼▼▼ 追加
+const initialRelationshipsArea = document.getElementById('initial-relationships-area'); // ▼▼▼ 追加
 
 // 話し方の要素
 const talkStylePreset = document.querySelector('input[name="talk-preset"]:checked'); // この時点ではまだないため、後で取得
@@ -172,7 +178,8 @@ function switchView(viewToShow) {
         // 管理室だけを表示
         managementRoomView.style.display = 'block';
         alignAllSliderTicks(); // 管理室表示時に再計算
-        renderManagementList(); // ▼▼▼ 追加 ▼▼▼ 管理室表示時に一覧を更新        
+        renderManagementList(); // ▼▼▼ 追加 ▼▼▼ 管理室表示時に一覧を更新
+        resetFormState(); // 管理室表示時はまずフォームを隠す
     } else { // 'main' を表示する場合
         // 管理室を非表示に
         managementRoomView.style.display = 'none';
@@ -180,6 +187,41 @@ function switchView(viewToShow) {
         mainViewSections.forEach(section => section.style.display = 'block');
         resetFormState(); // メイン画面に戻るときにフォームの状態をリセット
     }
+}
+
+/**
+ * 初期関係設定フォームを描画する関数
+ */
+function renderRelationshipForm() {
+    initialRelationshipsArea.innerHTML = ''; // 中身をリセット
+
+    // 自分以外のキャラクターを取得
+    const otherCharacters = characters.filter(c => c.id !== currentlyEditingId);
+
+    if (otherCharacters.length === 0) {
+        initialRelationshipsArea.innerHTML = '<p>他に関係を設定できるキャラクターがいません。</p>';
+        return;
+    }
+
+    otherCharacters.forEach(otherChar => {
+        const row = document.createElement('div');
+        row.className = 'relationship-form-row form-item';
+        
+        // 仕様書の関係ラベルに合わせて選択肢を作成
+        const relationshipOptions = ['なし', '認知', '友達', '親友', '恋人', '家族'].map(label => `<option value="${label}">${label}</option>`).join('');
+
+        row.innerHTML = `
+            <label>${otherChar.name} との関係:</label>
+            <div class="relationship-inputs">
+                <select data-target-id="${otherChar.id}" class="relationship-select">
+                    ${relationshipOptions}
+                </select>
+                <input type="text" placeholder="相手の呼び方" data-target-id="${otherChar.id}" class="nickname-to-other">
+                <input type="text" placeholder="相手からの呼ばれ方" data-target-id="${otherChar.id}" class="nickname-from-other">
+            </div>
+        `;
+        initialRelationshipsArea.appendChild(row);
+    });
 }
 
 /**
@@ -193,6 +235,10 @@ function resetFormState() {
         personalityValues[key].textContent = '3';
     }
     currentlyEditingId = null; // 編集モードを解除
+
+    addCharacterForm.style.display = 'none'; // フォームを隠す
+    showAddFormButton.style.display = 'block'; // 「＋」ボタンを表示
+
 }
 
 /**
@@ -265,7 +311,6 @@ const executeDiagButton = document.getElementById('execute-diag-button');
 const mbtiQuestionsArea = document.getElementById('mbti-questions-area');
 const mbtiResultArea = document.getElementById('mbti-result-area');
 const mbtiResultText = document.getElementById('mbti-result-text'); // 結果表示用のpタグも取得
-
 
 // 「診断スタート」ボタンの処理
 startDiagButton.addEventListener('click', () => {
@@ -405,6 +450,17 @@ for (const key in personalityInputs) {
     });
 }
 
+// ▼▼▼ 「＋キャラクター追加」ボタンのイベントリスナーを追加 ▼▼▼
+showAddFormButton.addEventListener('click', () => {
+    currentlyEditingId = null; // 必ず追加モードにする
+    resetFormState(); // フォームの中身をリセット
+    formTitle.textContent = 'キャラクター追加フォーム';
+    submitButton.textContent = '追加する';
+    addCharacterForm.style.display = 'block'; // フォームを表示
+    showAddFormButton.style.display = 'none'; // 「＋」ボタンを隠す
+    renderRelationshipForm(); // 関係設定フォームを描画
+});
+
 // ▼▼▼ 新しいイベントリスナー ▼▼▼
 /**
  * 管理室のキャラクターリストがクリックされたときの処理
@@ -467,6 +523,11 @@ managementCharacterList.addEventListener('click', (event) => {
             talkFirstPersonInput.value = characterToEdit.talk_style.first_person;
             talkSuffixInput.value = characterToEdit.talk_style.suffix;
             document.querySelector(`input[name="activity-pattern"][value="${characterToEdit.activityPattern}"]`).checked = true;
+
+            currentlyEditingId = idToEdit; // 編集モードに設定
+            addCharacterForm.style.display = 'block'; // フォームを表示
+            showAddFormButton.style.display = 'none'; // 「＋」ボタンを隠す
+            renderRelationshipForm(); // 関係設定フォームを描画
             
             interestsInput.value = characterToEdit.interests ? characterToEdit.interests.join(', ') : ''; // ▼▼▼ 追加
 
