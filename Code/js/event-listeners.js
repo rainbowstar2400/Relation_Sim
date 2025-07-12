@@ -1,5 +1,6 @@
 import { dom, initDomCache } from './dom-cache.js';
 import { switchView, alignAllSliderTicks } from './view-switcher.js';
+import { setupDailyReport } from './daily-report.js';
 import { calculateMbti } from './mbti-diagnosis.js';
 import { renderCharacters, renderManagementList } from './character-render.js';
 import { setupFormHandlers } from './form-handler.js';
@@ -8,8 +9,12 @@ import { exportState, importStateFromFile } from './storage.js';
 
 export function setupEventListeners() {
     dom.managementButton.addEventListener('click', () => switchView('management'));
+    dom.dailyReportButton.addEventListener('click', () => {
+        switchView('daily-report');
+    });
     dom.backToMainButton.addEventListener('click', () => switchView('main'));
     dom.statusBackButton.addEventListener('click', () => switchView('main'));
+    dom.reportBackButton.addEventListener('click', () => switchView('main'));
     dom.saveButton.addEventListener('click', () => exportState(state));
     dom.loadButton.addEventListener('click', () => dom.loadFileInput.click());
     dom.loadFileInput.addEventListener('change', (e) => {
@@ -67,4 +72,5 @@ export function setupEventListeners() {
     });
 
     setupFormHandlers();
+    setupDailyReport();
 }
