@@ -295,3 +295,17 @@ input[type="range"]::-moz-range-thumb {
 #configured-relationships-list .delete-relation-button {
     margin-left: 5px;
 }
+/* 日報画面 */
+#daily-report-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+#daily-report-view input[type="date"] {
+    color: #e0e0e0;
+    background-color: #3d3d3d;
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+}
