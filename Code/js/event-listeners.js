@@ -6,12 +6,14 @@ import { renderCharacters, renderManagementList } from './character-render.js';
 import { setupFormHandlers } from './form-handler.js';
 import { state, mbtiDescriptions } from './state.js';
 import { exportState, importStateFromFile } from './storage.js';
+import { triggerRandomEvent } from './event-system.js';
 
 export function setupEventListeners() {
     dom.managementButton.addEventListener('click', () => switchView('management'));
     dom.dailyReportButton.addEventListener('click', () => {
         switchView('daily-report');
     });
+    dom.devEventButton.addEventListener('click', () => triggerRandomEvent());
     dom.backToMainButton.addEventListener('click', () => switchView('main'));
     dom.statusBackButton.addEventListener('click', () => switchView('main'));
     dom.reportBackButton.addEventListener('click', () => switchView('main'));

@@ -6,6 +6,7 @@ export function initDomCache() {
     dom.timeElement = document.getElementById('time');
     dom.dateElement = document.getElementById('date');
     dom.characterListElement = document.querySelector('.character-list');
+    dom.logContent = document.getElementById('log-content');
     dom.mbtiInputs = {};
     for (let i = 1; i <= 16; i++) {
         dom.mbtiInputs[`q${i}`] = document.getElementById(`mbti-q${i}`);
@@ -17,6 +18,7 @@ export function initDomCache() {
     dom.backToMainButton = document.getElementById('back-to-main-button');
     dom.managementButton = document.getElementById('management-button');
     dom.dailyReportButton = document.getElementById('daily-report-button');
+    dom.devEventButton = document.getElementById('dev-event-button');
     dom.saveButton = document.getElementById('save-button');
     dom.loadButton = document.getElementById('load-button');
     dom.loadFileInput = document.getElementById('load-file-input');
