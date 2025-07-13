@@ -6,6 +6,8 @@ export function initDomCache() {
     dom.timeElement = document.getElementById('time');
     dom.dateElement = document.getElementById('date');
     dom.characterListElement = document.querySelector('.character-list');
+    dom.consultationArea = document.querySelector('.consultation-area');
+    dom.logContent = document.querySelector('.log-display .log-content');
     dom.mbtiInputs = {};
     for (let i = 1; i <= 16; i++) {
         dom.mbtiInputs[`q${i}`] = document.getElementById(`mbti-q${i}`);

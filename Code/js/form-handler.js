@@ -5,6 +5,7 @@ import { renderCharacters, renderManagementList } from './character-render.js';
 import { renderRelationshipEditor } from './relationship-editor.js';
 import { switchView, resetFormState, alignAllSliderTicks } from './view-switcher.js';
 import { saveState } from './storage.js';
+import { addLog } from './event-log.js';
 
 export function setupFormHandlers() {
     dom.addCharacterForm.addEventListener('submit', (event) => {
@@ -49,6 +50,7 @@ export function setupFormHandlers() {
                 charToUpdate.activityPattern = activityPatternValue;
                 charToUpdate.interests = interestsValue;
             }
+            addLog(`キャラクター「${dom.charNameInput.value}」を更新しました。`);
             state.relationships = state.relationships.filter(r => !r.pair.includes(characterId));
             state.nicknames = state.nicknames.filter(n => n.from !== characterId && n.to !== characterId);
             state.affections = state.affections.filter(a => a.from !== characterId && a.to !== characterId);
@@ -64,6 +66,7 @@ export function setupFormHandlers() {
                 activityPattern: activityPatternValue,
                 interests: interestsValue,
             });
+            addLog(`キャラクター「${dom.charNameInput.value}」を追加しました。`);
         }
 
         Object.keys(state.tempRelations).forEach(targetId => {
@@ -110,10 +113,12 @@ export function setupFormHandlers() {
         if (event.target.classList.contains('delete-button')) {
             const idToDelete = event.target.dataset.id;
             if (confirm('本当にこのキャラクターを削除しますか？')) {
+                const target = state.characters.find(char => char.id === idToDelete);
                 state.characters = state.characters.filter(char => char.id !== idToDelete);
                 renderManagementList();
                 renderCharacters();
                 saveState(state);
+                addLog(`キャラクター「${target ? target.name : idToDelete}」を削除しました。`);
             }
         } else if (event.target.classList.contains('edit-button')) {
             const idToEdit = event.target.dataset.id;

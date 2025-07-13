@@ -6,6 +6,7 @@ import { renderCharacters, renderManagementList } from './character-render.js';
 import { setupFormHandlers } from './form-handler.js';
 import { state, mbtiDescriptions } from './state.js';
 import { exportState, importStateFromFile } from './storage.js';
+import { addLog } from './event-log.js';
 
 export function setupEventListeners() {
     dom.managementButton.addEventListener('click', () => switchView('management'));
@@ -70,6 +71,17 @@ export function setupEventListeners() {
         dom.mbtiDiagModeBtn.classList.remove('active');
         dom.mbtiManualModeBtn.classList.add('active');
     });
+
+    if (dom.consultationArea) {
+        dom.consultationArea.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON' && e.target.closest('.consultation-item')) {
+                const msg = e.target.closest('.consultation-item').querySelector('span').textContent.replace('・', '').trim();
+                addLog(`${msg} に対応しました。`);
+            } else if (e.target.classList.contains('add-consultation')) {
+                addLog('新しい相談を受け付けました。');
+            }
+        });
+    }
 
     setupFormHandlers();
     setupDailyReport();

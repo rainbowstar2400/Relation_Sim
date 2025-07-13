@@ -4,6 +4,7 @@ import { renderCharacters } from './character-render.js';
 import { switchView, alignAllSliderTicks } from './view-switcher.js';
 import { loadState } from './storage.js';
 import { state } from './state.js';
+import { renderLogs } from './event-log.js';
 
 function updateDateTime() {
     const now = new Date();
@@ -33,6 +34,7 @@ export async function initializeApp() {
     setInterval(updateDateTime, 1000);
     updateDateTime();
     renderCharacters();
+    renderLogs();
     switchView('main');
     requestAnimationFrame(alignAllSliderTicks);
 }
