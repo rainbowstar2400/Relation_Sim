@@ -1,6 +1,7 @@
 import { initDomCache, dom } from './dom-cache.js';
 import { setupEventListeners } from './event-listeners.js';
 import { renderCharacters } from './character-render.js';
+import { triggerRandomEvent } from './event-system.js';
 import { switchView, alignAllSliderTicks } from './view-switcher.js';
 import { loadState } from './storage.js';
 import { state } from './state.js';
@@ -32,6 +33,7 @@ export async function initializeApp() {
     setupEventListeners();
     setInterval(updateDateTime, 1000);
     updateDateTime();
+    setInterval(triggerRandomEvent, 60000);
     renderCharacters();
     switchView('main');
     requestAnimationFrame(alignAllSliderTicks);
