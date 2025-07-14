@@ -1,6 +1,7 @@
 import { state } from './state.js';
 import { saveState } from './storage.js';
 import { dom } from './dom-cache.js';
+import { drawMood } from './mood.js';
 
 function getRandomPair() {
     if (state.characters.length < 2) return null;
@@ -32,9 +33,9 @@ function appendLog(text, type = 'EVENT') {
     }
 }
 
-function storeEvent(text) {
+function storeEvent(event) {
     const history = JSON.parse(localStorage.getItem('event_history') || '[]');
-    history.push({ timestamp: Date.now(), description: text });
+    history.push(event);
     localStorage.setItem('event_history', JSON.stringify(history));
 }
 
@@ -62,9 +63,10 @@ export function triggerRandomEvent() {
     }
     updateAffection(a.id, b.id, delta);
     updateAffection(b.id, a.id, delta);
+    const mood = drawMood(a.id, b.id);
     appendLog(desc);
     appendLog(`${a.name}→${b.name}の好感度が上昇しました`, 'SYSTEM');
     appendLog(`${b.name}→${a.name}の好感度が上昇しました`, 'SYSTEM');
-    storeEvent(desc);
+    storeEvent({ timestamp: Date.now(), description: desc, mood });
     saveState(state);
 }
