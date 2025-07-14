@@ -2,6 +2,7 @@ import { initDomCache, dom } from './dom-cache.js';
 import { setupEventListeners } from './event-listeners.js';
 import { renderCharacters } from './character-render.js';
 import { triggerRandomEvent } from './event-system.js';
+import { loadMoodTables } from './mood.js';
 import { switchView, alignAllSliderTicks } from './view-switcher.js';
 import { loadState } from './storage.js';
 import { state } from './state.js';
@@ -41,6 +42,7 @@ export async function initializeApp() {
     if (saved) {
         Object.assign(state, saved);
     }
+    await loadMoodTables();
     setupEventListeners();
     setInterval(updateDateTime, 1000);
     updateDateTime();
