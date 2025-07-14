@@ -6,6 +6,9 @@ import { switchView, alignAllSliderTicks } from './view-switcher.js';
 import { loadState } from './storage.js';
 import { state } from './state.js';
 
+const EVENT_INTERVAL_MS = 1800000; // 30分に1回
+const EVENT_PROBABILITY = 0.7; // 70%
+
 function updateDateTime() {
     const now = new Date();
     const hours = String(now.getHours()).padStart(2, '0');
@@ -16,6 +19,14 @@ function updateDateTime() {
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
     dom.dateElement.textContent = `${year}/${month}/${day}`;
+}
+
+function startEventScheduler() {
+    setInterval(() => {
+        if (Math.random() < EVENT_PROBABILITY) {
+            triggerRandomEvent();
+        }
+    }, EVENT_INTERVAL_MS);
 }
 
 export async function loadHTML(id, file) {
@@ -33,7 +44,7 @@ export async function initializeApp() {
     setupEventListeners();
     setInterval(updateDateTime, 1000);
     updateDateTime();
-    setInterval(triggerRandomEvent, 60000);
+    startEventScheduler();
     renderCharacters();
     switchView('main');
     requestAnimationFrame(alignAllSliderTicks);

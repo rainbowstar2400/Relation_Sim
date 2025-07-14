@@ -21,10 +21,11 @@ function updateAffection(from, to, delta) {
     rec.score += delta;
 }
 
-function appendLog(text) {
-    const time = new Date().toTimeString().slice(0,5);
+function appendLog(text, type = 'EVENT') {
+    const time = new Date().toTimeString().slice(0, 5);
     const p = document.createElement('p');
-    p.innerHTML = `<span class="log-time">[${time}]</span> <span class="log-event">EVENT:</span> ${text}`;
+    const cls = type === 'SYSTEM' ? 'log-system' : 'log-event';
+    p.innerHTML = `<span class="log-time">[${time}]</span> <span class="${cls}">${type}:</span> ${text}`;
     if (dom.logContent) {
         dom.logContent.appendChild(p);
         dom.logContent.scrollTop = dom.logContent.scrollHeight;
@@ -62,6 +63,8 @@ export function triggerRandomEvent() {
     updateAffection(a.id, b.id, delta);
     updateAffection(b.id, a.id, delta);
     appendLog(desc);
+    appendLog(`${a.name}→${b.name}の好感度が上昇しました`, 'SYSTEM');
+    appendLog(`${b.name}→${a.name}の好感度が上昇しました`, 'SYSTEM');
     storeEvent(desc);
     saveState(state);
 }
