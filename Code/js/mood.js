@@ -7,9 +7,9 @@ let emotionModifier = {};
 
 export async function loadMoodTables() {
     const [distRes, relRes, emoRes] = await Promise.all([
-        fetch('../data/initial_distribution_table.json'),
-        fetch('../data/relation_modifier_table.json'),
-        fetch('../data/emotion_modifier_table.json'),
+        fetch('./data/initial_distribution_table.json'),
+        fetch('./data/relation_modifier_table.json'),
+        fetch('./data/emotion_modifier_table.json'),
     ]);
     initialDistribution = await distRes.json();
     relationModifier = await relRes.json();
