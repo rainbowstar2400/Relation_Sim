@@ -100,3 +100,6 @@ export function triggerRandomEvent() {
     storeEvent({ timestamp: Date.now(), description: desc, mood });
     saveState(state);
 }
+
+// 他モジュールでもログ出力を使うために公開
+export { appendLog };

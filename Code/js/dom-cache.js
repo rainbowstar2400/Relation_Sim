@@ -6,6 +6,7 @@ export function initDomCache() {
     dom.timeElement = document.getElementById('time');
     dom.dateElement = document.getElementById('date');
     dom.characterListElement = document.querySelector('.character-list');
+    dom.consultationList = document.getElementById('consultation-list');
     dom.logContent = document.getElementById('log-content');
     dom.mbtiInputs = {};
     for (let i = 1; i <= 16; i++) {
@@ -83,6 +84,7 @@ export function initDomCache() {
     dom.statusFirstPerson = document.getElementById('status-first-person');
     dom.statusSuffix = document.getElementById('status-suffix');
     dom.statusCondition = document.getElementById('status-condition');
+    dom.statusTrust = document.getElementById('status-trust');
     dom.statusPersonality = {
         social: document.getElementById('status-social'),
         kindness: document.getElementById('status-kindness'),

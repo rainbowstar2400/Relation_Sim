@@ -10,7 +10,8 @@ export let state = {
             mbti_slider: [],
             talk_style: { preset: 'くだけた', first_person: '俺', suffix: '〜じゃん' },
             activityPattern: '夜型',
-            interests: ['読書', '散歩']
+            interests: ['読書', '散歩'],
+            trust: 0
         },
         {
             id: 'char_002',
@@ -20,7 +21,8 @@ export let state = {
             mbti_slider: [],
             talk_style: { preset: '丁寧', first_person: '私', suffix: '〜です' },
             activityPattern: '朝型',
-            interests: ['お菓子作り', 'カフェ巡り']
+            interests: ['お菓子作り', 'カフェ巡り'],
+            trust: 0
         },
         {
             id: 'char_003',
@@ -30,13 +32,15 @@ export let state = {
             mbti_slider: [],
             talk_style: { preset: 'くだけた', first_person: 'ボク', suffix: '〜だよ' },
             activityPattern: '通常',
-            interests: ['音楽鑑賞']
+            interests: ['音楽鑑賞'],
+            trust: 0
         }
     ],
 
     relationships: [], // 関係ラベルを保存
     nicknames: [], // 呼び方を保存
     affections: [], // 好感度を保存
+    consultations: [], // 相談イベント一覧
     currentlyEditingId: null,
     tempRelations: {},
 };
@@ -68,3 +72,15 @@ export const mbtiDescriptions = {
     ESTP: "賢く、エネルギッシュで、リスクを恐れない起業家精神の持ち主です。",
     ESTJ: "優れた管理能力を持ち、物事を着実に実行していく、頼れる幹部タイプです。",
 };
+
+// 信頼度操作用ユーティリティ
+export function getTrust(id) {
+    const char = state.characters.find(c => c.id === id);
+    return char ? char.trust || 0 : 0;
+}
+
+export function updateTrust(id, delta) {
+    const char = state.characters.find(c => c.id === id);
+    if (!char) return;
+    char.trust = Math.max(0, Math.min(100, (char.trust || 0) + delta));
+}

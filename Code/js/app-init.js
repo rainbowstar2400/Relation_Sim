@@ -2,6 +2,7 @@ import { initDomCache, dom } from './dom-cache.js';
 import { setupEventListeners } from './event-listeners.js';
 import { renderCharacters } from './character-render.js';
 import { triggerRandomEvent } from './event-system.js';
+import { loadConsultationTemplates, tryGenerateConsultation, renderConsultations } from './consultation.js';
 import { loadMoodTables } from './mood.js';
 import { switchView, alignAllSliderTicks } from './view-switcher.js';
 import { loadState } from './storage.js';
@@ -9,6 +10,7 @@ import { state } from './state.js';
 
 const EVENT_INTERVAL_MS = 1800000; // 30分に1回
 const EVENT_PROBABILITY = 0.7; // 70%
+const CONSULTATION_INTERVAL_MS = 3600000; // 1時間ごと
 
 function updateDateTime() {
     const now = new Date();
@@ -30,6 +32,12 @@ function startEventScheduler() {
     }, EVENT_INTERVAL_MS);
 }
 
+function startConsultationScheduler() {
+    setInterval(() => {
+        tryGenerateConsultation();
+    }, CONSULTATION_INTERVAL_MS);
+}
+
 export async function loadHTML(id, file) {
     const res = await fetch(file);
     const html = await res.text();
@@ -43,11 +51,14 @@ export async function initializeApp() {
         Object.assign(state, saved);
     }
     await loadMoodTables();
+    await loadConsultationTemplates();
     setupEventListeners();
     setInterval(updateDateTime, 1000);
     updateDateTime();
     startEventScheduler();
+    startConsultationScheduler();
     renderCharacters();
+    renderConsultations();
     switchView('main');
     requestAnimationFrame(alignAllSliderTicks);
 }

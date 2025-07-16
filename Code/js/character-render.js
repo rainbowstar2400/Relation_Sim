@@ -86,6 +86,7 @@ function showCharacterStatus(char) {
     dom.statusFirstPerson.textContent = style.first_person;
     dom.statusSuffix.textContent = style.suffix;
     dom.statusCondition.textContent = '活動中';
+    dom.statusTrust.textContent = char.trust;
     const p = char.personality;
     dom.statusPersonality.social.textContent = levelToBars(p.social);
     dom.statusPersonality.kindness.textContent = levelToBars(p.kindness);
