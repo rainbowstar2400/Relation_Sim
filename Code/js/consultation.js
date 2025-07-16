@@ -161,7 +161,7 @@ function openPopup(id) {
     dom.consultationPopup.style.display = 'flex';
 }
 
-dom.consultationSendButton?.addEventListener('click', () => {
+function handleSendClick() {
     if (currentId == null) return;
     const ev = state.consultations.find(e => e.id === currentId);
     if (!ev) return;
@@ -174,14 +174,20 @@ dom.consultationSendButton?.addEventListener('click', () => {
     let delta = 0;
     if (kind === 'good') delta = Math.floor(Math.random() * 3) + 3; // +3〜+5
     else if (kind === 'neutral') delta = Math.floor(Math.random() * 3); // 0〜2
-    else delta = - (Math.floor(Math.random() * 3) + 2); // -2〜-4
+    else delta = -(Math.floor(Math.random() * 3) + 2); // -2〜-4
     updateTrust(ev.charId, delta);
     dom.consultationAnswerArea.innerHTML = '<p>ありがとう！</p>';
     setTimeout(() => {
         dom.consultationPopup.style.display = 'none';
         removeConsultation(ev.id, true);
     }, 800);
-});
+}
+
+export function setupConsultationHandlers() {
+    if (dom.consultationSendButton) {
+        dom.consultationSendButton.addEventListener('click', handleSendClick);
+    }
+}
 
 export function removeConsultation(id, answered) {
     const idx = state.consultations.findIndex(e => e.id === id);
