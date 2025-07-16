@@ -118,6 +118,14 @@ input[type="range"]::-moz-range-thumb {
     font-weight: bold;
     color: #ffd166;
 }
+.relation-item summary {
+    cursor: pointer;
+    list-style: none;
+}
+.detail-body {
+    margin-left: 1em;
+    margin-top: 4px;
+}
 .relation-direction {
     margin-left: 1em;
     margin-top: 4px;

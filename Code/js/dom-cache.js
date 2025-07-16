@@ -90,6 +90,8 @@ export function initDomCache() {
     dom.statusFirstPerson = document.getElementById('status-first-person');
     dom.statusSuffix = document.getElementById('status-suffix');
     dom.statusCondition = document.getElementById('status-condition');
+    dom.statusActivityPattern = document.getElementById('status-activity-pattern');
+    dom.statusTrust = document.getElementById('status-trust');
     dom.statusPersonality = {
         social: document.getElementById('status-social'),
         kindness: document.getElementById('status-kindness'),
