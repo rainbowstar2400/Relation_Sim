@@ -7,6 +7,7 @@ import { loadEmotionLabelTable } from './emotion-label.js';
 import { switchView, alignAllSliderTicks } from './view-switcher.js';
 import { loadState } from './storage.js';
 import { state } from './state.js';
+import { renderSavedLogs } from './logger.js';
 import { loadConsultationTemplates, startConsultationScheduler, renderConsultations } from './consultation.js';
 
 const EVENT_INTERVAL_MS = 1800000; // 30分に1回
@@ -43,6 +44,7 @@ export async function initializeApp() {
     const saved = loadState();
     if (saved) {
         Object.assign(state, saved);
+        renderSavedLogs();
     }
     await loadEmotionLabelTable();
     await loadMoodTables();
