@@ -5,16 +5,17 @@
 
 <section class="consultation-area">
     <h2>▼ 困りごと相談エリア</h2>
-    <div class="consultation-item">
-        <span>・彩花から相談があります</span>
-        <button>対応する</button>
-    </div>
-    <div class="consultation-item">
-        <span>・志音が困っているようです</span>
-        <button>対応する</button>
-    </div>
-    <button class="add-consultation">+ 相談をさらに受ける</button>
+    <ul id="consultation-list"></ul>
+    <button id="add-consultation-button" class="add-consultation">+ 相談をさらに受ける</button>
 </section>
+
+<div id="consultation-popup" class="consultation-popup" style="display:none;">
+    <div class="popup-inner">
+        <p id="consultation-question"></p>
+        <div id="consultation-answer-area"></div>
+        <button id="consultation-send-button">送信する</button>
+    </div>
+</div>
 
 <section class="log-display">
     <h2>▼ ログ表示エリア (CLI風)</h2>
