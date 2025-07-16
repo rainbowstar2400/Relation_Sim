@@ -1,19 +1,23 @@
 // 雰囲気(mood)抽選関連の処理
-import { state } from './state.js';
+import { state } from "./state.js";
+import { getEmotionLabel, specialRelations } from "./emotion-label.js";
 
 let initialDistribution = {};
 let relationModifier = {};
 let emotionModifier = {};
+let emotionModifierSpecial = {};
 
 export async function loadMoodTables() {
-    const [distRes, relRes, emoRes] = await Promise.all([
+    const [distRes, relRes, emoRes, emoSpeRes] = await Promise.all([
         fetch('./data/initial_distribution_table.json'),
         fetch('./data/relation_modifier_table.json'),
         fetch('./data/emotion_modifier_table.json'),
+        fetch('./data/emotion_modifier_table_special.json'),
     ]);
     initialDistribution = await distRes.json();
     relationModifier = await relRes.json();
     emotionModifier = await emoRes.json();
+    emotionModifierSpecial = await emoSpeRes.json();
 }
 
 function getAffection(from, to) {
@@ -51,10 +55,14 @@ export function drawMood(idA, idB) {
     const base = initialDistribution[String(baseMood)];
     if (!base) return 0;
 
-    const relationCoeff = getModifier(relationModifier, getRelationLabel(idA, idB));
-    // 感情ラベルは未実装のため仮に 'なし' を使用
-    const emotionCoeffA = getModifier(emotionModifier, 'なし');
-    const emotionCoeffB = getModifier(emotionModifier, 'なし');
+    const relation = getRelationLabel(idA, idB);
+    const relationCoeff = getModifier(relationModifier, relation);
+    const isSpecial = specialRelations.includes(relation);
+    const emotionTable = isSpecial ? emotionModifierSpecial : emotionModifier;
+    const labelA = getEmotionLabel(idA, idB) || 'なし';
+    const labelB = getEmotionLabel(idB, idA) || 'なし';
+    const emotionCoeffA = getModifier(emotionTable, labelA);
+    const emotionCoeffB = getModifier(emotionTable, labelB);
 
     const corrected = {};
     let total = 0;
