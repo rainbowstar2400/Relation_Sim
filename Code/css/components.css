@@ -310,6 +310,12 @@ input[type="range"]::-moz-range-thumb {
     padding-left: 0;
 }
 
+#change-history-list {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 10px;
+}
+
 #daily-report-view input[type="date"] {
     color: #e0e0e0;
     background-color: #3d3d3d;

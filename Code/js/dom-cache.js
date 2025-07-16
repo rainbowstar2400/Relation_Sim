@@ -105,6 +105,7 @@ export function initDomCache() {
     // 日報画面要素
     dom.dailyReportView = document.getElementById('daily-report-view');
     dom.dailyReportList = document.getElementById('daily-report-list');
+    dom.changeHistoryList = document.getElementById('change-history-list');
     dom.reportDateInput = document.getElementById('report-date');
     dom.reportBackButton = document.getElementById('back-to-main-from-report');
 }
