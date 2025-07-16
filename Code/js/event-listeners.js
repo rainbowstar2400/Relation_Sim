@@ -8,6 +8,7 @@ import { state, mbtiDescriptions } from './state.js';
 import { exportState, importStateFromFile } from './storage.js';
 import { triggerRandomEvent } from './event-system.js';
 import { createConsultation, setupConsultationHandlers } from './consultation.js';
+import { renderSavedLogs } from './logger.js';
 
 export function setupEventListeners() {
     dom.managementButton.addEventListener('click', () => switchView('management'));
@@ -28,6 +29,7 @@ export function setupEventListeners() {
                 Object.assign(state, loaded);
                 renderCharacters();
                 renderManagementList();
+                renderSavedLogs();
             })
             .catch(() => alert('読み込みに失敗しました。'))
             .finally(() => {

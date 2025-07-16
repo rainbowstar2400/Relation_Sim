@@ -80,8 +80,7 @@ function createDirectionBlock(labelText, score, nickname) {
 }
 
 function renderCharacterEvents(char) {
-    const all = JSON.parse(localStorage.getItem('event_history') || '[]');
-    const events = all
+    const events = state.reports
         .filter(ev => ev.description && ev.description.includes(char.name))
         .sort((a, b) => b.timestamp - a.timestamp)
         .slice(0, 5);

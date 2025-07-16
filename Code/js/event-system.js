@@ -44,9 +44,7 @@ function updateAffection(from, to, delta) {
 
 
 function storeEvent(event) {
-    const history = JSON.parse(localStorage.getItem('event_history') || '[]');
-    history.push(event);
-    localStorage.setItem('event_history', JSON.stringify(history));
+    state.reports.push(event);
 }
 
 export function triggerRandomEvent() {

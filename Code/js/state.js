@@ -50,6 +50,8 @@ export let state = {
         { id: 'char_003', score: 50 }
     ], // プレイヤーへの信頼度
     consultations: [], // 進行中の相談イベント
+    logs: {}, // CLIログを日付ごとに保存
+    reports: [], // 日報イベント履歴を保存
     currentlyEditingId: null,
     tempRelations: {},
 };

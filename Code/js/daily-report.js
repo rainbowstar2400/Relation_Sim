@@ -1,8 +1,8 @@
 import { dom } from './dom-cache.js';
+import { state } from './state.js';
 
 function filterEventsByDate(dateStr) {
-    const events = JSON.parse(localStorage.getItem('event_history') || '[]');
-    return events.filter(ev => {
+    return state.reports.filter(ev => {
         if (!ev.timestamp) return false;
         const d = new Date(ev.timestamp).toISOString().split('T')[0];
         return d === dateStr;
