@@ -19,7 +19,7 @@ export function loadState() {
     try {
         const parsed = JSON.parse(data);
         parsed.logs = parsed.logs || {};
-        parsed.reports = parsed.reports || [];
+        parsed.reports = parsed.reports || {};
         return parsed;
     } catch (e) {
         console.error('保存データの読み込みに失敗しました', e);
@@ -51,7 +51,7 @@ export function importStateFromFile(file) {
             try {
                 const data = JSON.parse(reader.result);
                 data.logs = data.logs || {};
-                data.reports = data.reports || [];
+                data.reports = data.reports || {};
                 resolve(data);
             } catch (e) {
                 reject(e);

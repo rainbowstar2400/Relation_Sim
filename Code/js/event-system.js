@@ -3,6 +3,7 @@ import { saveState } from './storage.js';
 import { drawMood } from './mood.js';
 import { appendLog } from './logger.js';
 import { drawEmotionChange } from './emotion-label.js';
+import { addReportEvent, addReportChange } from './report-utils.js';
 
 // イベント種別ごとの基礎好感度値
 const baseAffection = {
@@ -43,9 +44,6 @@ function updateAffection(from, to, delta) {
 }
 
 
-function storeEvent(event) {
-    state.reports.push(event);
-}
 
 export function triggerRandomEvent() {
     const pair = getRandomPair();
@@ -76,6 +74,11 @@ export function triggerRandomEvent() {
 
     updateAffection(a.id, b.id, delta);
     updateAffection(b.id, a.id, delta);
+    if (delta !== 0) {
+        const verb = delta > 0 ? '上昇しました' : '下降しました';
+        addReportChange(`${a.name}→${b.name}の好感度が${verb}`);
+        addReportChange(`${b.name}→${a.name}の好感度が${verb}`);
+    }
 
     appendLog(desc);
     if (delta !== 0) {
@@ -90,6 +93,6 @@ export function triggerRandomEvent() {
     drawEmotionChange(a.id, b.id, mood);
     drawEmotionChange(b.id, a.id, mood);
 
-    storeEvent({ timestamp: Date.now(), description: desc, mood });
+    addReportEvent({ timestamp: Date.now(), description: desc, mood });
     saveState(state);
 }

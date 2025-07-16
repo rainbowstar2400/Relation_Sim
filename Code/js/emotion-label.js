@@ -1,5 +1,6 @@
 import { state } from './state.js';
 import { appendLog } from './logger.js';
+import { addReportChange } from './report-utils.js';
 
 let drawTable = null;
 
@@ -107,5 +108,6 @@ export function drawEmotionChange(from, to, mood) {
         const fromName = state.characters.find(c => c.id === from)?.name || from;
         const toName = state.characters.find(c => c.id === to)?.name || to;
         appendLog(`${fromName}→${toName}の印象が「${result}」に変化しました。`, 'SYSTEM');
+        addReportChange(`${fromName}→${toName}の印象「${current}」→「${result}」`);
     }
 }

@@ -1,31 +1,41 @@
 import { dom } from './dom-cache.js';
 import { state } from './state.js';
 
-function filterEventsByDate(dateStr) {
-    return state.reports.filter(ev => {
-        if (!ev.timestamp) return false;
-        const d = new Date(ev.timestamp).toISOString().split('T')[0];
-        return d === dateStr;
-    });
+function getReportByDate(dateStr) {
+    const report = state.reports[dateStr];
+    if (!report) return { events: [], changes: [] };
+    return report;
 }
 
 export function renderDailyReport(dateStr) {
     const target = dateStr || new Date().toISOString().split('T')[0];
     if (!dateStr) dom.reportDateInput.value = target;
-    const events = filterEventsByDate(target);
+    const report = getReportByDate(target);
     dom.dailyReportList.innerHTML = '';
-    if (events.length === 0) {
+    dom.changeHistoryList.innerHTML = '';
+    if (report.events.length === 0) {
         const li = document.createElement('li');
         li.textContent = 'イベントがありません';
         dom.dailyReportList.appendChild(li);
-        return;
+    } else {
+        report.events.forEach(ev => {
+            const li = document.createElement('li');
+            const time = new Date(ev.timestamp).toTimeString().slice(0,5);
+            li.textContent = `[${time}] ${ev.description || ''}`;
+            dom.dailyReportList.appendChild(li);
+        });
     }
-    events.forEach(ev => {
+    if (report.changes.length === 0) {
         const li = document.createElement('li');
-        const time = new Date(ev.timestamp).toTimeString().slice(0,5);
-        li.textContent = `[${time}] ${ev.description || ''}`;
-        dom.dailyReportList.appendChild(li);
-    });
+        li.textContent = '変化はありません';
+        dom.changeHistoryList.appendChild(li);
+    } else {
+        report.changes.forEach(chg => {
+            const li = document.createElement('li');
+            li.textContent = `[${chg.time}] ${chg.description}`;
+            dom.changeHistoryList.appendChild(li);
+        });
+    }
 }
 
 export function setupDailyReport() {
