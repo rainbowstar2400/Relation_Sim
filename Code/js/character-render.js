@@ -79,6 +79,29 @@ function createDirectionBlock(labelText, score, nickname) {
     return div;
 }
 
+function renderCharacterEvents(char) {
+    const all = JSON.parse(localStorage.getItem('event_history') || '[]');
+    const events = all
+        .filter(ev => ev.description && ev.description.includes(char.name))
+        .sort((a, b) => b.timestamp - a.timestamp)
+        .slice(0, 5);
+
+    dom.statusEvents.innerHTML = '';
+    if (events.length === 0) {
+        const li = document.createElement('li');
+        li.textContent = '履歴なし';
+        dom.statusEvents.appendChild(li);
+        return;
+    }
+    events.forEach(ev => {
+        const d = new Date(ev.timestamp);
+        const dateStr = `${d.getMonth() + 1}/${d.getDate()}`;
+        const li = document.createElement('li');
+        li.textContent = `${dateStr} ${ev.description}`;
+        dom.statusEvents.appendChild(li);
+    });
+}
+
 function showCharacterStatus(char) {
     dom.statusName.textContent = char.name;
     dom.statusMbti.textContent = char.mbti;
@@ -139,6 +162,6 @@ function showCharacterStatus(char) {
         });
     }
 
-    dom.statusEvents.textContent = '';
+    renderCharacterEvents(char);
     switchView('status');
 }
