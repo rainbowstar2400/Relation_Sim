@@ -37,6 +37,7 @@ export let state = {
     relationships: [], // 関係ラベルを保存
     nicknames: [], // 呼び方を保存
     affections: [], // 好感度を保存
+    emotions: [], // 感情ラベルを保存
     currentlyEditingId: null,
     tempRelations: {},
 };

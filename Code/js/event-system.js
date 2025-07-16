@@ -1,7 +1,8 @@
 import { state } from './state.js';
 import { saveState } from './storage.js';
-import { dom } from './dom-cache.js';
 import { drawMood } from './mood.js';
+import { appendLog } from './logger.js';
+import { drawEmotionChange } from './emotion-label.js';
 
 // イベント種別ごとの基礎好感度値
 const baseAffection = {
@@ -41,16 +42,6 @@ function updateAffection(from, to, delta) {
     rec.score = Math.max(-100, Math.min(100, rec.score));
 }
 
-function appendLog(text, type = 'EVENT') {
-    const time = new Date().toTimeString().slice(0, 5);
-    const p = document.createElement('p');
-    const cls = type === 'SYSTEM' ? 'log-system' : 'log-event';
-    p.innerHTML = `<span class="log-time">[${time}]</span> <span class="${cls}">${type}:</span> ${text}`;
-    if (dom.logContent) {
-        dom.logContent.appendChild(p);
-        dom.logContent.scrollTop = dom.logContent.scrollHeight;
-    }
-}
 
 function storeEvent(event) {
     const history = JSON.parse(localStorage.getItem('event_history') || '[]');
@@ -96,6 +87,10 @@ export function triggerRandomEvent() {
     } else {
         appendLog(`${a.name}と${b.name}の好感度に変化はありません`, 'SYSTEM');
     }
+
+    // 好感度変化後に感情ラベル変化を抽選
+    drawEmotionChange(a.id, b.id, mood);
+    drawEmotionChange(b.id, a.id, mood);
 
     storeEvent({ timestamp: Date.now(), description: desc, mood });
     saveState(state);
