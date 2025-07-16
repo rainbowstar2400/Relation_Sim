@@ -102,7 +102,8 @@ input[type="range"]::-moz-range-thumb {
 
 /* ステータス画面のリスト */
 .personality-list,
-.relation-list {
+.relation-list,
+#status-events {
     list-style: none;
     padding-left: 0;
 }
