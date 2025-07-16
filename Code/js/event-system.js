@@ -79,9 +79,6 @@ export function triggerRandomEvent() {
     updateAffection(a.id, b.id, delta);
     updateAffection(b.id, a.id, delta);
 
-    drawEmotionChange(a.id, b.id, mood);
-    drawEmotionChange(b.id, a.id, mood);
-
     appendLog(desc);
     if (delta !== 0) {
         const verb = delta > 0 ? '上昇しました' : '下降しました';
@@ -90,6 +87,10 @@ export function triggerRandomEvent() {
     } else {
         appendLog(`${a.name}と${b.name}の好感度に変化はありません`, 'SYSTEM');
     }
+
+    // 好感度変化後に感情ラベル変化を抽選
+    drawEmotionChange(a.id, b.id, mood);
+    drawEmotionChange(b.id, a.id, mood);
 
     storeEvent({ timestamp: Date.now(), description: desc, mood });
     saveState(state);
