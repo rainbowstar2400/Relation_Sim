@@ -7,6 +7,7 @@ import { setupFormHandlers } from './form-handler.js';
 import { state, mbtiDescriptions } from './state.js';
 import { exportState, importStateFromFile } from './storage.js';
 import { triggerRandomEvent } from './event-system.js';
+import { createConsultation, setupConsultationHandlers } from './consultation.js';
 
 export function setupEventListeners() {
     dom.managementButton.addEventListener('click', () => switchView('management'));
@@ -72,6 +73,9 @@ export function setupEventListeners() {
         dom.mbtiDiagModeBtn.classList.remove('active');
         dom.mbtiManualModeBtn.classList.add('active');
     });
+
+    dom.addConsultationButton.addEventListener('click', () => createConsultation());
+    setupConsultationHandlers();
 
     setupFormHandlers();
     setupDailyReport();

@@ -10,7 +10,9 @@ export let state = {
             mbti_slider: [],
             talk_style: { preset: 'くだけた', first_person: '俺', suffix: '〜じゃん' },
             activityPattern: '夜型',
-            interests: ['読書', '散歩']
+            interests: ['読書', '散歩'],
+            condition: '活動中',
+            lastConsultation: 0
         },
         {
             id: 'char_002',
@@ -20,7 +22,9 @@ export let state = {
             mbti_slider: [],
             talk_style: { preset: '丁寧', first_person: '私', suffix: '〜です' },
             activityPattern: '朝型',
-            interests: ['お菓子作り', 'カフェ巡り']
+            interests: ['お菓子作り', 'カフェ巡り'],
+            condition: '活動中',
+            lastConsultation: 0
         },
         {
             id: 'char_003',
@@ -30,7 +34,9 @@ export let state = {
             mbti_slider: [],
             talk_style: { preset: 'くだけた', first_person: 'ボク', suffix: '〜だよ' },
             activityPattern: '通常',
-            interests: ['音楽鑑賞']
+            interests: ['音楽鑑賞'],
+            condition: '活動中',
+            lastConsultation: 0
         }
     ],
 
@@ -38,6 +44,12 @@ export let state = {
     nicknames: [], // 呼び方を保存
     affections: [], // 好感度を保存
     emotions: [], // 感情ラベルを保存
+    trusts: [
+        { id: 'char_001', score: 50 },
+        { id: 'char_002', score: 50 },
+        { id: 'char_003', score: 50 }
+    ], // プレイヤーへの信頼度
+    consultations: [], // 進行中の相談イベント
     currentlyEditingId: null,
     tempRelations: {},
 };

@@ -77,6 +77,36 @@ h2 {
     margin-bottom: 8px;
 }
 
+.consultation-popup {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.consultation-popup .popup-inner {
+    background-color: #3d3d3d;
+    padding: 20px;
+    border-radius: 6px;
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+}
+
+.consultation-popup .popup-close {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+}
+
 /* ログ表示エリア (CLI風) - ここは黒を維持してメリハリをつけます */
 .log-display .log-content {
     background-color: #1e1e1e;

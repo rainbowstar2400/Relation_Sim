@@ -6,6 +6,13 @@ export function initDomCache() {
     dom.timeElement = document.getElementById('time');
     dom.dateElement = document.getElementById('date');
     dom.characterListElement = document.querySelector('.character-list');
+    dom.consultationList = document.getElementById('consultation-list');
+    dom.addConsultationButton = document.getElementById('add-consultation-button');
+    dom.consultationPopup = document.getElementById('consultation-popup');
+    dom.consultationQuestion = document.getElementById('consultation-question');
+    dom.consultationAnswerArea = document.getElementById('consultation-answer-area');
+    dom.consultationSendButton = document.getElementById('consultation-send-button');
+    dom.consultationCloseButton = document.getElementById('consultation-close-button');
     dom.logContent = document.getElementById('log-content');
     dom.mbtiInputs = {};
     for (let i = 1; i <= 16; i++) {

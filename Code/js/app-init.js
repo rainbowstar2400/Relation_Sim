@@ -7,6 +7,7 @@ import { loadEmotionLabelTable } from './emotion-label.js';
 import { switchView, alignAllSliderTicks } from './view-switcher.js';
 import { loadState } from './storage.js';
 import { state } from './state.js';
+import { loadConsultationTemplates, startConsultationScheduler, renderConsultations } from './consultation.js';
 
 const EVENT_INTERVAL_MS = 1800000; // 30分に1回
 const EVENT_PROBABILITY = 0.7; // 70%
@@ -45,11 +46,14 @@ export async function initializeApp() {
     }
     await loadEmotionLabelTable();
     await loadMoodTables();
+    await loadConsultationTemplates();
     setupEventListeners();
     setInterval(updateDateTime, 1000);
     updateDateTime();
     startEventScheduler();
+    startConsultationScheduler();
     renderCharacters();
+    renderConsultations();
     switchView('main');
     requestAnimationFrame(alignAllSliderTicks);
 }
