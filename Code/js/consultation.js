@@ -5,6 +5,7 @@ import { saveState } from './storage.js';
 
 let templates = [];
 let currentId = null;
+let answered = false;
 
 export async function loadConsultationTemplates() {
     const res = await fetch('./data/trouble_prompt_templates.json');
@@ -128,6 +129,7 @@ export function renderConsultations() {
 
 function openPopup(id) {
     currentId = id;
+    answered = false;
     const ev = state.consultations.find(e => e.id === id);
     if (!ev) return;
     const char = state.characters.find(c => c.id === ev.charId);
@@ -158,6 +160,7 @@ function openPopup(id) {
         input.placeholder = 'ここに入力';
         dom.consultationAnswerArea.appendChild(input);
     }
+    dom.consultationSendButton.disabled = false;
     dom.consultationPopup.style.display = 'flex';
 }
 
@@ -175,17 +178,29 @@ function handleSendClick() {
     if (kind === 'good') delta = Math.floor(Math.random() * 3) + 3; // +3〜+5
     else if (kind === 'neutral') delta = Math.floor(Math.random() * 3); // 0〜2
     else delta = -(Math.floor(Math.random() * 3) + 2); // -2〜-4
+    if (answered) return;
     updateTrust(ev.charId, delta);
     dom.consultationAnswerArea.innerHTML = '<p>ありがとう！</p>';
-    setTimeout(() => {
-        dom.consultationPopup.style.display = 'none';
-        removeConsultation(ev.id, true);
-    }, 800);
+    dom.consultationSendButton.disabled = true;
+    answered = true;
+}
+
+function closePopup() {
+    dom.consultationPopup.style.display = 'none';
+    if (currentId == null) return;
+    const id = currentId;
+    currentId = null;
+    if (answered) {
+        removeConsultation(id, true);
+    }
 }
 
 export function setupConsultationHandlers() {
     if (dom.consultationSendButton) {
         dom.consultationSendButton.addEventListener('click', handleSendClick);
+    }
+    if (dom.consultationCloseButton) {
+        dom.consultationCloseButton.addEventListener('click', closePopup);
     }
 }
 

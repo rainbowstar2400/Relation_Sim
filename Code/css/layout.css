@@ -93,6 +93,18 @@ h2 {
     border-radius: 6px;
     width: 90%;
     max-width: 400px;
+    position: relative;
+}
+
+.consultation-popup .popup-close {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
 }
 
 /* ログ表示エリア (CLI風) - ここは黒を維持してメリハリをつけます */

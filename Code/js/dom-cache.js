@@ -12,6 +12,7 @@ export function initDomCache() {
     dom.consultationQuestion = document.getElementById('consultation-question');
     dom.consultationAnswerArea = document.getElementById('consultation-answer-area');
     dom.consultationSendButton = document.getElementById('consultation-send-button');
+    dom.consultationCloseButton = document.getElementById('consultation-close-button');
     dom.logContent = document.getElementById('log-content');
     dom.mbtiInputs = {};
     for (let i = 1; i <= 16; i++) {
