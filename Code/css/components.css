@@ -102,7 +102,8 @@ input[type="range"]::-moz-range-thumb {
 
 /* ステータス画面のリスト */
 .personality-list,
-.relation-list {
+.relation-list,
+#status-events {
     list-style: none;
     padding-left: 0;
 }
@@ -117,6 +118,14 @@ input[type="range"]::-moz-range-thumb {
 .relation-item .other-name {
     font-weight: bold;
     color: #ffd166;
+}
+.relation-item summary {
+    cursor: pointer;
+    list-style: none;
+}
+.detail-body {
+    margin-left: 1em;
+    margin-top: 4px;
 }
 .relation-direction {
     margin-left: 1em;

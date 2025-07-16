@@ -1,5 +1,6 @@
 import { dom } from './dom-cache.js';
 import { state } from './state.js';
+import { getEmotionLabel } from './emotion-label.js';
 import { switchView } from './view-switcher.js';
 
 export function renderCharacters() {
@@ -78,6 +79,29 @@ function createDirectionBlock(labelText, score, nickname) {
     return div;
 }
 
+function renderCharacterEvents(char) {
+    const all = JSON.parse(localStorage.getItem('event_history') || '[]');
+    const events = all
+        .filter(ev => ev.description && ev.description.includes(char.name))
+        .sort((a, b) => b.timestamp - a.timestamp)
+        .slice(0, 5);
+
+    dom.statusEvents.innerHTML = '';
+    if (events.length === 0) {
+        const li = document.createElement('li');
+        li.textContent = '履歴なし';
+        dom.statusEvents.appendChild(li);
+        return;
+    }
+    events.forEach(ev => {
+        const d = new Date(ev.timestamp);
+        const dateStr = `${d.getMonth() + 1}/${d.getDate()}`;
+        const li = document.createElement('li');
+        li.textContent = `${dateStr} ${ev.description}`;
+        dom.statusEvents.appendChild(li);
+    });
+}
+
 function showCharacterStatus(char) {
     dom.statusName.textContent = char.name;
     dom.statusMbti.textContent = char.mbti;
@@ -86,6 +110,9 @@ function showCharacterStatus(char) {
     dom.statusFirstPerson.textContent = style.first_person;
     dom.statusSuffix.textContent = style.suffix;
     dom.statusCondition.textContent = '活動中';
+    dom.statusActivityPattern.textContent = char.activityPattern || '不明';
+    const trustRec = state.trusts.find(t => t.id === char.id);
+    dom.statusTrust.textContent = trustRec ? trustRec.score : 50;
     const p = char.personality;
     dom.statusPersonality.social.textContent = levelToBars(p.social);
     dom.statusPersonality.kindness.textContent = levelToBars(p.kindness);
@@ -93,16 +120,18 @@ function showCharacterStatus(char) {
     dom.statusPersonality.activity.textContent = levelToBars(p.activity);
     dom.statusPersonality.expressiveness.textContent = levelToBars(p.expressiveness);
 
-    const relations = state.relationships
-        .filter(r => r.pair.includes(char.id))
-        .map(rel => {
-            const otherId = rel.pair.find(id => id !== char.id);
-            const other = state.characters.find(c => c.id === otherId);
-            const affectionTo = state.affections.find(a => a.from === char.id && a.to === otherId)?.score || 0;
-            const affectionFrom = state.affections.find(a => a.from === otherId && a.to === char.id)?.score || 0;
-            const nicknameTo = state.nicknames.find(n => n.from === char.id && n.to === otherId)?.nickname || '';
-            const nicknameFrom = state.nicknames.find(n => n.from === otherId && n.to === char.id)?.nickname || '';
-            return { otherId, other, label: rel.label, affectionTo, affectionFrom, nicknameTo, nicknameFrom };
+    const relations = state.characters
+        .filter(c => c.id !== char.id)
+        .map(other => {
+            const pair = [char.id, other.id].sort();
+            const relRec = state.relationships.find(r => r.pair[0] === pair[0] && r.pair[1] === pair[1]);
+            const label = relRec ? relRec.label : 'なし';
+            const affectionTo = state.affections.find(a => a.from === char.id && a.to === other.id)?.score || 0;
+            const affectionFrom = state.affections.find(a => a.from === other.id && a.to === char.id)?.score || 0;
+            const nicknameTo = state.nicknames.find(n => n.from === char.id && n.to === other.id)?.nickname || '';
+            const nicknameFrom = state.nicknames.find(n => n.from === other.id && n.to === char.id)?.nickname || '';
+            const emotion = getEmotionLabel(char.id, other.id) || 'なし';
+            return { other, label, affectionTo, affectionFrom, nicknameTo, nicknameFrom, emotion };
         })
         .sort((a, b) => (b.affectionTo + b.affectionFrom) - (a.affectionTo + a.affectionFrom));
 
@@ -113,22 +142,26 @@ function showCharacterStatus(char) {
         dom.statusRelations.appendChild(li);
     } else {
         relations.forEach(rel => {
-            const otherName = rel.other ? rel.other.name : rel.otherId;
+            const otherName = rel.other.name;
             const li = document.createElement('li');
             li.className = 'relation-item';
 
-            const header = document.createElement('p');
-            header.className = 'relation-header';
-            header.innerHTML = `■ 相手：<span class="other-name">${otherName}</span>（関係：${rel.label}）`;
-            li.appendChild(header);
+            const details = document.createElement('details');
+            const summary = document.createElement('summary');
+            summary.innerHTML = `<span class="other-name">${otherName}</span> - ${rel.label} | 印象: ${rel.emotion}`;
+            details.appendChild(summary);
 
-            li.appendChild(createDirectionBlock(`${char.name} → ${otherName}`, rel.affectionTo, rel.nicknameTo));
-            li.appendChild(createDirectionBlock(`${otherName} → ${char.name}`, rel.affectionFrom, rel.nicknameFrom));
+            const body = document.createElement('div');
+            body.className = 'detail-body';
+            body.appendChild(createDirectionBlock(`${char.name} → ${otherName}`, rel.affectionTo, rel.nicknameTo));
+            body.appendChild(createDirectionBlock(`${otherName} → ${char.name}`, rel.affectionFrom, rel.nicknameFrom));
+            details.appendChild(body);
 
+            li.appendChild(details);
             dom.statusRelations.appendChild(li);
         });
     }
 
-    dom.statusEvents.textContent = '';
+    renderCharacterEvents(char);
     switchView('status');
 }
