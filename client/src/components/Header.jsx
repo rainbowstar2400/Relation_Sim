@@ -16,10 +16,10 @@ export default function Header({ onChangeView }) {
   }, [])
 
   return (
-    <header className="top-menu flex gap-2 mb-4">
+    <header className="flex items-center gap-2 pb-4 mb-5 border-b border-gray-600">
       <button onClick={() => onChangeView('management')}>管理室</button>
       <button onClick={() => onChangeView('daily')}>日報</button>
-      <div className="datetime ml-auto text-right">
+      <div className="ml-auto text-right">
         <span id="time" className="font-bold mr-1">{time}</span>
         <span id="date">{date}</span>
       </div>

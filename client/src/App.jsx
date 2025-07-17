@@ -146,7 +146,7 @@ export default function App() {
   }
 
   return (
-    <div className="p-4 text-gray-100">
+    <div className="max-w-2xl mx-auto border border-gray-600 bg-panel p-4 rounded text-gray-100 min-h-screen">
       <Header onChangeView={setView} />
       {view === 'main' && (
         <MainView

@@ -18,11 +18,11 @@ export default function MainView({ characters, onSelect, logs, trusts, addLog, u
 
   return (
     <div>
-      <section className="character-observer mb-4">
-        <h2 className="mb-2">▼ みんなの様子</h2>
-        <div className="character-list flex overflow-x-auto gap-2">
+      <section className="mb-6">
+        <h2 className="text-sm text-gray-300 border-b border-gray-600 pb-1 mb-2">▼ みんなの様子</h2>
+        <div className="flex overflow-x-auto gap-2 pb-2">
           {characters.map(c => (
-            <div key={c.id} className="character-card w-24 h-16 bg-gray-600 flex items-center justify-center cursor-pointer" onClick={() => onSelect(c)}>
+            <div key={c.id} className="flex-shrink-0 w-24 h-16 bg-gray-600 border border-gray-500 rounded flex items-center justify-center cursor-pointer" onClick={() => onSelect(c)}>
               {c.name}
             </div>
           ))}
@@ -34,9 +34,9 @@ export default function MainView({ characters, onSelect, logs, trusts, addLog, u
         updateTrust={updateTrust}
         addLog={addLog}
       />
-      <section className="log-display">
-        <h2 className="mb-2">▼ ログ表示エリア (CLI風)</h2>
-        <div ref={logRef} className="log-content h-40 overflow-y-auto bg-black p-2">
+      <section className="mb-6">
+        <h2 className="text-sm text-gray-300 border-b border-gray-600 pb-1 mb-2">▼ ログ表示エリア (CLI風)</h2>
+        <div ref={logRef} className="h-52 overflow-y-auto bg-black border border-gray-600 p-3 font-mono rounded text-gray-100">
           {logs.map((line, idx) => {
             const { time, type, text } = parseLog(line)
             const cls = type === 'SYSTEM'

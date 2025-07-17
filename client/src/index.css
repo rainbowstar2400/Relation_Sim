@@ -1,6 +1,9 @@
-@import '../Code/css/layout.css';
-@import '../Code/css/components.css';
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-base text-gray-200 font-jp p-5;
+  }
+}

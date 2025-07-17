@@ -205,8 +205,8 @@ export default function ManagementRoom({
   const otherCharsForSelect = characters.filter(c => c.id !== editingId && !Object.keys(tempRelations).includes(c.id))
 
   return (
-    <section id="management-room" className="view">
-      <h2 className="mb-2">▼ 管理室</h2>
+    <section id="management-room" className="mb-6">
+      <h2 className="text-sm text-gray-300 border-b border-gray-600 pb-1 mb-2">▼ 管理室</h2>
       {!showForm && (
         <button onClick={() => {setShowForm(true);resetForm()}}>+ キャラクター追加</button>
       )}
