@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import ConsultationArea from './ConsultationArea.jsx'
 
 function parseLog(line) {
@@ -8,6 +8,14 @@ function parseLog(line) {
 }
 
 export default function MainView({ characters, onSelect, logs, trusts, addLog, updateTrust }) {
+  const logRef = useRef(null)
+
+  useEffect(() => {
+    if (logRef.current) {
+      logRef.current.scrollTop = logRef.current.scrollHeight
+    }
+  }, [logs])
+
   return (
     <div>
       <section className="character-observer mb-4">
@@ -28,12 +36,12 @@ export default function MainView({ characters, onSelect, logs, trusts, addLog, u
       />
       <section className="log-display">
         <h2 className="mb-2">▼ ログ表示エリア (CLI風)</h2>
-        <div className="log-content h-40 overflow-y-auto bg-black p-2">
+        <div ref={logRef} className="log-content h-40 overflow-y-auto bg-black p-2">
           {logs.map((line, idx) => {
             const { time, type, text } = parseLog(line)
             const cls = type === 'SYSTEM'
               ? 'text-orange-300 font-bold'
-              : 'text-sky-400 font-bold'
+              : 'text-blue-400 font-bold'
             return (
               <p key={idx} className="mb-1">
                 {time && <span className="text-gray-400 mr-1">[{time}]</span>}
