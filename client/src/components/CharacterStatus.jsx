@@ -30,16 +30,16 @@ export default function CharacterStatus({ char, characters = [], logs = [], onBa
     .reverse()
 
   return (
-    <section id="character-status-view" className="view">
-      <h2 className="mb-2">▼ ステータス</h2>
+    <section id="character-status-view" className="mb-6">
+      <h2 className="text-sm text-gray-300 border-b border-gray-600 pb-1 mb-2">▼ ステータス</h2>
       <div className="basic-info mb-2">
         <p>名前: {char.name}</p>
         <p>MBTI: {char.mbti}</p>
       </div>
 
       {/* 性格パラメータのバー表示 */}
-      <h3 className="mb-2">▼ 性格パラメータ</h3>
-      <ul className="personality-list mb-2">
+      <h3 className="text-sm text-gray-300 border-b border-gray-600 pb-1 mb-2">▼ 性格パラメータ</h3>
+      <ul className="mb-2 list-none p-0">
         <li className="mb-1">
           社交性:
           <progress value={p.social || 0} max="5" className="ml-2 w-40 h-2" />
@@ -63,13 +63,13 @@ export default function CharacterStatus({ char, characters = [], logs = [], onBa
       </ul>
 
       {/* 関係一覧（横スクロールカード） */}
-      <h3 className="mb-2">▼ 関係一覧</h3>
+      <h3 className="text-sm text-gray-300 border-b border-gray-600 pb-1 mb-2">▼ 関係一覧</h3>
       <div className="flex overflow-x-auto gap-2 mb-2">
         {relations.length === 0 ? (
           <p>関係情報なし</p>
         ) : (
           relations.map((rel, idx) => (
-            <div key={idx} className="relation-card flex-shrink-0 w-40 bg-gray-700 rounded p-2">
+            <div key={idx} className="flex-shrink-0 w-40 bg-gray-700 border border-gray-600 rounded p-2">
               <p className="font-bold text-yellow-300 mb-1">{rel.otherName}</p>
               <p className="text-sm mb-1">
                 {rel.label} | {rel.emotion}
@@ -81,8 +81,8 @@ export default function CharacterStatus({ char, characters = [], logs = [], onBa
       </div>
 
       {/* 最近のイベント履歴 */}
-      <h3 className="mb-2">▼ イベント履歴</h3>
-      <ul id="status-events" className="mb-2">
+      <h3 className="text-sm text-gray-300 border-b border-gray-600 pb-1 mb-2">▼ イベント履歴</h3>
+      <ul id="status-events" className="mb-2 list-disc pl-4">
         {events.length === 0 ? (
           <li>履歴なし</li>
         ) : (
