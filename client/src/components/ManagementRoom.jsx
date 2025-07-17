@@ -110,6 +110,7 @@ export default function ManagementRoom({
     e.preventDefault()
     if (!name) return
     const id = editingId || 'char_' + Date.now()
+    const existing = characters.find(c => c.id === id)
     const char = {
       id,
       name,
@@ -118,7 +119,8 @@ export default function ManagementRoom({
       mbti_slider: mbtiMode === 'diag' ? mbtiSliders : [],
       talkStyle: { preset: talkPreset, firstPerson, suffix },
       activityPattern,
-      interests: interests.split(',').map(i => i.trim()).filter(i => i)
+      interests: interests.split(',').map(i => i.trim()).filter(i => i),
+      condition: existing?.condition || '活動中'
     }
     const rels = []
     const nicks = []

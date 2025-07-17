@@ -25,6 +25,7 @@ const initialState = {
       talkStyle: { preset: 'くだけた', firstPerson: '俺', suffix: '〜じゃん' },
       activityPattern: '夜型',
       interests: ['読書', '散歩'],
+      condition: '活動中',
     },
     {
       id: 'char_002',
@@ -34,6 +35,7 @@ const initialState = {
       talkStyle: { preset: '丁寧', firstPerson: '私', suffix: '〜です' },
       activityPattern: '朝型',
       interests: ['お菓子作り', 'カフェ巡り'],
+      condition: '活動中',
     },
     {
       id: 'char_003',
@@ -43,6 +45,7 @@ const initialState = {
       talkStyle: { preset: 'くだけた', firstPerson: 'ボク', suffix: '〜だよ' },
       activityPattern: '通常',
       interests: ['音楽鑑賞'],
+      condition: '活動中',
     },
   ],
   relationships: [], // キャラクター同士の関係
@@ -196,6 +199,7 @@ export default function App() {
           char={currentChar}
           characters={state.characters}
           logs={state.logs}
+          trusts={state.trusts}
           onBack={() => setView('main')}
         />
       )}
