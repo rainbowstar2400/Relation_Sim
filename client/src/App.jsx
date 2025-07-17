@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import { triggerRandomEvent } from './lib/eventSystem.js'
+import {
+  loadStateFromLocal,
+  saveStateToLocal,
+  exportState,
+  importStateFromFile,
+} from './lib/storage.js'
 import Header from './components/Header.jsx'
 import MainView from './components/MainView.jsx'
 import ManagementRoom from './components/ManagementRoom.jsx'
 import CharacterStatus from './components/CharacterStatus.jsx'
 import DailyReport from './components/DailyReport.jsx'
-
-const STORAGE_KEY = 'relation_sim_state'
 const EVENT_INTERVAL_MS = 1800000 // 30分ごと
 const EVENT_PROBABILITY = 0.7
 
@@ -95,21 +99,15 @@ export default function App() {
 
   // localStorageから読み込み
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY)
+    const saved = loadStateFromLocal()
     if (saved) {
-      try {
-        const parsed = JSON.parse(saved)
-        // 新しいフィールドが増えても壊れないよう初期値とマージ
-        setState(prev => ({ ...prev, ...parsed }))
-      } catch (e) {
-        console.error('load error', e)
-      }
+      setState(prev => ({ ...prev, ...saved }))
     }
   }, [])
 
   // 保存
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+    saveStateToLocal(state)
   }, [state])
 
   // 一定間隔でランダムイベントを発生させる
@@ -154,6 +152,16 @@ export default function App() {
     }))
   }
 
+  const handleExport = () => {
+    exportState(state)
+  }
+
+  const handleImport = (file) => {
+    importStateFromFile(file)
+      .then(loaded => setState(prev => ({ ...prev, ...loaded })))
+      .catch(() => alert('読み込みに失敗しました'))
+  }
+
   const showStatus = (char) => {
     setCurrentChar(char)
     setView('status')
@@ -161,7 +169,7 @@ export default function App() {
 
   return (
     <div className="max-w-2xl mx-auto border border-gray-600 bg-panel p-4 rounded text-gray-100 min-h-screen">
-      <Header onChangeView={setView} />
+      <Header onChangeView={setView} onSave={handleExport} onLoad={handleImport} />
       {view === 'main' && (
         <MainView
           characters={state.characters}

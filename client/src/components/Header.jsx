@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 
-export default function Header({ onChangeView }) {
+export default function Header({ onChangeView, onSave, onLoad }) {
   const [time, setTime] = useState('')
   const [date, setDate] = useState('')
+  const fileInputRef = useRef(null)
 
   useEffect(() => {
     const update = () => {
@@ -19,6 +20,19 @@ export default function Header({ onChangeView }) {
     <header className="flex items-center gap-2 pb-4 mb-5 border-b border-gray-600">
       <button onClick={() => onChangeView('management')}>管理室</button>
       <button onClick={() => onChangeView('daily')}>日報</button>
+      <button onClick={onSave}>セーブ</button>
+      <button onClick={() => fileInputRef.current?.click()}>ロード</button>
+      <input
+        type="file"
+        accept="application/json"
+        className="hidden"
+        ref={fileInputRef}
+        onChange={(e) => {
+          const file = e.target.files?.[0]
+          if (file) onLoad(file)
+          e.target.value = ''
+        }}
+      />
       <div className="ml-auto text-right">
         <span id="time" className="font-bold mr-1">{time}</span>
         <span id="date">{date}</span>
