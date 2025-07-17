@@ -200,6 +200,10 @@ export default function App() {
           characters={state.characters}
           logs={state.logs}
           trusts={state.trusts}
+          relationships={state.relationships}
+          nicknames={state.nicknames}
+          affections={state.affections}
+          emotions={state.emotions}
           onBack={() => setView('main')}
         />
       )}

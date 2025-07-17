@@ -1,4 +1,5 @@
 import React from 'react'
+import { getEmotionLabel } from '../lib/emotionLabel.js'
 
 // ログ文字列をパースする簡易関数
 function parseLog(line) {
@@ -7,23 +8,49 @@ function parseLog(line) {
   return { time: '', text: line }
 }
 
+// 好感度スコア(-100〜100)を0〜100のパーセントに変換
+function affectionToPercent(score) {
+  const clamped = Math.max(-100, Math.min(100, score))
+  return (clamped + 100) / 2
+}
+
 // characters: 全キャラクター一覧
 // logs: これまでのログ
-export default function CharacterStatus({ char, characters = [], logs = [], trusts = [], onBack }) {
+// 関係情報も受け取れるように引数を拡張
+export default function CharacterStatus({
+  char,
+  characters = [],
+  logs = [],
+  trusts = [],
+  relationships = [],
+  nicknames = [],
+  affections = [],
+  emotions = [],
+  onBack,
+}) {
   const p = char.personality || {}
   const talk = char.talkStyle || {}
   const trustRec = trusts.find(t => t.id === char.id)
   const trust = trustRec ? trustRec.score : 50
 
-  // 簡易的な関係情報を生成（現状ダミー）
+  // 実際の関係情報を抽出
   const relations = characters
     .filter(c => c.id !== char.id)
-    .map(other => ({
-      otherName: other.name,
-      label: '友達',
-      affection: 50,
-      emotion: '普通'
-    }))
+    .map(other => {
+      // 関係ラベルは pair 配列で検索
+      const pair = [char.id, other.id].sort()
+      const relRec = relationships.find(r => r.pair[0] === pair[0] && r.pair[1] === pair[1])
+      const label = relRec ? relRec.label : 'なし'
+
+      // 好感度は片方向のみを表示
+      const affection = affections.find(a => a.from === char.id && a.to === other.id)?.score || 0
+
+      // 感情ラベル（印象）
+      const emotion = getEmotionLabel({ emotions }, char.id, other.id) || 'なし'
+
+      return { otherName: other.name, label, affection, emotion }
+    })
+    .sort((a, b) => b.affection - a.affection)
 
   // 対象キャラ名を含むログを抽出し、新しいものから5件表示
   const events = logs
@@ -84,7 +111,7 @@ export default function CharacterStatus({ char, characters = [], logs = [], trus
               <p className="text-sm mb-1">
                 {rel.label} | {rel.emotion}
               </p>
-              <progress value={rel.affection} max="100" className="w-full h-2" />
+              <progress value={affectionToPercent(rel.affection)} max="100" className="w-full h-2" />
             </div>
           ))
         )}
