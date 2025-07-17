@@ -1,0 +1,80 @@
+import React, { useState, useEffect } from 'react'
+import Header from './components/Header.jsx'
+import MainView from './components/MainView.jsx'
+import ManagementRoom from './components/ManagementRoom.jsx'
+import CharacterStatus from './components/CharacterStatus.jsx'
+import DailyReport from './components/DailyReport.jsx'
+
+const STORAGE_KEY = 'relation_sim_state'
+
+// 初期状態を Code/js/state.js から簡略化して移植
+const initialState = {
+  characters: [
+    {
+      id: 'char_001',
+      name: '碧',
+      personality: { social: 4, kindness: 3, stubbornness: 2, activity: 5, expressiveness: 4 },
+      mbti: 'INFP',
+      talkStyle: { preset: 'くだけた', firstPerson: '俺', suffix: '〜じゃん' },
+      activityPattern: '夜型',
+      interests: ['読書', '散歩'],
+    },
+    {
+      id: 'char_002',
+      name: '彩花',
+      personality: { social: 5, kindness: 4, stubbornness: 1, activity: 3, expressiveness: 5 },
+      mbti: 'ESFJ',
+      talkStyle: { preset: '丁寧', firstPerson: '私', suffix: '〜です' },
+      activityPattern: '朝型',
+      interests: ['お菓子作り', 'カフェ巡り'],
+    },
+    {
+      id: 'char_003',
+      name: '志音',
+      personality: { social: 2, kindness: 5, stubbornness: 4, activity: 2, expressiveness: 2 },
+      mbti: 'ISFP',
+      talkStyle: { preset: 'くだけた', firstPerson: 'ボク', suffix: '〜だよ' },
+      activityPattern: '通常',
+      interests: ['音楽鑑賞'],
+    },
+  ],
+  logs: []
+}
+
+export default function App() {
+  const [view, setView] = useState('main')
+  const [state, setState] = useState(initialState)
+  const [currentChar, setCurrentChar] = useState(null)
+
+  // localStorageから読み込み
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    if (saved) {
+      setState(JSON.parse(saved))
+    }
+  }, [])
+
+  // 保存
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+  }, [state])
+
+  const addCharacter = (char) => {
+    setState(prev => ({ ...prev, characters: [...prev.characters, char] }))
+  }
+
+  const showStatus = (char) => {
+    setCurrentChar(char)
+    setView('status')
+  }
+
+  return (
+    <div className="p-4 text-gray-100">
+      <Header onChangeView={setView} />
+      {view === 'main' && <MainView characters={state.characters} onSelect={showStatus} logs={state.logs} />}
+      {view === 'management' && <ManagementRoom characters={state.characters} addCharacter={addCharacter} />}
+      {view === 'status' && currentChar && <CharacterStatus char={currentChar} onBack={() => setView('main')} />}
+      {view === 'daily' && <DailyReport onBack={() => setView('main')} />}
+    </div>
+  )
+}
