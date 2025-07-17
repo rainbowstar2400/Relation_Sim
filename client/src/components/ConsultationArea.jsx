@@ -13,8 +13,11 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
 
   // 初回マウント時に相談テンプレートを取得
   useEffect(() => {
-    fetch('../Code/data/trouble_prompt_templates.json')
-      .then(res => res.json())
+    fetch('/Code/data/trouble_prompt_templates.json')
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        return res.json()
+      })
       .then(data => setTemplates(data))
       .catch(err => console.error('テンプレートの取得に失敗しました', err))
   }, [])
