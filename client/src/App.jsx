@@ -42,6 +42,7 @@ const initialState = {
   relationships: [], // キャラクター同士の関係
   nicknames: [],     // 呼び方設定
   affections: [],    // 好感度一覧
+  emotions: [],      // 感情ラベル一覧
   trusts: [          // プレイヤーへの信頼度
     { id: 'char_001', score: 50 },
     { id: 'char_002', score: 50 },
