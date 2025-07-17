@@ -119,7 +119,14 @@ export default function App() {
           onBack={() => setView('main')}
         />
       )}
-      {view === 'status' && currentChar && <CharacterStatus char={currentChar} onBack={() => setView('main')} />}
+      {view === 'status' && currentChar && (
+        <CharacterStatus
+          char={currentChar}
+          characters={state.characters}
+          logs={state.logs}
+          onBack={() => setView('main')}
+        />
+      )}
       {view === 'daily' && <DailyReport onBack={() => setView('main')} />}
     </div>
   )
