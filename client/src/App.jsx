@@ -7,7 +7,7 @@ import DailyReport from './components/DailyReport.jsx'
 
 const STORAGE_KEY = 'relation_sim_state'
 
-// 初期状態を Code/js/state.js から簡略化して移植
+// 初期状態を Code/js/state.js の構造に合わせて定義
 const initialState = {
   characters: [
     {
@@ -38,16 +38,17 @@ const initialState = {
       interests: ['音楽鑑賞'],
     },
   ],
-  relationships: [],
-  nicknames: [],
-  affections: [],
-  trusts: {
-    char_001: 50,
-    char_002: 50,
-    char_003: 50,
-  },
-  logs: [],
-  reports: {}
+  relationships: [], // キャラクター同士の関係
+  nicknames: [],     // 呼び方設定
+  affections: [],    // 好感度一覧
+  trusts: [          // プレイヤーへの信頼度
+    { id: 'char_001', score: 50 },
+    { id: 'char_002', score: 50 },
+    { id: 'char_003', score: 50 },
+  ],
+  consultations: [], // 進行中の相談イベント
+  logs: [],          // CLI 風ログ
+  reports: {},       // 日報履歴
 }
 
 export default function App() {
@@ -65,17 +66,24 @@ export default function App() {
   }
 
   // 信頼度を変更
+  // 信頼度を変更
   const updateTrust = (charId, delta) => {
     setState(prev => {
-      const current = prev.trusts[charId] ?? 50
+      const trusts = [...prev.trusts]
+      const idx = trusts.findIndex(t => t.id === charId)
+      const current = idx >= 0 ? trusts[idx].score : 50
       const score = Math.max(0, Math.min(100, current + delta))
+      if (idx >= 0) trusts[idx] = { id: charId, score }
+      else trusts.push({ id: charId, score })
+
       const char = prev.characters.find(c => c.id === charId)
       const verb = delta >= 0 ? '上昇しました' : '下降しました'
       const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       const line = `[${time}] SYSTEM: ${char.name}からの信頼度が${verb}。`
+
       return {
         ...prev,
-        trusts: { ...prev.trusts, [charId]: score },
+        trusts,
         logs: [...prev.logs, line]
       }
     })
@@ -85,9 +93,13 @@ export default function App() {
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY)
     if (saved) {
-      const parsed = JSON.parse(saved)
-      parsed.reports = parsed.reports || {}
-      setState(parsed)
+      try {
+        const parsed = JSON.parse(saved)
+        // 新しいフィールドが増えても壊れないよう初期値とマージ
+        setState(prev => ({ ...prev, ...parsed }))
+      } catch (e) {
+        console.error('load error', e)
+      }
     }
   }, [])
 
