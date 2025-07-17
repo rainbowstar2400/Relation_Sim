@@ -7,7 +7,7 @@ function parseLog(line) {
   return { time: '', type: 'EVENT', text: line }
 }
 
-export default function MainView({ characters, onSelect, logs }) {
+export default function MainView({ characters, onSelect, logs, trusts, addLog, updateTrust }) {
   return (
     <div>
       <section className="character-observer mb-4">
@@ -20,7 +20,12 @@ export default function MainView({ characters, onSelect, logs }) {
           ))}
         </div>
       </section>
-      <ConsultationArea characters={characters} />
+      <ConsultationArea
+        characters={characters}
+        trusts={trusts}
+        updateTrust={updateTrust}
+        addLog={addLog}
+      />
       <section className="log-display">
         <h2 className="mb-2">▼ ログ表示エリア (CLI風)</h2>
         <div className="log-content h-40 overflow-y-auto bg-black p-2">
