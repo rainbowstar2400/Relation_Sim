@@ -1,5 +1,6 @@
 import React from 'react'
 import { getEmotionLabel } from '../lib/emotionLabel.js'
+import RelationItem from './RelationItem.jsx'
 
 // ログ文字列をパースする簡易関数
 function parseLog(line) {
@@ -37,20 +38,33 @@ export default function CharacterStatus({
   const relations = characters
     .filter(c => c.id !== char.id)
     .map(other => {
-      // 関係ラベルは pair 配列で検索
       const pair = [char.id, other.id].sort()
       const relRec = relationships.find(r => r.pair[0] === pair[0] && r.pair[1] === pair[1])
       const label = relRec ? relRec.label : 'なし'
 
-      // 好感度は片方向のみを表示
-      const affection = affections.find(a => a.from === char.id && a.to === other.id)?.score || 0
+      const affectionTo =
+        affections.find(a => a.from === char.id && a.to === other.id)?.score || 0
+      const affectionFrom =
+        affections.find(a => a.from === other.id && a.to === char.id)?.score || 0
 
-      // 感情ラベル（印象）
+      const nicknameTo =
+        nicknames.find(n => n.from === char.id && n.to === other.id)?.nickname || ''
+      const nicknameFrom =
+        nicknames.find(n => n.from === other.id && n.to === char.id)?.nickname || ''
+
       const emotion = getEmotionLabel({ emotions }, char.id, other.id) || 'なし'
 
-      return { otherName: other.name, label, affection, emotion }
+      return {
+        otherName: other.name,
+        label,
+        affectionTo,
+        affectionFrom,
+        nicknameTo,
+        nicknameFrom,
+        emotion
+      }
     })
-    .sort((a, b) => b.affection - a.affection)
+    .sort((a, b) => (b.affectionTo + b.affectionFrom) - (a.affectionTo + a.affectionFrom))
 
   // 対象キャラ名を含むログを抽出し、新しいものから5件表示
   const events = logs
@@ -106,13 +120,7 @@ export default function CharacterStatus({
           <p>関係情報なし</p>
         ) : (
           relations.map((rel, idx) => (
-            <div key={idx} className="flex-shrink-0 w-40 bg-gray-700 border border-gray-600 rounded p-2">
-              <p className="font-bold text-yellow-300 mb-1">{rel.otherName}</p>
-              <p className="text-sm mb-1">
-                {rel.label} | {rel.emotion}
-              </p>
-              <progress value={affectionToPercent(rel.affection)} max="100" className="w-full h-2" />
-            </div>
+            <RelationItem key={idx} charName={char.name} relation={rel} />
           ))
         )}
       </div>
