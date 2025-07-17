@@ -46,7 +46,8 @@ const initialState = {
     char_002: 50,
     char_003: 50,
   },
-  logs: []
+  logs: [],
+  reports: {}
 }
 
 export default function App() {
@@ -84,7 +85,9 @@ export default function App() {
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY)
     if (saved) {
-      setState(JSON.parse(saved))
+      const parsed = JSON.parse(saved)
+      parsed.reports = parsed.reports || {}
+      setState(parsed)
     }
   }, [])
 
@@ -162,7 +165,12 @@ export default function App() {
           onBack={() => setView('main')}
         />
       )}
-      {view === 'daily' && <DailyReport onBack={() => setView('main')} />}
+      {view === 'daily' && (
+        <DailyReport
+          reports={state.reports}
+          onBack={() => setView('main')}
+        />
+      )}
     </div>
   )
 }
