@@ -38,6 +38,9 @@ const initialState = {
       interests: ['音楽鑑賞'],
     },
   ],
+  relationships: [],
+  nicknames: [],
+  affections: [],
   trusts: {
     char_001: 50,
     char_002: 50,
@@ -90,8 +93,36 @@ export default function App() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
   }, [state])
 
-  const addCharacter = (char) => {
-    setState(prev => ({ ...prev, characters: [...prev.characters, char] }))
+  const saveCharacter = (char, rels = [], nicks = [], affs = []) => {
+    setState(prev => {
+      let characters = [...prev.characters]
+      let relationships = prev.relationships.filter(r => !r.pair.includes(char.id))
+      let nicknames = prev.nicknames.filter(n => n.from !== char.id && n.to !== char.id)
+      let affections = prev.affections.filter(a => a.from !== char.id && a.to !== char.id)
+      const exists = characters.some(c => c.id === char.id)
+      if (exists) {
+        characters = characters.map(c => c.id === char.id ? char : c)
+      } else {
+        characters.push(char)
+      }
+      return {
+        ...prev,
+        characters,
+        relationships: relationships.concat(rels),
+        nicknames: nicknames.concat(nicks),
+        affections: affections.concat(affs)
+      }
+    })
+  }
+
+  const deleteCharacter = (id) => {
+    setState(prev => ({
+      ...prev,
+      characters: prev.characters.filter(c => c.id !== id),
+      relationships: prev.relationships.filter(r => !r.pair.includes(id)),
+      nicknames: prev.nicknames.filter(n => n.from !== id && n.to !== id),
+      affections: prev.affections.filter(a => a.from !== id && a.to !== id)
+    }))
   }
 
   const showStatus = (char) => {
@@ -115,7 +146,11 @@ export default function App() {
       {view === 'management' && (
         <ManagementRoom
           characters={state.characters}
-          addCharacter={addCharacter}
+          relationships={state.relationships}
+          nicknames={state.nicknames}
+          affections={state.affections}
+          onSaveCharacter={saveCharacter}
+          onDeleteCharacter={deleteCharacter}
           onBack={() => setView('main')}
         />
       )}
