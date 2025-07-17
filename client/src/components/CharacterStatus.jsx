@@ -9,8 +9,11 @@ function parseLog(line) {
 
 // characters: 全キャラクター一覧
 // logs: これまでのログ
-export default function CharacterStatus({ char, characters = [], logs = [], onBack }) {
+export default function CharacterStatus({ char, characters = [], logs = [], trusts = [], onBack }) {
   const p = char.personality || {}
+  const talk = char.talkStyle || {}
+  const trustRec = trusts.find(t => t.id === char.id)
+  const trust = trustRec ? trustRec.score : 50
 
   // 簡易的な関係情報を生成（現状ダミー）
   const relations = characters
@@ -35,6 +38,13 @@ export default function CharacterStatus({ char, characters = [], logs = [], onBa
       <div className="basic-info mb-2">
         <p>名前: {char.name}</p>
         <p>MBTI: {char.mbti}</p>
+        <p>話し方プリセット: {talk.preset || '未設定'}</p>
+        <p>一人称: {talk.firstPerson || '未設定'}</p>
+        <p>語尾: {talk.suffix || '未設定'}</p>
+        <p>現在状態: {char.condition || '活動中'}</p>
+        <p>活動傾向: {char.activityPattern || '通常'}</p>
+        <p>信頼度: {trust}</p>
+        <p>興味関心: {(char.interests || []).length > 0 ? char.interests.join(', ') : 'なし'}</p>
       </div>
 
       {/* 性格パラメータのバー表示 */}
