@@ -210,6 +210,7 @@ export default function App() {
       {view === 'daily' && (
         <DailyReport
           reports={state.reports}
+          characters={state.characters}
           onBack={() => setView('main')}
         />
       )}
