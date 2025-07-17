@@ -140,10 +140,14 @@ export default function ManagementRoom({
 
   const handleRelTargetChange = (e) => {
     const targetId = e.target.value
-    if (!targetId) return
+    if (!targetId) {
+      setRelForm(prev => ({ ...prev, targetId: '' }))
+      return
+    }
     const existing = tempRelations[targetId]
     if (existing) {
       setRelForm({
+        targetId,
         type: existing.type,
         nicknameTo: existing.nicknameTo,
         nicknameFrom: existing.nicknameFrom,
@@ -152,6 +156,7 @@ export default function ManagementRoom({
       })
     } else {
       setRelForm({
+        targetId,
         type: 'なし',
         nicknameTo: characters.find(c=>c.id===targetId)?.name || '',
         nicknameFrom: name || '',
@@ -258,7 +263,7 @@ export default function ManagementRoom({
           <div className="border p-2 mb-2">
             <div className="mb-2">
               <label className="mr-2">相手を選択:</label>
-              <select className="text-black" value={relForm.targetId} onChange={e=>{setRelForm(prev=>({...prev,targetId:e.target.value})); handleRelTargetChange(e)}}>
+            <select className="text-black" value={relForm.targetId} onChange={handleRelTargetChange}>
                 <option value="">--選択してください--</option>
                 {otherCharsForSelect.map(c=> (
                   <option key={c.id} value={c.id}>{c.name}</option>
