@@ -38,6 +38,11 @@ const initialState = {
       interests: ['音楽鑑賞'],
     },
   ],
+  trusts: {
+    char_001: 50,
+    char_002: 50,
+    char_003: 50,
+  },
   logs: []
 }
 
@@ -45,6 +50,32 @@ export default function App() {
   const [view, setView] = useState('main')
   const [state, setState] = useState(initialState)
   const [currentChar, setCurrentChar] = useState(null)
+
+  // ログを追加するヘルパー
+  const addLog = (text, type = 'EVENT') => {
+    setState(prev => {
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      const line = `[${time}] ${type}: ${text}`
+      return { ...prev, logs: [...prev.logs, line] }
+    })
+  }
+
+  // 信頼度を変更
+  const updateTrust = (charId, delta) => {
+    setState(prev => {
+      const current = prev.trusts[charId] ?? 50
+      const score = Math.max(0, Math.min(100, current + delta))
+      const char = prev.characters.find(c => c.id === charId)
+      const verb = delta >= 0 ? '上昇しました' : '下降しました'
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      const line = `[${time}] SYSTEM: ${char.name}からの信頼度が${verb}。`
+      return {
+        ...prev,
+        trusts: { ...prev.trusts, [charId]: score },
+        logs: [...prev.logs, line]
+      }
+    })
+  }
 
   // localStorageから読み込み
   useEffect(() => {
@@ -71,7 +102,16 @@ export default function App() {
   return (
     <div className="p-4 text-gray-100">
       <Header onChangeView={setView} />
-      {view === 'main' && <MainView characters={state.characters} onSelect={showStatus} logs={state.logs} />}
+      {view === 'main' && (
+        <MainView
+          characters={state.characters}
+          logs={state.logs}
+          trusts={state.trusts}
+          onSelect={showStatus}
+          addLog={addLog}
+          updateTrust={updateTrust}
+        />
+      )}
       {view === 'management' && (
         <ManagementRoom
           characters={state.characters}
