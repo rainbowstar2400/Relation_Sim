@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 
-export default function ManagementRoom({ characters, addCharacter }) {
+// onBack は管理画面からメイン画面へ戻るためのコールバック
+export default function ManagementRoom({ characters, addCharacter, onBack }) {
   const [name, setName] = useState('')
 
   const handleSubmit = (e) => {
@@ -21,7 +22,7 @@ export default function ManagementRoom({ characters, addCharacter }) {
       <ul className="list-disc pl-4">
         {characters.map(c => <li key={c.id}>{c.name}</li>)}
       </ul>
-      <button className="mt-4" onClick={() => addCharacter && window.history.back()}>メイン画面に戻る</button>
+      <button className="mt-4" onClick={onBack}>メイン画面に戻る</button>
     </section>
   )
 }
