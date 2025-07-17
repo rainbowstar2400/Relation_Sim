@@ -1,4 +1,10 @@
 // eventSystem.js - イベント発生処理
+import { drawMood, loadMoodTables } from './mood.js'
+import { drawEmotionChange, loadEmotionLabelTable } from './emotionLabel.js'
+
+// テーブルを事前読み込み
+loadMoodTables()
+loadEmotionLabelTable()
 
 // イベント種別ごとの基本好感度変化量
 const baseAffection = {
@@ -42,11 +48,6 @@ function updateAffection(list, from, to, delta) {
   return next
 }
 
-// 簡易ムード抽選 (-2 ~ 2)
-function drawMood() {
-  const moods = [-2, -1, 0, 1, 2]
-  return moods[Math.floor(Math.random() * moods.length)]
-}
 
 // ランダムイベントを発生させるメイン関数
 // setState: React の状態更新関数
@@ -77,20 +78,29 @@ export function triggerRandomEvent(setState, addLog) {
         break
     }
 
-    const mood = drawMood()
+    const mood = drawMood(prev, a.id, b.id)
     const base = baseAffection[type] || 0
     const delta = base + (moodAffectionModifier[mood] || 0)
 
     let affections = updateAffection(prev.affections, a.id, b.id, delta)
     affections = updateAffection(affections, b.id, a.id, delta)
+    let emotions = prev.emotions || []
+    const logs = []
 
-    eventInfo = { a, b, desc, delta }
-    return { ...prev, affections }
+    let result = drawEmotionChange(prev, emotions, a.id, b.id, mood)
+    emotions = result.emotions
+    if (result.log) logs.push(result.log)
+    result = drawEmotionChange(prev, emotions, b.id, a.id, mood)
+    emotions = result.emotions
+    if (result.log) logs.push(result.log)
+
+    eventInfo = { a, b, desc, delta, logs }
+    return { ...prev, affections, emotions }
   })
 
   // state 更新後にログを追加
   if (!eventInfo) return
-  const { a, b, desc, delta } = eventInfo
+  const { a, b, desc, delta, logs } = eventInfo
   addLog(desc)
   if (delta !== 0) {
     const verb = delta > 0 ? '上昇しました' : '下降しました'
@@ -99,5 +109,7 @@ export function triggerRandomEvent(setState, addLog) {
   } else {
     addLog(`${a.name}と${b.name}の好感度に変化はありません`, 'SYSTEM')
   }
+
+  logs.forEach(l => addLog(l, 'SYSTEM'))
 }
 
