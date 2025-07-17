@@ -7,6 +7,8 @@ import CharacterStatus from './components/CharacterStatus.jsx'
 import DailyReport from './components/DailyReport.jsx'
 
 const STORAGE_KEY = 'relation_sim_state'
+const EVENT_INTERVAL_MS = 1800000 // 30分ごと
+const EVENT_PROBABILITY = 0.7
 
 // 初期状態を Code/js/state.js の構造に合わせて定義
 const initialState = {
@@ -113,8 +115,10 @@ export default function App() {
   // 一定間隔でランダムイベントを発生させる
   useEffect(() => {
     const timer = setInterval(() => {
-      triggerRandomEvent(setState, addLog)
-    }, 15000) // 15秒ごと
+      if (Math.random() < EVENT_PROBABILITY) {
+        triggerRandomEvent(setState, addLog)
+      }
+    }, EVENT_INTERVAL_MS)
     return () => clearInterval(timer)
   }, [])
 

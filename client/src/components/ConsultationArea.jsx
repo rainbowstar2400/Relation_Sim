@@ -10,6 +10,7 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
   const [current, setCurrent] = useState(null)
   const [selected, setSelected] = useState('')
   const [answered, setAnswered] = useState(false)
+  const AUTO_INTERVAL_MS = 3600000 // 1時間ごと
 
   // 初回マウント時に相談テンプレートを取得
   useEffect(() => {
@@ -22,13 +23,35 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
       .catch(err => console.error('テンプレートの取得に失敗しました', err))
   }, [])
 
+  // 自動生成のスケジューラ
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setConsultations(prev => {
+        if (prev.length > 0 || templates.length === 0) return prev
+        const char = characters[Math.floor(Math.random() * characters.length)]
+        const template = templates[Math.floor(Math.random() * templates.length)]
+        const id = Date.now()
+        const timeout = setTimeout(() => {
+          setConsultations(p => p.filter(c => c.id !== id))
+        }, AUTO_INTERVAL_MS)
+        addLog(`${char.name}がプレイヤーに相談しています…`)
+        return [...prev, { id, char, template, timeout }]
+      })
+    }, AUTO_INTERVAL_MS)
+    return () => clearInterval(timer)
+  }, [templates, characters])
+
   // 相談イベントを追加
   const addConsultation = () => {
     if (templates.length === 0) return
     if (consultations.length >= 3) return
     const char = characters[Math.floor(Math.random() * characters.length)]
     const template = templates[Math.floor(Math.random() * templates.length)]
-    const c = { id: Date.now(), char, template }
+    const id = Date.now()
+    const timeout = setTimeout(() => {
+      setConsultations(prev => prev.filter(ev => ev.id !== id))
+    }, AUTO_INTERVAL_MS)
+    const c = { id, char, template, timeout }
     setConsultations(prev => [...prev, c])
     addLog(`${char.name}がプレイヤーに相談しています…`)
   }
@@ -54,12 +77,14 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
 
     updateTrust(current.char.id, delta)
     addLog(`${current.char.name}との相談が終了しました`)
+    clearTimeout(current.timeout)
     setAnswered(true)
   }
 
   // ポップアップを閉じる
   const closePopup = () => {
     if (answered && current) {
+      clearTimeout(current.timeout)
       setConsultations(prev => prev.filter(ev => ev.id !== current.id))
     }
     setCurrent(null)
