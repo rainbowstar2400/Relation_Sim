@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { triggerRandomEvent } from './lib/eventSystem.js'
 import Header from './components/Header.jsx'
 import MainView from './components/MainView.jsx'
 import ManagementRoom from './components/ManagementRoom.jsx'
@@ -107,6 +108,14 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
   }, [state])
+
+  // 一定間隔でランダムイベントを発生させる
+  useEffect(() => {
+    const timer = setInterval(() => {
+      triggerRandomEvent(setState, addLog)
+    }, 15000) // 15秒ごと
+    return () => clearInterval(timer)
+  }, [])
 
   const saveCharacter = (char, rels = [], nicks = [], affs = []) => {
     setState(prev => {
