@@ -72,7 +72,13 @@ export default function App() {
     <div className="p-4 text-gray-100">
       <Header onChangeView={setView} />
       {view === 'main' && <MainView characters={state.characters} onSelect={showStatus} logs={state.logs} />}
-      {view === 'management' && <ManagementRoom characters={state.characters} addCharacter={addCharacter} />}
+      {view === 'management' && (
+        <ManagementRoom
+          characters={state.characters}
+          addCharacter={addCharacter}
+          onBack={() => setView('main')}
+        />
+      )}
       {view === 'status' && currentChar && <CharacterStatus char={currentChar} onBack={() => setView('main')} />}
       {view === 'daily' && <DailyReport onBack={() => setView('main')} />}
     </div>
