@@ -72,6 +72,10 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
   // 回答を送信
   const sendAnswer = () => {
     if (!current) return
+    if (answered) {
+      closePopup()
+      return
+    }
     let kind = 'neutral'
     if (current.template.form === 'choice') {
       if (!selected) return
@@ -139,7 +143,7 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
                 placeholder="ここに入力"
               />
             )}
-            <button onClick={sendAnswer} disabled={answered}>{answered ? '完了' : '決定'}</button>
+            <button onClick={answered ? closePopup : sendAnswer}>{answered ? '完了' : '決定'}</button>
             {answered && <p className="mt-2">ありがとう！</p>}
           </div>
         </div>

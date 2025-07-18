@@ -167,6 +167,10 @@ function openPopup(id) {
 
 function handleSendClick() {
     if (currentId == null) return;
+    if (answered) {
+        closePopup();
+        return;
+    }
     const ev = state.consultations.find(e => e.id === currentId);
     if (!ev) return;
     let kind = 'neutral';
@@ -179,10 +183,8 @@ function handleSendClick() {
     if (kind === 'good') delta = Math.floor(Math.random() * 3) + 3; // +3〜+5
     else if (kind === 'neutral') delta = Math.floor(Math.random() * 3); // 0〜2
     else delta = -(Math.floor(Math.random() * 3) + 2); // -2〜-4
-    if (answered) return;
     updateTrust(ev.charId, delta);
     dom.consultationAnswerArea.innerHTML = '<p>ありがとう！</p>';
-    dom.consultationSendButton.disabled = true;
     dom.consultationSendButton.textContent = '完了';
     answered = true;
 }
