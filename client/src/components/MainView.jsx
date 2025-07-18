@@ -7,7 +7,7 @@ function parseLog(line) {
   return { time: '', type: 'EVENT', text: line }
 }
 
-export default function MainView({ characters, onSelect, logs, trusts, addLog, updateTrust }) {
+export default function MainView({ characters, onSelect, logs, trusts, addLog, updateTrust, updateLastConsultation }) {
   const logRef = useRef(null)
 
   useEffect(() => {
@@ -33,6 +33,7 @@ export default function MainView({ characters, onSelect, logs, trusts, addLog, u
         trusts={trusts}
         updateTrust={updateTrust}
         addLog={addLog}
+        updateLastConsultation={updateLastConsultation}
       />
       <section className="mb-6">
         <h2 className="text-sm text-gray-300 border-b border-gray-600 pb-1 mb-2">▼ ログ表示エリア (CLI風)</h2>

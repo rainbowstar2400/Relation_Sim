@@ -120,7 +120,8 @@ export default function ManagementRoom({
       talkStyle: { preset: talkPreset, firstPerson, suffix },
       activityPattern,
       interests: interests.split(',').map(i => i.trim()).filter(i => i),
-      condition: existing?.condition || '活動中'
+      condition: existing?.condition || '活動中',
+      lastConsultation: existing?.lastConsultation || 0
     }
     const rels = []
     const nicks = []

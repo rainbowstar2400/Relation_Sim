@@ -26,6 +26,7 @@ const initialState = {
       activityPattern: '夜型',
       interests: ['読書', '散歩'],
       condition: '活動中',
+      lastConsultation: 0,
     },
     {
       id: 'char_002',
@@ -36,6 +37,7 @@ const initialState = {
       activityPattern: '朝型',
       interests: ['お菓子作り', 'カフェ巡り'],
       condition: '活動中',
+      lastConsultation: 0,
     },
     {
       id: 'char_003',
@@ -46,6 +48,7 @@ const initialState = {
       activityPattern: '通常',
       interests: ['音楽鑑賞'],
       condition: '活動中',
+      lastConsultation: 0,
     },
   ],
   relationships: [], // キャラクター同士の関係
@@ -98,6 +101,17 @@ export default function App() {
         logs: [...prev.logs, line]
       }
     })
+  }
+
+  // キャラクターが相談を行った時間を更新
+  const updateLastConsultation = (charId) => {
+    const now = Date.now()
+    setState(prev => ({
+      ...prev,
+      characters: prev.characters.map(c =>
+        c.id === charId ? { ...c, lastConsultation: now } : c
+      )
+    }))
   }
 
   // localStorageから読み込み
@@ -181,6 +195,7 @@ export default function App() {
           onSelect={showStatus}
           addLog={addLog}
           updateTrust={updateTrust}
+          updateLastConsultation={updateLastConsultation}
         />
       )}
       {view === 'management' && (
