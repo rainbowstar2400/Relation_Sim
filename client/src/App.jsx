@@ -11,6 +11,7 @@ import MainView from './components/MainView.jsx'
 import ManagementRoom from './components/ManagementRoom.jsx'
 import CharacterStatus from './components/CharacterStatus.jsx'
 import DailyReport from './components/DailyReport.jsx'
+import { addReportChange } from './lib/reportUtils.js'
 const EVENT_INTERVAL_MS = 1800000 // 30分ごと
 const EVENT_PROBABILITY = 0.7
 
@@ -135,6 +136,52 @@ export default function App() {
       }
     }, EVENT_INTERVAL_MS)
     return () => clearInterval(timer)
+  }, [])
+
+  // 日次で好感度の経過日数を評価
+  useEffect(() => {
+    const evaluateDecay = () => {
+      setState(prev => {
+        let changed = false
+        let reports = prev.reports || {}
+        const now = Date.now()
+        const dayMs = 86400000
+        const affections = prev.affections.map(rec => {
+          if (!rec.lastInteracted) return rec
+          const days = Math.floor((now - rec.lastInteracted) / dayMs)
+          let delta = 0
+          if (days >= 8) delta = -2
+          else if (days >= 4) delta = -1
+          if (delta !== 0) {
+            const score = Math.max(-100, Math.min(100, rec.score + delta))
+            const fromName = prev.characters.find(c => c.id === rec.from)?.name || rec.from
+            const toName = prev.characters.find(c => c.id === rec.to)?.name || rec.to
+            reports = addReportChange(reports, `${fromName}→${toName}の好感度が${-delta}低下（疎遠）`)
+            changed = true
+            return { ...rec, score }
+          }
+          return rec
+        })
+        if (changed) {
+          return { ...prev, affections, reports }
+        }
+        return prev
+      })
+    }
+
+    evaluateDecay()
+    const now = new Date()
+    const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1)
+    const firstDelay = tomorrow.getTime() - now.getTime()
+    let intervalId
+    const timeoutId = setTimeout(() => {
+      evaluateDecay()
+      intervalId = setInterval(evaluateDecay, 86400000)
+    }, firstDelay)
+    return () => {
+      clearTimeout(timeoutId)
+      if (intervalId) clearInterval(intervalId)
+    }
   }, [])
 
   const saveCharacter = (char, rels = [], nicks = [], affs = []) => {

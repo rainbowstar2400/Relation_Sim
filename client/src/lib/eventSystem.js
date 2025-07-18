@@ -36,15 +36,16 @@ function getRandomPair(characters) {
 }
 
 // 好感度を更新するヘルパー
-function updateAffection(list, from, to, delta) {
+function updateAffection(list, from, to, delta, ts = null) {
   const next = [...list]
   const idx = next.findIndex(a => a.from === from && a.to === to)
   if (idx >= 0) {
     const score = Math.max(-100, Math.min(100, next[idx].score + delta))
-    next[idx] = { ...next[idx], score }
+    const last = ts ?? next[idx].lastInteracted
+    next[idx] = { ...next[idx], score, lastInteracted: last }
   } else {
     const score = Math.max(-100, Math.min(100, delta))
-    next.push({ from, to, score })
+    next.push({ from, to, score, lastInteracted: ts ?? Date.now() })
   }
   return next
 }
@@ -83,8 +84,9 @@ export function triggerRandomEvent(setState, addLog) {
     const base = baseAffection[type] || 0
     const delta = base + (moodAffectionModifier[mood] || 0)
 
-    let affections = updateAffection(prev.affections, a.id, b.id, delta)
-    affections = updateAffection(affections, b.id, a.id, delta)
+    const now = Date.now()
+    let affections = updateAffection(prev.affections, a.id, b.id, delta, now)
+    affections = updateAffection(affections, b.id, a.id, delta, now)
     let emotions = prev.emotions || []
     let reports = prev.reports || {}
     const logs = []
