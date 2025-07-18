@@ -2,6 +2,7 @@
 import { drawMood, loadMoodTables } from './mood.js'
 import { drawEmotionChange, loadEmotionLabelTable } from './emotionLabel.js'
 import { addReportEvent, addReportChange } from './reportUtils.js'
+import { getTimeWeight } from './timeUtils.js'
 
 // テーブルを事前読み込み
 loadMoodTables()
@@ -26,13 +27,16 @@ const moodAffectionModifier = {
 
 // キャラクター2名をランダムに選ぶ
 function getRandomPair(characters) {
-  if (!characters || characters.length < 2) return null
-  const idx1 = Math.floor(Math.random() * characters.length)
+  const active = characters.filter(
+    c => c.condition !== '就寝中' && c.condition !== '風邪'
+  )
+  if (active.length < 2) return null
+  const idx1 = Math.floor(Math.random() * active.length)
   let idx2 = idx1
   while (idx2 === idx1) {
-    idx2 = Math.floor(Math.random() * characters.length)
+    idx2 = Math.floor(Math.random() * active.length)
   }
-  return [characters[idx1], characters[idx2]]
+  return [active[idx1], active[idx2]]
 }
 
 // 好感度を更新するヘルパー
@@ -58,6 +62,10 @@ export function triggerRandomEvent(state, setState, addLog) {
   const pair = getRandomPair(state.characters)
   if (!pair) return
   const [a, b] = pair
+  const weightA = getTimeWeight(a.activityPattern)
+  const weightB = getTimeWeight(b.activityPattern)
+  const chance = Math.min(1, weightA * weightB)
+  if (Math.random() > chance) return
 
   const types = ['挨拶', '雑談', '思い出し会話', '二人きりの時間']
   const type = types[Math.floor(Math.random() * types.length)]

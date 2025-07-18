@@ -1,0 +1,32 @@
+{
+  "globalTimeModifiers": {
+    "morning": 0.7,
+    "noon": 1.0,
+    "evening": 1.2,
+    "night": 1.1,
+    "midnight": 0.5
+  },
+  "personalTimeModifiers": {
+    "normal": {
+      "morning": 1.0,
+      "noon": 1.0,
+      "evening": 1.0,
+      "night": 1.0,
+      "midnight": 1.0
+    },
+    "morning": {
+      "morning": 1.3,
+      "noon": 1.1,
+      "evening": 1.0,
+      "night": 0.9,
+      "midnight": 0.7
+    },
+    "night": {
+      "morning": 0.7,
+      "noon": 0.9,
+      "evening": 1.0,
+      "night": 1.1,
+      "midnight": 1.3
+    }
+  }
+}

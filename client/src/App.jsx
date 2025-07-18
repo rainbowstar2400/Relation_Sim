@@ -14,6 +14,7 @@ import RelationDetail from './components/RelationDetail.jsx'
 import DailyReport from './components/DailyReport.jsx'
 import LogDetail from './components/LogDetail.jsx'
 import { addReportChange } from './lib/reportUtils.js'
+import { loadTimeModifiers, isSleeping } from './lib/timeUtils.js'
 const EVENT_INTERVAL_MS = 1800000 // 30分ごと
 const EVENT_PROBABILITY = 0.7
 
@@ -133,6 +134,11 @@ export default function App() {
     }
   }, [])
 
+  // 時間帯補正テーブルを読み込む
+  useEffect(() => {
+    loadTimeModifiers()
+  }, [])
+
   // 保存
   useEffect(() => {
     saveStateToLocal(state)
@@ -199,9 +205,9 @@ export default function App() {
     const updateCondition = () => {
       const now = new Date()
       const hour = now.getHours()
-      const base = hour >= 0 && hour < 6 ? '就寝中' : '活動中'
       setState(prev => {
         const characters = prev.characters.map(c => {
+          const base = isSleeping(c.activityPattern, hour) ? '就寝中' : '活動中'
           let condition = c.condition
           let recoverAt = c.recoverAt
 
@@ -215,8 +221,8 @@ export default function App() {
             condition = base
           }
 
-          // 5% の確率で風邪を発症
-          if (condition !== '風邪' && Math.random() < 0.05) {
+          // 1時間あたり約5%の確率で風邪を発症
+          if (condition !== '風邪' && Math.random() < 0.05 / 3600) {
             condition = '風邪'
             recoverAt = Date.now() + 3 * 86400000
           }
@@ -231,7 +237,7 @@ export default function App() {
     }
 
     updateCondition()
-    const timer = setInterval(updateCondition, 3600000)
+    const timer = setInterval(updateCondition, 1000)
     return () => clearInterval(timer)
   }, [])
 
