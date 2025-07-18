@@ -10,21 +10,23 @@ export default function RelationItem({ charName, relation, onOpen }) {
     <details className="flex-shrink-0 w-60 bg-gray-700 border border-gray-600 rounded p-2">
       <summary className="cursor-pointer list-none">
         <p className="font-bold text-yellow-300">{relation.otherName}</p>
-        <p className="text-sm">
+        {/* 印象表示の右側に詳細ボタンを配置 */}
+        <p className="text-sm flex items-center">
           {relation.label} | 印象: {relation.emotion}
+          {onOpen && (
+            <button
+              type="button"
+              className="ml-2 text-blue-300 underline"
+              onClick={e => {
+                // summaryの開閉と独立させるためイベント伝播を停止
+                e.stopPropagation()
+                onOpen()
+              }}
+            >
+              詳細
+            </button>
+          )}
         </p>
-        {onOpen && (
-          <button
-            type="button"
-            className="ml-2 text-blue-300 underline"
-            onClick={e => {
-              e.stopPropagation()
-              onOpen()
-            }}
-          >
-            詳細
-          </button>
-        )}
       </summary>
       <div className="mt-2 ml-2 text-sm">
         <p>[{charName} → {relation.otherName}]</p>
