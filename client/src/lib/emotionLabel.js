@@ -1,5 +1,7 @@
 // emotionLabel.js - 感情ラベル関連処理
 
+import { addReportChange } from './reportUtils.js'
+
 let drawTable = null
 export const specialRelations = ['恋人', '親友', '家族']
 
@@ -85,15 +87,15 @@ function ensureEmotionRecord(state, emotions, from, to) {
 }
 
 // 感情ラベル変化抽選
-export function drawEmotionChange(state, emotions, from, to, mood) {
-  if (!drawTable) return { emotions, log: null }
+export function drawEmotionChange(state, emotions, from, to, mood, reports = {}) {
+  if (!drawTable) return { emotions, log: null, reports }
   let next = ensureEmotionRecord(state, emotions, from, to)
   const relation = getRelationLabel(state, from, to)
   const current = getEmotionLabel({ ...state, emotions: next }, from, to)
   const tableRoot = specialRelations.includes(relation) ? drawTable.special_relationship : drawTable.normal_relationship
   const key = (specialRelations.includes(relation) ? '特殊_' : '通常_') + current
   const moodWeights = tableRoot[key]?.[moodText[String(mood)]]
-  if (!moodWeights) return { emotions: next, log: null }
+  if (!moodWeights) return { emotions: next, log: null, reports }
   let total = 0
   Object.values(moodWeights).forEach(v => { total += v })
   let rnd = Math.random() * total
@@ -107,7 +109,8 @@ export function drawEmotionChange(state, emotions, from, to, mood) {
     const fromName = state.characters.find(c => c.id === from)?.name || from
     const toName = state.characters.find(c => c.id === to)?.name || to
     const log = `${fromName}→${toName}の印象が「${result}」に変化しました。`
-    return { emotions: next, log }
+    reports = addReportChange(reports, `${fromName}→${toName}の印象「${current}」→「${result}」`)
+    return { emotions: next, log, reports }
   }
-  return { emotions: next, log: null }
+  return { emotions: next, log: null, reports }
 }
