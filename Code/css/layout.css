@@ -143,16 +143,18 @@ h2 {
 
 /* ボタンの共通スタイル */
 button {
-    background-color: #686868;
-    color: #f0f0f0;
-    border: 1px solid #888;
-    padding: 5px 10px;
+    /* グレー背景に白枠線でボタンだと分かりやすく */
+    background-color: #666666;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+    padding: 6px 12px;
     border-radius: 4px;
     cursor: pointer;
 }
 
 button:hover {
-    background-color: #7a7a7a;
+    /* ホバー時は背景を少し明るいグレーに */
+    background-color: #777777;
 }
 
 /* 画面切り替え用のスタイル */
