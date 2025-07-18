@@ -11,11 +11,12 @@ export default function AffectionBar({ score }) {
   const percent = affectionToPercent(score)
 
   return (
-    <div className="relative w-40 h-2 bg-gray-600">
+    {/* 外枠にも白線を付ける */}
+    <div className="relative w-40 h-2 bg-gray-600 border border-white">
       {/* 実際のバー部分 */}
       <div className="h-full" style={{ width: `${percent}%`, backgroundColor: '#4eb0db' }} />
-      {/* 区切り線を4分割で表示。線をやや太くするため divide-x-2 を使用 */}
-      <div className="absolute inset-0 grid grid-cols-4 divide-x-2 divide-gray-500 pointer-events-none opacity-50">
+      {/* 区切り線を4分割で表示。色は白に変更し、太さを維持 */}
+      <div className="absolute inset-0 grid grid-cols-4 divide-x-2 divide-white pointer-events-none opacity-50">
         <div></div>
         <div></div>
         <div></div>
