@@ -16,7 +16,16 @@ export function loadStateFromLocal() {
   if (!data) return null
   try {
     const parsed = JSON.parse(data)
-    parsed.logs = parsed.logs || []
+    parsed.logs = (parsed.logs || []).map(l => {
+      if (typeof l === 'string') {
+        const m = l.match(/^\[(.*?)\]\s*(EVENT|SYSTEM):\s*(.*)$/)
+        if (m) {
+          return { id: Date.now().toString(36), time: m[1], type: m[2], text: m[3], detail: m[3] }
+        }
+        return { id: Date.now().toString(36), time: '', type: 'EVENT', text: l, detail: l }
+      }
+      return l
+    })
     parsed.reports = parsed.reports || {}
     return parsed
   } catch (e) {
@@ -44,7 +53,17 @@ export function importStateFromFile(file) {
     reader.onload = () => {
       try {
         const data = JSON.parse(reader.result)
-        data.logs = data.logs || []
+        data.logs = (data.logs || []).map(l => {
+          if (typeof l === 'string') {
+            const m = l.match(/^\[(.*?)\]\s*(EVENT|SYSTEM):\s*(.*)$/)
+            if (m) {
+              return { id: Date.now().toString(36), time: m[1], type: m[2], text: m[3], detail: m[3] }
+            }
+            return { id: Date.now().toString(36), time: '', type: 'EVENT', text: l, detail: l }
+          }
+          return l
+        })
+        data.reports = data.reports || {}
         data.reports = data.reports || {}
         resolve(data)
       } catch (e) {

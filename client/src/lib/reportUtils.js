@@ -25,7 +25,7 @@ export function addReportEvent(reports, event) {
  * @param {string} description - 変化内容の説明
  * @returns {Object} 更新後の reports
  */
-export function addReportChange(reports, description) {
+export function addReportChange(reports, description, logId = null) {
   const now = new Date()
   const dateKey = now.toISOString().split('T')[0]
   const time = now.toTimeString().slice(0, 5)
@@ -34,7 +34,7 @@ export function addReportChange(reports, description) {
     ...reports,
     [dateKey]: {
       events: data.events,
-      changes: [...data.changes, { time, description }],
+      changes: [...data.changes, { time, description, logId }],
     },
   }
 }

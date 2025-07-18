@@ -12,6 +12,7 @@ import ManagementRoom from './components/ManagementRoom.jsx'
 import CharacterStatus from './components/CharacterStatus.jsx'
 import RelationDetail from './components/RelationDetail.jsx'
 import DailyReport from './components/DailyReport.jsx'
+import LogDetail from './components/LogDetail.jsx'
 import { addReportChange } from './lib/reportUtils.js'
 const EVENT_INTERVAL_MS = 1800000 // 30分ごと
 const EVENT_PROBABILITY = 0.7
@@ -72,14 +73,21 @@ export default function App() {
   const [state, setState] = useState(initialState)
   const [currentChar, setCurrentChar] = useState(null)
   const [currentPair, setCurrentPair] = useState(null)
+  const [currentLogId, setCurrentLogId] = useState(null)
 
   // ログを追加するヘルパー
-  const addLog = (text, type = 'EVENT') => {
-    setState(prev => {
-      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      const line = `[${time}] ${type}: ${text}`
-      return { ...prev, logs: [...prev.logs, line] }
+  // text: 表示テキスト
+  // type: EVENT または SYSTEM
+  // detail: クリック時に表示する全文
+  const addLog = (text, type = 'EVENT', detail = '') => {
+    const id = Date.now().toString(36) + Math.random().toString(36).slice(2)
+    const time = new Date().toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit'
     })
+    const entry = { id, time, type, text, detail: detail || text }
+    setState(prev => ({ ...prev, logs: [...prev.logs, entry] }))
+    return id
   }
 
   // 信頼度を変更
@@ -95,13 +103,13 @@ export default function App() {
 
       const char = prev.characters.find(c => c.id === charId)
       const verb = delta >= 0 ? '上昇しました' : '下降しました'
-      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      const line = `[${time}] SYSTEM: ${char.name}からの信頼度が${verb}。`
+
+      // ログ追加
+      addLog(`${char.name}からの信頼度が${verb}。`, 'SYSTEM')
 
       return {
         ...prev,
-        trusts,
-        logs: [...prev.logs, line]
+        trusts
       }
     })
   }
@@ -134,7 +142,7 @@ export default function App() {
   useEffect(() => {
     const timer = setInterval(() => {
       if (Math.random() < EVENT_PROBABILITY) {
-        triggerRandomEvent(setState, addLog)
+        triggerRandomEvent(state, setState, addLog)
       }
     }, EVENT_INTERVAL_MS)
     return () => clearInterval(timer)
@@ -347,6 +355,16 @@ export default function App() {
           reports={state.reports}
           characters={state.characters}
           onBack={() => setView('main')}
+          onOpenLog={(id) => {
+            setCurrentLogId(id)
+            setView('logdetail')
+          }}
+        />
+      )}
+      {view === 'logdetail' && (
+        <LogDetail
+          log={state.logs.find(l => l.id === currentLogId)}
+          onBack={() => setView('daily')}
         />
       )}
     </div>

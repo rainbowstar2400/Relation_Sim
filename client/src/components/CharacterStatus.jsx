@@ -4,9 +4,12 @@ import RelationItem from './RelationItem.jsx'
 
 // ログ文字列をパースする簡易関数
 function parseLog(line) {
-  const m = line.match(/^\[(.*?)\]\s*(EVENT|SYSTEM):\s*(.*)$/)
-  if (m) return { time: m[1], text: m[3] }
-  return { time: '', text: line }
+  if (typeof line === 'string') {
+    const m = line.match(/^\[(.*?)\]\s*(EVENT|SYSTEM):\s*(.*)$/)
+    if (m) return { time: m[1], text: m[3] }
+    return { time: '', text: line }
+  }
+  return line
 }
 
 // 好感度スコア(-100〜100)を0〜100のパーセントに変換
