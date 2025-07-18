@@ -1,6 +1,7 @@
 import React from 'react'
 import { getEmotionLabel } from '../lib/emotionLabel.js'
 import RelationItem from './RelationItem.jsx'
+import RangeSlider from './RangeSlider.jsx'
 
 // ログ文字列をパースする簡易関数
 function parseLog(line) {
@@ -13,10 +14,6 @@ function parseLog(line) {
 }
 
 // 好感度スコア(-100〜100)を0〜100のパーセントに変換
-function affectionToPercent(score) {
-  const clamped = Math.max(-100, Math.min(100, score))
-  return (clamped + 100) / 2
-}
 
 // characters: 全キャラクター一覧
 // logs: これまでのログ
@@ -98,23 +95,23 @@ export default function CharacterStatus({
       <ul className="mb-2 list-none p-0">
         <li className="mb-1">
           社交性:
-          <progress value={p.social || 0} max="5" className="ml-2 w-40 h-2" />
+          <RangeSlider min={0} max={5} value={p.social || 0} disabled />
         </li>
         <li className="mb-1">
           気配り傾向:
-          <progress value={p.kindness || 0} max="5" className="ml-2 w-40 h-2" />
+          <RangeSlider min={0} max={5} value={p.kindness || 0} disabled />
         </li>
         <li className="mb-1">
           頑固さ:
-          <progress value={p.stubbornness || 0} max="5" className="ml-2 w-40 h-2" />
+          <RangeSlider min={0} max={5} value={p.stubbornness || 0} disabled />
         </li>
         <li className="mb-1">
           行動力:
-          <progress value={p.activity || 0} max="5" className="ml-2 w-40 h-2" />
+          <RangeSlider min={0} max={5} value={p.activity || 0} disabled />
         </li>
         <li>
           表現力:
-          <progress value={p.expressiveness || 0} max="5" className="ml-2 w-40 h-2" />
+          <RangeSlider min={0} max={5} value={p.expressiveness || 0} disabled />
         </li>
       </ul>
 

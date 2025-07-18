@@ -1,4 +1,5 @@
 import React from 'react'
+import RangeSlider from './RangeSlider.jsx'
 
 // 関係カード1件分を展開表示するコンポーネント
 // charName: ベースキャラクター名
@@ -33,13 +34,13 @@ export default function RelationItem({ charName, relation, onOpen }) {
         <p>[{charName} → {relation.otherName}]</p>
         <p className="flex items-center mb-1">
           <span className="mr-1">好感度:</span>
-          <progress value={affectionToPercent(relation.affectionTo)} max="100" className="w-full h-2" />
+          <RangeSlider min={-100} max={100} value={relation.affectionTo} disabled tickInterval={50} showNumbers={false} />
         </p>
         <p>呼び方：{relation.nicknameTo ? `「${relation.nicknameTo}」` : '―'}</p>
         <p className="mt-2">[{relation.otherName} → {charName}]</p>
         <p className="flex items-center mb-1">
           <span className="mr-1">好感度:</span>
-          <progress value={affectionToPercent(relation.affectionFrom)} max="100" className="w-full h-2" />
+          <RangeSlider min={-100} max={100} value={relation.affectionFrom} disabled tickInterval={50} showNumbers={false} />
         </p>
         <p>呼び方：{relation.nicknameFrom ? `「${relation.nicknameFrom}」` : '―'}</p>
       </div>

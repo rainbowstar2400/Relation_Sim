@@ -267,13 +267,13 @@ export default function ManagementRoom({
               <label className="mr-2">相手への好感度:{relForm.affectionTo}</label>
               <RangeSlider min={-100} max={100} value={relForm.affectionTo}
                 onChange={e=>setRelForm(prev=>({...prev,affectionTo:parseInt(e.target.value)}))}
-                showNumbers={false} />
+                showNumbers={false} tickInterval={50} />
             </div>
             <div className="mb-2">
               <label className="mr-2">相手からの好感度:{relForm.affectionFrom}</label>
               <RangeSlider min={-100} max={100} value={relForm.affectionFrom}
                 onChange={e=>setRelForm(prev=>({...prev,affectionFrom:parseInt(e.target.value)}))}
-                showNumbers={false} />
+                showNumbers={false} tickInterval={50} />
             </div>
             <div className="mb-2">
               <label className="mr-2">相手の呼び方:</label>
