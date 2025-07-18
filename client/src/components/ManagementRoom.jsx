@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { mbtiQuestions, mbtiDescriptions, mbtiTypes, calculateMbti } from '../lib/mbti.js'
+import RangeSlider from './RangeSlider.jsx'
 
 const defaultAffections = {
   'なし': 0,
@@ -214,7 +215,7 @@ export default function ManagementRoom({
                 key === 'kindness' ? '気配り傾向' :
                 key === 'stubbornness' ? '頑固さ' :
                 key === 'activity' ? '行動力' : '表現力'}: {personality[key]}</label>
-              <input type="range" min="1" max="5" value={personality[key]} className="w-40"
+              <RangeSlider min={1} max={5} value={personality[key]}
                 onChange={e=>setPersonality(prev=>({...prev,[key]:parseInt(e.target.value)}))} />
             </div>
           ))}
@@ -264,11 +265,15 @@ export default function ManagementRoom({
             </div>
             <div className="mb-2">
               <label className="mr-2">相手への好感度:{relForm.affectionTo}</label>
-              <input type="range" min="-100" max="100" value={relForm.affectionTo} onChange={e=>setRelForm(prev=>({...prev,affectionTo:parseInt(e.target.value)}))} />
+              <RangeSlider min={-100} max={100} value={relForm.affectionTo}
+                onChange={e=>setRelForm(prev=>({...prev,affectionTo:parseInt(e.target.value)}))}
+                showNumbers={false} />
             </div>
             <div className="mb-2">
               <label className="mr-2">相手からの好感度:{relForm.affectionFrom}</label>
-              <input type="range" min="-100" max="100" value={relForm.affectionFrom} onChange={e=>setRelForm(prev=>({...prev,affectionFrom:parseInt(e.target.value)}))} />
+              <RangeSlider min={-100} max={100} value={relForm.affectionFrom}
+                onChange={e=>setRelForm(prev=>({...prev,affectionFrom:parseInt(e.target.value)}))}
+                showNumbers={false} />
             </div>
             <div className="mb-2">
               <label className="mr-2">相手の呼び方:</label>
@@ -311,8 +316,9 @@ export default function ManagementRoom({
                   {mbtiSliders.map((v,i)=> (
                     <div className="mb-1" key={i}>
                       <label className="mr-2">Q{i+1}: {mbtiQuestions[i]}</label>
-                      <input type="range" min="0" max="4" value={v} onChange={e=>setMbtiSliders(prev=>{
-                        const arr=[...prev]; arr[i]=parseInt(e.target.value); return arr})} />
+                      <RangeSlider min={0} max={4} value={v}
+                        onChange={e=>setMbtiSliders(prev=>{ const arr=[...prev]; arr[i]=parseInt(e.target.value); return arr })}
+                        showNumbers={false} />
                     </div>
                   ))}
                   <button type="button" onClick={()=>setMbtiResult(calculateMbti(mbtiSliders, personality))}>診断する</button>
