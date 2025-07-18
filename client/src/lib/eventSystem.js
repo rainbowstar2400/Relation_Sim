@@ -54,76 +54,72 @@ function updateAffection(list, from, to, delta, ts = null) {
 // ランダムイベントを発生させるメイン関数
 // setState: React の状態更新関数
 // addLog: ログ追加用関数
-export function triggerRandomEvent(setState, addLog) {
-  let eventInfo = null
-  setState(prev => {
-    const pair = getRandomPair(prev.characters)
-    if (!pair) return prev
-    const [a, b] = pair
+export function triggerRandomEvent(state, setState, addLog) {
+  const pair = getRandomPair(state.characters)
+  if (!pair) return
+  const [a, b] = pair
 
-    const types = ['挨拶', '雑談', '思い出し会話', '二人きりの時間']
-    const type = types[Math.floor(Math.random() * types.length)]
+  const types = ['挨拶', '雑談', '思い出し会話', '二人きりの時間']
+  const type = types[Math.floor(Math.random() * types.length)]
 
-    let desc = ''
-    switch (type) {
-      case '挨拶':
-        desc = `${a.name}と${b.name}が軽く挨拶を交わした。`
-        break
-      case '雑談':
-        desc = `${a.name}と${b.name}が楽しそうに雑談している。`
-        break
-      case '思い出し会話':
-        desc = `${a.name}と${b.name}が昔の出来事を思い出して語り合っている。`
-        break
-      case '二人きりの時間':
-        desc = `${a.name}と${b.name}が静かに二人きりの時間を過ごしている。`
-        break
-    }
+  let desc = ''
+  switch (type) {
+    case '挨拶':
+      desc = `${a.name}と${b.name}が軽く挨拶を交わした。`
+      break
+    case '雑談':
+      desc = `${a.name}と${b.name}が楽しそうに雑談している。`
+      break
+    case '思い出し会話':
+      desc = `${a.name}と${b.name}が昔の出来事を思い出して語り合っている。`
+      break
+    case '二人きりの時間':
+      desc = `${a.name}と${b.name}が静かに二人きりの時間を過ごしている。`
+      break
+  }
 
-    const mood = drawMood(prev, a.id, b.id)
-    const base = baseAffection[type] || 0
-    const delta = base + (moodAffectionModifier[mood] || 0)
+  const mood = drawMood(state, a.id, b.id)
+  const base = baseAffection[type] || 0
+  const delta = base + (moodAffectionModifier[mood] || 0)
 
-    const now = Date.now()
-    let affections = updateAffection(prev.affections, a.id, b.id, delta, now)
-    affections = updateAffection(affections, b.id, a.id, delta, now)
-    let emotions = prev.emotions || []
-    let reports = prev.reports || {}
-    const logs = []
-
-    let result = drawEmotionChange(prev, emotions, a.id, b.id, mood, reports)
-    emotions = result.emotions
-    reports = result.reports
-    if (result.log) logs.push(result.log)
-    result = drawEmotionChange(prev, emotions, b.id, a.id, mood, reports)
-    emotions = result.emotions
-    reports = result.reports
-    if (result.log) logs.push(result.log)
-
-    // イベント決定後に日報へ記録
-    reports = addReportEvent(reports, { timestamp: Date.now(), description: desc })
-    if (delta !== 0) {
-      const verb = delta > 0 ? '上昇しました' : '下降しました'
-      reports = addReportChange(reports, `${a.name}→${b.name}の好感度が${verb}`)
-      reports = addReportChange(reports, `${b.name}→${a.name}の好感度が${verb}`)
-    }
-
-    eventInfo = { a, b, desc, delta, logs }
-    return { ...prev, affections, emotions, reports }
-  })
-
-  // state 更新後にログを追加
-  if (!eventInfo) return
-  const { a, b, desc, delta, logs } = eventInfo
-  addLog(desc)
+  const now = Date.now()
+  const eventLogId = addLog(desc, 'EVENT', desc)
+  let changeLogIdA = null
+  let changeLogIdB = null
   if (delta !== 0) {
     const verb = delta > 0 ? '上昇しました' : '下降しました'
-    addLog(`${a.name}→${b.name}の好感度が${verb}`, 'SYSTEM')
-    addLog(`${b.name}→${a.name}の好感度が${verb}`, 'SYSTEM')
+    changeLogIdA = addLog(`${a.name}→${b.name}の好感度が${verb}`, 'SYSTEM')
+    changeLogIdB = addLog(`${b.name}→${a.name}の好感度が${verb}`, 'SYSTEM')
   } else {
     addLog(`${a.name}と${b.name}の好感度に変化はありません`, 'SYSTEM')
   }
 
-  logs.forEach(l => addLog(l, 'SYSTEM'))
+  let emotionLogs = []
+  setState(prev => {
+    let affections = updateAffection(prev.affections, a.id, b.id, delta, now)
+    affections = updateAffection(affections, b.id, a.id, delta, now)
+    let emotions = prev.emotions || []
+    let reports = prev.reports || {}
+
+    let result = drawEmotionChange(prev, emotions, a.id, b.id, mood, reports)
+    emotions = result.emotions
+    reports = result.reports
+    if (result.log) emotionLogs.push(result.log)
+    result = drawEmotionChange(prev, emotions, b.id, a.id, mood, reports)
+    emotions = result.emotions
+    reports = result.reports
+    if (result.log) emotionLogs.push(result.log)
+
+    reports = addReportEvent(reports, { timestamp: now, description: desc, logId: eventLogId })
+    if (delta !== 0) {
+      const verb = delta > 0 ? '上昇しました' : '下降しました'
+      reports = addReportChange(reports, `${a.name}→${b.name}の好感度が${verb}`, changeLogIdA)
+      reports = addReportChange(reports, `${b.name}→${a.name}の好感度が${verb}`, changeLogIdB)
+    }
+
+    return { ...prev, affections, emotions, reports }
+  })
+
+  emotionLogs.forEach(l => addLog(l, 'SYSTEM', l))
 }
 

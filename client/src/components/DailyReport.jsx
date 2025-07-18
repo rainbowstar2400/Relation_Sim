@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 const todayStr = () => new Date().toISOString().split('T')[0]
 
 // reports: state.reports を想定
-export default function DailyReport({ reports = {}, characters = [], onBack }) {
+export default function DailyReport({ reports = {}, characters = [], onBack, onOpenLog }) {
   // 現在の日付を初期値とする
   const [date, setDate] = useState(todayStr())
   const [events, setEvents] = useState([])
@@ -111,7 +111,13 @@ export default function DailyReport({ reports = {}, characters = [], onBack }) {
           <li>イベントがありません</li>
         ) : (
           events.map((ev, idx) => (
-            <li key={idx}>[{formatTime(ev.timestamp)}] {ev.description || ''}</li>
+            <li
+              key={idx}
+              className={ev.logId ? 'cursor-pointer text-blue-300' : ''}
+              onClick={() => ev.logId && onOpenLog && onOpenLog(ev.logId)}
+            >
+              [{formatTime(ev.timestamp)}] {ev.description || ''}
+            </li>
           ))
         )}
       </ul>
@@ -123,7 +129,13 @@ export default function DailyReport({ reports = {}, characters = [], onBack }) {
           <li>変化はありません</li>
         ) : (
           changes.map((chg, idx) => (
-            <li key={idx}>[{chg.time}] {chg.description}</li>
+            <li
+              key={idx}
+              className={chg.logId ? 'cursor-pointer text-blue-300' : ''}
+              onClick={() => chg.logId && onOpenLog && onOpenLog(chg.logId)}
+            >
+              [{chg.time}] {chg.description}
+            </li>
           ))
         )}
       </ul>

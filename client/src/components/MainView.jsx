@@ -2,9 +2,12 @@ import React, { useEffect, useRef } from 'react'
 import ConsultationArea from './ConsultationArea.jsx'
 
 function parseLog(line) {
-  const m = line.match(/^\[(.*?)\]\s*(EVENT|SYSTEM):\s*(.*)$/)
-  if (m) return { time: m[1], type: m[2], text: m[3] }
-  return { time: '', type: 'EVENT', text: line }
+  if (typeof line === 'string') {
+    const m = line.match(/^\[(.*?)\]\s*(EVENT|SYSTEM):\s*(.*)$/)
+    if (m) return { time: m[1], type: m[2], text: m[3] }
+    return { time: '', type: 'EVENT', text: line }
+  }
+  return line
 }
 
 export default function MainView({ characters, onSelect, logs, trusts, addLog, updateTrust, updateLastConsultation }) {

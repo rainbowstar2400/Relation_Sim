@@ -3,9 +3,12 @@ import { getEmotionLabel } from '../lib/emotionLabel.js'
 
 // ログ行をパースして {time, text} を返す簡易関数
 function parseLog(line) {
-  const m = line.match(/^\[(.*?)\]\s*(EVENT|SYSTEM):\s*(.*)$/)
-  if (m) return { time: m[1], text: m[3] }
-  return { time: '', text: line }
+  if (typeof line === 'string') {
+    const m = line.match(/^\[(.*?)\]\s*(EVENT|SYSTEM):\s*(.*)$/)
+    if (m) return { time: m[1], text: m[3] }
+    return { time: '', text: line }
+  }
+  return line
 }
 
 // 好感度スコア(-100~100)を0~100のパーセントに変換
@@ -37,7 +40,10 @@ export default function RelationDetail({
 
   // 両名が登場するログを抽出し新しいものから5件表示
   const histories = logs
-    .filter(l => l.includes(charA.name) && l.includes(charB.name))
+    .filter(l => {
+      const text = typeof l === 'string' ? l : l.text || ''
+      return text.includes(charA.name) && text.includes(charB.name)
+    })
     .slice(-5)
     .map(parseLog)
     .reverse()
