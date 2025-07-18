@@ -95,23 +95,23 @@ export default function CharacterStatus({
       <ul className="mb-2 list-none p-0">
         <li className="mb-1">
           社交性:
-          <RangeSlider min={0} max={5} value={p.social || 0} disabled />
+          <RangeSlider min={0} max={5} value={p.social || 0} disabled showNumbers={false} />
         </li>
         <li className="mb-1">
           気配り傾向:
-          <RangeSlider min={0} max={5} value={p.kindness || 0} disabled />
+          <RangeSlider min={0} max={5} value={p.kindness || 0} disabled showNumbers={false} />
         </li>
         <li className="mb-1">
           頑固さ:
-          <RangeSlider min={0} max={5} value={p.stubbornness || 0} disabled />
+          <RangeSlider min={0} max={5} value={p.stubbornness || 0} disabled showNumbers={false} />
         </li>
         <li className="mb-1">
           行動力:
-          <RangeSlider min={0} max={5} value={p.activity || 0} disabled />
+          <RangeSlider min={0} max={5} value={p.activity || 0} disabled showNumbers={false} />
         </li>
         <li>
           表現力:
-          <RangeSlider min={0} max={5} value={p.expressiveness || 0} disabled />
+          <RangeSlider min={0} max={5} value={p.expressiveness || 0} disabled showNumbers={false} />
         </li>
       </ul>
 
