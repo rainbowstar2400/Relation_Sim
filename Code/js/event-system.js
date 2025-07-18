@@ -4,6 +4,7 @@ import { drawMood } from './mood.js';
 import { appendLog } from './logger.js';
 import { drawEmotionChange } from './emotion-label.js';
 import { addReportEvent, addReportChange } from './report-utils.js';
+import { getTimeWeight } from './time-utils.js';
 
 // イベント種別ごとの基礎好感度値
 const baseAffection = {
@@ -23,13 +24,14 @@ const moodAffectionModifier = {
 };
 
 function getRandomPair() {
-    if (state.characters.length < 2) return null;
-    const idx1 = Math.floor(Math.random() * state.characters.length);
+    const activeChars = state.characters.filter(c => c.condition !== '就寝中' && c.condition !== '風邪');
+    if (activeChars.length < 2) return null;
+    const idx1 = Math.floor(Math.random() * activeChars.length);
     let idx2 = idx1;
     while (idx2 === idx1) {
-        idx2 = Math.floor(Math.random() * state.characters.length);
+        idx2 = Math.floor(Math.random() * activeChars.length);
     }
-    return [state.characters[idx1], state.characters[idx2]];
+    return [activeChars[idx1], activeChars[idx2]];
 }
 
 function updateAffection(from, to, delta) {
@@ -49,6 +51,10 @@ export function triggerRandomEvent() {
     const pair = getRandomPair();
     if (!pair) return;
     const [a, b] = pair;
+    const weightA = getTimeWeight(a.activityPattern);
+    const weightB = getTimeWeight(b.activityPattern);
+    const chance = Math.min(1, weightA * weightB);
+    if (Math.random() > chance) return;
     const types = ['挨拶', '雑談', '思い出し会話', '二人きりの時間'];
     const type = types[Math.floor(Math.random() * types.length)];
     let desc = '';
