@@ -90,6 +90,7 @@ h2 {
 .consultation-popup .popup-inner {
     background-color: #3d3d3d;
     padding: 20px;
+    padding-top: 48px; /* 余白を広げてボタンと文字が重ならないように */
     border-radius: 6px;
     width: 90%;
     max-width: 400px;
@@ -100,11 +101,6 @@ h2 {
     position: absolute;
     top: 6px;
     right: 8px;
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 20px;
-    cursor: pointer;
 }
 
 /* ログ表示エリア (CLI風) - ここは黒を維持してメリハリをつけます */
