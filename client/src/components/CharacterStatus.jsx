@@ -12,11 +12,6 @@ function parseLog(line) {
   return line
 }
 
-// 好感度スコア(-100〜100)を0〜100のパーセントに変換
-function affectionToPercent(score) {
-  const clamped = Math.max(-100, Math.min(100, score))
-  return (clamped + 100) / 2
-}
 
 // characters: 全キャラクター一覧
 // logs: これまでのログ

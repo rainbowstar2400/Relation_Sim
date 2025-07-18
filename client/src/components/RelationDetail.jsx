@@ -1,5 +1,6 @@
 import React from 'react'
 import { getEmotionLabel } from '../lib/emotionLabel.js'
+import AffectionBar from './AffectionBar.jsx'
 
 // ログ行をパースして {time, text} を返す簡易関数
 function parseLog(line) {
@@ -11,11 +12,6 @@ function parseLog(line) {
   return line
 }
 
-// 好感度スコア(-100~100)を0~100のパーセントに変換
-function affectionToPercent(score) {
-  const clamped = Math.max(-100, Math.min(100, score))
-  return (clamped + 100) / 2
-}
 
 // charA, charB: 対象キャラオブジェクト
 // relationships, affections, emotions: 全体の状態
@@ -67,7 +63,7 @@ export default function RelationDetail({
           <p className="mb-1">[{charA.name} → {charB.name}]</p>
           <p className="flex items-center mb-1">
             <span className="mr-1">好感度:</span>
-            <progress value={affectionToPercent(affectionAB)} max="100" className="w-full h-2" />
+            <AffectionBar score={affectionAB} />
           </p>
           <p>感情ラベル: {emotionAB}</p>
         </div>
@@ -75,7 +71,7 @@ export default function RelationDetail({
           <p className="mb-1">[{charB.name} → {charA.name}]</p>
           <p className="flex items-center mb-1">
             <span className="mr-1">好感度:</span>
-            <progress value={affectionToPercent(affectionBA)} max="100" className="w-full h-2" />
+            <AffectionBar score={affectionBA} />
           </p>
           <p>感情ラベル: {emotionBA}</p>
         </div>
