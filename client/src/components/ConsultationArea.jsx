@@ -11,6 +11,8 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
   const [selected, setSelected] = useState('')
   const [answered, setAnswered] = useState(false)
   const AUTO_INTERVAL_MS = 3600000 // 1時間ごと
+  const MAX_AUTO_CONSULTATIONS = 2 // 自動生成時の上限
+  const MAX_TOTAL_CONSULTATIONS = 3 // 手動追加も含めた上限
 
   // 初回マウント時に相談テンプレートを取得
   useEffect(() => {
@@ -27,7 +29,7 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
   useEffect(() => {
     const timer = setInterval(() => {
       setConsultations(prev => {
-        if (prev.length > 0 || templates.length === 0) return prev
+        if (prev.length >= MAX_AUTO_CONSULTATIONS || templates.length === 0) return prev
         const available = characters.filter(c => Date.now() - (c.lastConsultation || 0) >= AUTO_INTERVAL_MS)
         if (available.length === 0) return prev
         const char = available[Math.floor(Math.random() * available.length)]
@@ -47,7 +49,7 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
   // 相談イベントを追加
   const addConsultation = () => {
     if (templates.length === 0) return
-    if (consultations.length >= 3) return
+    if (consultations.length >= MAX_TOTAL_CONSULTATIONS) return
     const available = characters.filter(c => Date.now() - (c.lastConsultation || 0) >= AUTO_INTERVAL_MS)
     if (available.length === 0) return
     const char = available[Math.floor(Math.random() * available.length)]
