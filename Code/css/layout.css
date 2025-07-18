@@ -153,8 +153,7 @@ button {
 }
 
 button:hover {
-    /* ホバー時は背景を少し明るいグレーに */
-    background-color: #777777;
+    background-color: #7a7a7a;
 }
 
 /* 画面切り替え用のスタイル */
