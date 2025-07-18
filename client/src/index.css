@@ -6,4 +6,13 @@
   body {
     @apply bg-base text-gray-200 font-jp p-5;
   }
+  /* すべてのボタンに共通のデザインを適用 */
+  button {
+    /* 青系の背景と白い枠でボタンらしさを強調 */
+    @apply bg-blue-600 text-white border-2 border-white rounded px-2 py-1;
+  }
+  button:hover {
+    /* ホバー時は少し明るい色に */
+    @apply bg-blue-500;
+  }
 }
