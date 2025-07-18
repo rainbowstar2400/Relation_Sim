@@ -113,7 +113,7 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
       {current && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
           <div className="bg-gray-700 p-4 rounded relative w-11/12 max-w-sm pt-6">
-            <button className="absolute top-1 left-2 px-2 py-1" onClick={closePopup}>×</button>
+            <button className="absolute top-1 right-2 px-2 py-1" onClick={closePopup}>×</button>
             <p className="mb-2">{current.char.name}「{current.template.core_prompt}」</p>
             {current.template.form === 'choice' ? (
               <div className="mb-2">

@@ -100,7 +100,7 @@ h2 {
 .consultation-popup .popup-close {
     position: absolute;
     top: 6px;
-    left: 8px;
+    right: 8px;
 }
 
 /* ログ表示エリア (CLI風) - ここは黒を維持してメリハリをつけます */
