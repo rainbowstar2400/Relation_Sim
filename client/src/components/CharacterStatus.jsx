@@ -73,7 +73,7 @@ export default function CharacterStatus({
 
   // 対象キャラ名を含むログを抽出し、新しいものから5件表示
   const events = logs
-    .filter(l => l.includes(char.name))
+    .filter(l => (typeof l === 'string' ? l : l.text).includes(char.name))
     .slice(-5)
     .map(parseLog)
     .reverse()
