@@ -84,7 +84,6 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
 
     updateTrust(current.char.id, delta)
     updateLastConsultation(current.char.id)
-    addLog(`${current.char.name}との相談が終了しました`)
     clearTimeout(current.timeout)
     setAnswered(true)
   }
