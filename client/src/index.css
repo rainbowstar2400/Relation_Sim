@@ -8,8 +8,8 @@
   }
   /* すべてのボタンに共通のデザインを適用 */
   button {
-    /* グレー背景に白枠線でボタンを目立たせる */
-    @apply bg-gray-600 text-white border-2 border-white rounded px-2 py-1;
+    /* グレー背景でシンプルなボタンに */
+    @apply bg-gray-600 text-white rounded px-2 py-1;
   }
   button:hover {
     /* ホバー時は少し明るいグレーに */

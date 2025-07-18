@@ -106,7 +106,7 @@ export default function DailyReport({ reports = {}, characters = [], onBack }) {
 
       {/* 発生イベント一覧 */}
       <h3 className="mb-1">発生イベント</h3>
-      <ul className="mb-2 list-disc pl-4">
+      <ul className="mb-2 list-none pl-4">
         {events.length === 0 ? (
           <li>イベントがありません</li>
         ) : (
@@ -118,7 +118,7 @@ export default function DailyReport({ reports = {}, characters = [], onBack }) {
 
       {/* 変化履歴一覧 */}
       <h3 className="mb-1">変化履歴</h3>
-      <ul className="mb-4 list-disc pl-4">
+      <ul className="mb-4 list-none pl-4">
         {changes.length === 0 ? (
           <li>変化はありません</li>
         ) : (

@@ -302,7 +302,7 @@ export default function ManagementRoom({
               {Object.keys(tempRelations).length === 0 ? (
                 <p>設定済みの関係はありません。</p>
               ) : (
-                <ul className="ml-4 list-disc">
+                <ul className="ml-4 list-none">
                   {Object.entries(tempRelations).map(([id,data])=> (
                     <li key={id}>
                       <strong>{characters.find(c=>c.id===id)?.name}</strong>: {data.type} ({data.affectionTo}/{data.affectionFrom})
@@ -352,7 +352,7 @@ export default function ManagementRoom({
         </form>
       )}
       <h3 className="mb-2">▼ 既存キャラクター一覧</h3>
-      <ul className="list-disc pl-4">
+      <ul className="list-none pl-4">
         {characters.map(c => (
           <li key={c.id} className="mb-1">
             {c.name}
