@@ -9,8 +9,20 @@ export default function DailyReport({ reports = {}, characters = [], onBack }) {
   const [date, setDate] = useState(todayStr())
   const [events, setEvents] = useState([])
   const [changes, setChanges] = useState([])
-  const [selectedChars, setSelectedChars] = useState('')
+  // 複数選択されたキャラ名を配列で保持
+  const [selectedChars, setSelectedChars] = useState([])
   const [changeType, setChangeType] = useState('all')
+
+  // キャラ選択時の処理
+  const handleCharChange = (e) => {
+    const values = Array.from(e.target.selectedOptions).map((o) => o.value)
+    // 先頭の "" (全員) が選択された場合は選択をリセット
+    if (values.includes('')) {
+      setSelectedChars([])
+    } else {
+      setSelectedChars(values)
+    }
+  }
 
   // 日付変更や reports 更新時にリストを再取得
   useEffect(() => {
@@ -18,8 +30,10 @@ export default function DailyReport({ reports = {}, characters = [], onBack }) {
     let evs = data.events
     let chgs = data.changes
 
-    if (selectedChars) {
-      const matchChar = (text = '') => text.includes(selectedChars)
+    // キャラが選ばれている場合は該当キャラを含む項目のみ表示
+    if (selectedChars.length > 0) {
+      const matchChar = (text = '') =>
+        selectedChars.some(name => text.includes(name))
       evs = evs.filter(ev => matchChar(ev.description))
       chgs = chgs.filter(chg => matchChar(chg.description))
     }
@@ -67,8 +81,9 @@ export default function DailyReport({ reports = {}, characters = [], onBack }) {
         <select
           id="char-select"
           className="text-black"
+          multiple
           value={selectedChars}
-          onChange={(e) => setSelectedChars(e.target.value)}
+          onChange={handleCharChange}
         >
           <option value="">全員</option>
           {characters.map(c => (
