@@ -184,6 +184,47 @@ export default function App() {
     }
   }, [])
 
+  // キャラ状態を時間帯や確率で更新
+  useEffect(() => {
+    const updateCondition = () => {
+      const now = new Date()
+      const hour = now.getHours()
+      const base = hour >= 0 && hour < 6 ? '就寝中' : '活動中'
+      setState(prev => {
+        const characters = prev.characters.map(c => {
+          let condition = c.condition
+          let recoverAt = c.recoverAt
+
+          // 風邪の継続判定
+          if (condition === '風邪') {
+            if (recoverAt && Date.now() >= recoverAt) {
+              condition = base
+              recoverAt = null
+            }
+          } else {
+            condition = base
+          }
+
+          // 5% の確率で風邪を発症
+          if (condition !== '風邪' && Math.random() < 0.05) {
+            condition = '風邪'
+            recoverAt = Date.now() + 3 * 86400000
+          }
+
+          if (condition !== c.condition || recoverAt !== c.recoverAt) {
+            return { ...c, condition, recoverAt }
+          }
+          return c
+        })
+        return { ...prev, characters }
+      })
+    }
+
+    updateCondition()
+    const timer = setInterval(updateCondition, 3600000)
+    return () => clearInterval(timer)
+  }, [])
+
   const saveCharacter = (char, rels = [], nicks = [], affs = []) => {
     setState(prev => {
       let characters = [...prev.characters]
