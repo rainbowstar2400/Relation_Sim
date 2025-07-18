@@ -100,7 +100,7 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
   return (
     <section className="mb-6">
       <h2 className="text-sm text-gray-300 border-b border-gray-600 pb-1 mb-2">▼ 困りごと相談エリア</h2>
-      <ul className="mb-2">
+      <ul className="mb-2 list-none">
         {consultations.map(c => (
           <li key={c.id} className="flex justify-between bg-gray-700 rounded px-2 py-1 mb-1">
             <span>・{c.char.name}から相談があります</span>

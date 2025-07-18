@@ -127,7 +127,7 @@ export default function CharacterStatus({
 
       {/* 最近のイベント履歴 */}
       <h3 className="text-sm text-gray-300 border-b border-gray-600 pb-1 mb-2">▼ イベント履歴</h3>
-      <ul id="status-events" className="mb-2 list-disc pl-4">
+      <ul id="status-events" className="mb-2 list-none pl-4">
         {events.length === 0 ? (
           <li>履歴なし</li>
         ) : (
