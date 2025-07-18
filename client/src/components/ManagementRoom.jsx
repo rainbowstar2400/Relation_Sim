@@ -1,20 +1,5 @@
 import React, { useState, useEffect } from 'react'
-
-// 簡易MBTI計算用ヘルパー
-const calcMbti = (values, personality) => {
-  const sums = {
-    ei: values[0] + values[4] + values[8] + values[12],
-    sn: values[1] + values[5] + values[9] + values[13],
-    tf: values[2] + values[6] + values[10] + values[14],
-    jp: values[3] + values[7] + values[11] + values[15]
-  }
-  let r = ''
-  r += sums.ei <= 7 ? 'E' : sums.ei >= 9 ? 'I' : (personality.social >= 3 ? 'E' : 'I')
-  r += sums.sn <= 7 ? 'S' : sums.sn >= 9 ? 'N' : (personality.expressiveness >= 3 ? 'N' : 'S')
-  r += sums.tf <= 7 ? 'T' : sums.tf >= 9 ? 'F' : (personality.kindness >= 3 ? 'F' : 'T')
-  r += sums.jp <= 7 ? 'J' : sums.jp >= 9 ? 'P' : (personality.activity >= 3 ? 'J' : 'P')
-  return r
-}
+import { mbtiQuestions, mbtiDescriptions, mbtiTypes, calculateMbti } from '../lib/mbti.js'
 
 const defaultAffections = {
   'なし': 0,
@@ -25,10 +10,6 @@ const defaultAffections = {
   '家族': 50
 }
 
-const mbtiTypes = [
-  'INFP','INFJ','INTP','INTJ','ISFP','ISFJ','ISTP','ISTJ',
-  'ENFP','ENFJ','ENTP','ENTJ','ESFP','ESFJ','ESTP','ESTJ'
-]
 
 export default function ManagementRoom({
   characters,
@@ -115,7 +96,7 @@ export default function ManagementRoom({
       id,
       name,
       personality,
-      mbti: mbtiMode === 'diag' ? (mbtiResult || calcMbti(mbtiSliders, personality)) : mbtiManual,
+      mbti: mbtiMode === 'diag' ? (mbtiResult || calculateMbti(mbtiSliders, personality)) : mbtiManual,
       mbti_slider: mbtiMode === 'diag' ? mbtiSliders : [],
       talkStyle: { preset: talkPreset, firstPerson, suffix },
       activityPattern,
@@ -329,13 +310,15 @@ export default function ManagementRoom({
                   <p>各質問にスライダーで回答してください。</p>
                   {mbtiSliders.map((v,i)=> (
                     <div className="mb-1" key={i}>
-                      <label className="mr-2">Q{i+1}:</label>
+                      <label className="mr-2">Q{i+1}: {mbtiQuestions[i]}</label>
                       <input type="range" min="0" max="4" value={v} onChange={e=>setMbtiSliders(prev=>{
                         const arr=[...prev]; arr[i]=parseInt(e.target.value); return arr})} />
                     </div>
                   ))}
-                  <button type="button" onClick={()=>setMbtiResult(calcMbti(mbtiSliders, personality))}>診断する</button>
-                  {mbtiResult && <p className="mt-1">診断結果: {mbtiResult}</p>}
+                  <button type="button" onClick={()=>setMbtiResult(calculateMbti(mbtiSliders, personality))}>診断する</button>
+                  {mbtiResult && (
+                    <p className="mt-1">診断結果: {mbtiResult}<br />{mbtiDescriptions[mbtiResult]}</p>
+                  )}
                 </div>
               )}
             </div>
