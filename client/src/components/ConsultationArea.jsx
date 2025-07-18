@@ -38,7 +38,6 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
         const timeout = setTimeout(() => {
           setConsultations(p => p.filter(c => c.id !== id))
         }, AUTO_INTERVAL_MS)
-        addLog(`${char.name}がプレイヤーに相談しています…`)
         updateLastConsultation(char.id)
         return [...prev, { id, char, template, timeout }]
       })
@@ -60,7 +59,6 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
     }, AUTO_INTERVAL_MS)
     const c = { id, char, template, timeout }
     setConsultations(prev => [...prev, c])
-    addLog(`${char.name}がプレイヤーに相談しています…`)
     updateLastConsultation(char.id)
   }
 
@@ -68,6 +66,7 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
     setCurrent(c)
     setSelected('')
     setAnswered(false)
+    addLog(`${c.char.name}がプレイヤーに相談しています…`)
   }
 
   // 回答を送信
