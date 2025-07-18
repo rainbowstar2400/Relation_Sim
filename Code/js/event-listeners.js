@@ -11,6 +11,7 @@ import { createConsultation, setupConsultationHandlers } from './consultation.js
 import { renderSavedLogs } from './logger.js';
 
 export function setupEventListeners() {
+    dom.homeButton.addEventListener('click', () => switchView('main'));
     dom.managementButton.addEventListener('click', () => switchView('management'));
     dom.dailyReportButton.addEventListener('click', () => {
         switchView('daily-report');

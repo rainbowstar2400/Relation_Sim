@@ -23,6 +23,7 @@ export function initDomCache() {
     // 管理室画面の要素
     dom.managementRoomView = document.getElementById('management-room');
     dom.backToMainButton = document.getElementById('back-to-main-button');
+    dom.homeButton = document.getElementById('home-button');
     dom.managementButton = document.getElementById('management-button');
     dom.dailyReportButton = document.getElementById('daily-report-button');
     dom.devEventButton = document.getElementById('dev-event-button');

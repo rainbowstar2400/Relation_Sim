@@ -18,6 +18,8 @@ export default function Header({ onChangeView, onSave, onLoad }) {
 
   return (
     <header className="flex items-center gap-2 pb-4 mb-5 border-b border-gray-600">
+      {/* どの画面からでもメイン画面に戻るためのボタン */}
+      <button onClick={() => onChangeView('main')}>ホーム</button>
       <button onClick={() => onChangeView('management')}>管理室</button>
       <button onClick={() => onChangeView('daily')}>日報</button>
       <button onClick={onSave}>セーブ</button>
