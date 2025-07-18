@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 
-export default function RangeSlider({ min, max, value, onChange, showNumbers = true }) {
+export default function RangeSlider({ min, max, value, onChange, step = 1, showNumbers = true }) {
   const sliderRef = useRef(null)
   const tickRefs = useRef([])
 
@@ -24,7 +24,7 @@ export default function RangeSlider({ min, max, value, onChange, showNumbers = t
   }, [])
 
   const ticks = []
-  for (let i = min; i <= max; i++) {
+  for (let i = min; i <= max; i += step) {
     ticks.push(i)
   }
 
@@ -34,6 +34,7 @@ export default function RangeSlider({ min, max, value, onChange, showNumbers = t
         type="range"
         min={min}
         max={max}
+        step={step}
         value={value}
         onChange={onChange}
         ref={sliderRef}
