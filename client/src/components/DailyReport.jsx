@@ -9,7 +9,7 @@ export default function DailyReport({ reports = {}, characters = [], onBack }) {
   const [date, setDate] = useState(todayStr())
   const [events, setEvents] = useState([])
   const [changes, setChanges] = useState([])
-  const [selectedChars, setSelectedChars] = useState([])
+  const [selectedChars, setSelectedChars] = useState('')
   const [changeType, setChangeType] = useState('all')
 
   // 日付変更や reports 更新時にリストを再取得
@@ -18,8 +18,8 @@ export default function DailyReport({ reports = {}, characters = [], onBack }) {
     let evs = data.events
     let chgs = data.changes
 
-    if (selectedChars.length > 0) {
-      const matchChar = (text = '') => selectedChars.some(name => text.includes(name))
+    if (selectedChars) {
+      const matchChar = (text = '') => text.includes(selectedChars)
       evs = evs.filter(ev => matchChar(ev.description))
       chgs = chgs.filter(chg => matchChar(chg.description))
     }
@@ -66,13 +66,11 @@ export default function DailyReport({ reports = {}, characters = [], onBack }) {
         <label htmlFor="char-select" className="mr-1">キャラ:</label>
         <select
           id="char-select"
-          multiple
           className="text-black"
           value={selectedChars}
-          onChange={(e) =>
-            setSelectedChars(Array.from(e.target.selectedOptions).map(o => o.value))
-          }
+          onChange={(e) => setSelectedChars(e.target.value)}
         >
+          <option value="">全員</option>
           {characters.map(c => (
             <option key={c.id} value={c.name}>{c.name}</option>
           ))}
@@ -86,8 +84,8 @@ export default function DailyReport({ reports = {}, characters = [], onBack }) {
         >
           <option value="all">すべて</option>
           <option value="event">イベント</option>
-          <option value="relation">関係ラベル</option>
-          <option value="emotion">感情ラベル</option>
+          <option value="relation">関係</option>
+          <option value="emotion">印象</option>
         </select>
       </div>
 
