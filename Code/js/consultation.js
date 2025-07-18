@@ -96,7 +96,6 @@ export function createConsultation() {
     };
     char.lastConsultation = Date.now();
     state.consultations.push(event);
-    appendLog(`${char.name}がプレイヤーに相談しています…`);
     renderConsultations();
     event.timer = setTimeout(() => removeConsultation(event.id, false), 3600000);
 }
@@ -133,6 +132,7 @@ function openPopup(id) {
     const ev = state.consultations.find(e => e.id === id);
     if (!ev) return;
     const char = state.characters.find(c => c.id === ev.charId);
+    appendLog(`${char.name}がプレイヤーに相談しています…`);
     dom.consultationQuestion.textContent = `${char.name}「${ev.template.core_prompt}」`;
     dom.consultationAnswerArea.innerHTML = '';
     if (ev.template.form === 'choice') {
