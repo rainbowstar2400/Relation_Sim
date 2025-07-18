@@ -343,10 +343,12 @@ export default function ManagementRoom({
       <h3 className="mb-2">▼ 既存キャラクター一覧</h3>
       <ul className="list-none pl-4">
         {characters.map(c => (
-          <li key={c.id} className="mb-1">
-            {c.name}
-            <button className="ml-2" onClick={()=>startEdit(c)}>編集</button>
-            <button className="ml-1" onClick={()=>remove(c.id)}>削除</button>
+          <li key={c.id} className="mb-1 flex justify-between items-center">
+            <span>{c.name}</span>
+            <div>
+              <button className="ml-2" onClick={() => startEdit(c)}>編集</button>
+              <button className="ml-1" onClick={() => remove(c.id)}>削除</button>
+            </div>
           </li>
         ))}
       </ul>
