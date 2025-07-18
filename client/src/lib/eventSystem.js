@@ -1,6 +1,7 @@
 // eventSystem.js - イベント発生処理
 import { drawMood, loadMoodTables } from './mood.js'
 import { drawEmotionChange, loadEmotionLabelTable } from './emotionLabel.js'
+import { addReportEvent, addReportChange } from './reportUtils.js'
 
 // テーブルを事前読み込み
 loadMoodTables()
@@ -85,17 +86,28 @@ export function triggerRandomEvent(setState, addLog) {
     let affections = updateAffection(prev.affections, a.id, b.id, delta)
     affections = updateAffection(affections, b.id, a.id, delta)
     let emotions = prev.emotions || []
+    let reports = prev.reports || {}
     const logs = []
 
-    let result = drawEmotionChange(prev, emotions, a.id, b.id, mood)
+    let result = drawEmotionChange(prev, emotions, a.id, b.id, mood, reports)
     emotions = result.emotions
+    reports = result.reports
     if (result.log) logs.push(result.log)
-    result = drawEmotionChange(prev, emotions, b.id, a.id, mood)
+    result = drawEmotionChange(prev, emotions, b.id, a.id, mood, reports)
     emotions = result.emotions
+    reports = result.reports
     if (result.log) logs.push(result.log)
 
+    // イベント決定後に日報へ記録
+    reports = addReportEvent(reports, { timestamp: Date.now(), description: desc })
+    if (delta !== 0) {
+      const verb = delta > 0 ? '上昇しました' : '下降しました'
+      reports = addReportChange(reports, `${a.name}→${b.name}の好感度が${verb}`)
+      reports = addReportChange(reports, `${b.name}→${a.name}の好感度が${verb}`)
+    }
+
     eventInfo = { a, b, desc, delta, logs }
-    return { ...prev, affections, emotions }
+    return { ...prev, affections, emotions, reports }
   })
 
   // state 更新後にログを追加
