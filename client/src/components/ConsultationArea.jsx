@@ -112,8 +112,8 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
 
       {current && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-          <div className="bg-gray-700 p-4 rounded relative w-11/12 max-w-sm">
-            <button className="absolute top-1 right-2" onClick={closePopup}>×</button>
+          <div className="bg-gray-700 p-4 rounded relative w-11/12 max-w-sm pt-6">
+            <button className="absolute top-1 left-2 px-2 py-1" onClick={closePopup}>×</button>
             <p className="mb-2">{current.char.name}「{current.template.core_prompt}」</p>
             {current.template.form === 'choice' ? (
               <div className="mb-2">
@@ -139,7 +139,7 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
                 placeholder="ここに入力"
               />
             )}
-            <button onClick={sendAnswer} disabled={answered}>送信する</button>
+            <button onClick={sendAnswer} disabled={answered}>{answered ? '完了' : '決定'}</button>
             {answered && <p className="mt-2">ありがとう！</p>}
           </div>
         </div>

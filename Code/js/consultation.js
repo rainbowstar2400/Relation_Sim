@@ -158,9 +158,10 @@ function openPopup(id) {
         input.type = 'text';
         input.id = 'consult-fill';
         input.placeholder = 'ここに入力';
-        dom.consultationAnswerArea.appendChild(input);
+    dom.consultationAnswerArea.appendChild(input);
     }
     dom.consultationSendButton.disabled = false;
+    dom.consultationSendButton.textContent = '決定';
     dom.consultationPopup.style.display = 'flex';
 }
 
@@ -182,6 +183,7 @@ function handleSendClick() {
     updateTrust(ev.charId, delta);
     dom.consultationAnswerArea.innerHTML = '<p>ありがとう！</p>';
     dom.consultationSendButton.disabled = true;
+    dom.consultationSendButton.textContent = '完了';
     answered = true;
 }
 
