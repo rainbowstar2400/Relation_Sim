@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react'
 
-export default function RangeSlider({ min, max, value, onChange, step = 1, showNumbers = true }) {
+// step: スライダーの実際の移動単位
+// tickStep: 目盛り線の間隔。指定がなければ step と同じ値を使う
+export default function RangeSlider({ min, max, value, onChange, step = 1, tickStep, showNumbers = true }) {
   const sliderRef = useRef(null)
   const tickRefs = useRef([])
 
@@ -23,8 +25,9 @@ export default function RangeSlider({ min, max, value, onChange, step = 1, showN
     return () => window.removeEventListener('resize', alignTicks)
   }, [])
 
+  const tickInterval = tickStep ?? step
   const ticks = []
-  for (let i = min; i <= max; i += step) {
+  for (let i = min; i <= max; i += tickInterval) {
     ticks.push(i)
   }
 
