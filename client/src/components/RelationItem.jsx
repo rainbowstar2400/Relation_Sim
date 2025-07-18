@@ -8,7 +8,7 @@ function affectionToPercent(score) {
   return (clamped + 100) / 2
 }
 
-export default function RelationItem({ charName, relation }) {
+export default function RelationItem({ charName, relation, onOpen }) {
   return (
     <details className="flex-shrink-0 w-60 bg-gray-700 border border-gray-600 rounded p-2">
       <summary className="cursor-pointer list-none">
@@ -16,6 +16,18 @@ export default function RelationItem({ charName, relation }) {
         <p className="text-sm">
           {relation.label} | 印象: {relation.emotion}
         </p>
+        {onOpen && (
+          <button
+            type="button"
+            className="ml-2 text-blue-300 underline"
+            onClick={e => {
+              e.stopPropagation()
+              onOpen()
+            }}
+          >
+            詳細
+          </button>
+        )}
       </summary>
       <div className="mt-2 ml-2 text-sm">
         <p>[{charName} → {relation.otherName}]</p>

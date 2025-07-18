@@ -28,6 +28,7 @@ export default function CharacterStatus({
   affections = [],
   emotions = [],
   onBack,
+  onOpenRelation,
 }) {
   const p = char.personality || {}
   const talk = char.talkStyle || {}
@@ -55,6 +56,7 @@ export default function CharacterStatus({
       const emotion = getEmotionLabel({ emotions }, char.id, other.id) || 'なし'
 
       return {
+        otherId: other.id,
         otherName: other.name,
         label,
         affectionTo,
@@ -120,7 +122,12 @@ export default function CharacterStatus({
           <p>関係情報なし</p>
         ) : (
           relations.map((rel, idx) => (
-            <RelationItem key={idx} charName={char.name} relation={rel} />
+            <RelationItem
+              key={idx}
+              charName={char.name}
+              relation={rel}
+              onOpen={() => onOpenRelation && onOpenRelation(char.id, rel.otherId)}
+            />
           ))
         )}
       </div>

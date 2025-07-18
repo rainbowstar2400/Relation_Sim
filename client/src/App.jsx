@@ -10,6 +10,7 @@ import Header from './components/Header.jsx'
 import MainView from './components/MainView.jsx'
 import ManagementRoom from './components/ManagementRoom.jsx'
 import CharacterStatus from './components/CharacterStatus.jsx'
+import RelationDetail from './components/RelationDetail.jsx'
 import DailyReport from './components/DailyReport.jsx'
 import { addReportChange } from './lib/reportUtils.js'
 const EVENT_INTERVAL_MS = 1800000 // 30分ごと
@@ -70,6 +71,7 @@ export default function App() {
   const [view, setView] = useState('main')
   const [state, setState] = useState(initialState)
   const [currentChar, setCurrentChar] = useState(null)
+  const [currentPair, setCurrentPair] = useState(null)
 
   // ログを追加するヘルパー
   const addLog = (text, type = 'EVENT') => {
@@ -269,7 +271,16 @@ export default function App() {
 
   const showStatus = (char) => {
     setCurrentChar(char)
+    setCurrentPair(null)
     setView('status')
+  }
+
+  const showRelationDetail = (idA, idB) => {
+    const a = state.characters.find(c => c.id === idA)
+    const b = state.characters.find(c => c.id === idB)
+    if (!a || !b) return
+    setCurrentPair({ a, b })
+    setView('relation')
   }
 
   return (
@@ -294,7 +305,10 @@ export default function App() {
           affections={state.affections}
           onSaveCharacter={saveCharacter}
           onDeleteCharacter={deleteCharacter}
-          onBack={() => setView('main')}
+          onBack={() => {
+            setCurrentPair(null)
+            setView('main')
+          }}
         />
       )}
       {view === 'status' && currentChar && (
@@ -307,7 +321,25 @@ export default function App() {
           nicknames={state.nicknames}
           affections={state.affections}
           emotions={state.emotions}
-          onBack={() => setView('main')}
+          onBack={() => {
+            setCurrentPair(null)
+            setView('main')
+          }}
+          onOpenRelation={showRelationDetail}
+        />
+      )}
+      {view === 'relation' && currentPair && (
+        <RelationDetail
+          charA={currentPair.a}
+          charB={currentPair.b}
+          relationships={state.relationships}
+          affections={state.affections}
+          emotions={state.emotions}
+          logs={state.logs}
+          onBack={() => {
+            setCurrentPair(null)
+            setView('status')
+          }}
         />
       )}
       {view === 'daily' && (
