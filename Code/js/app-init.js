@@ -9,6 +9,7 @@ import { loadState } from './storage.js';
 import { state } from './state.js';
 import { renderSavedLogs } from './logger.js';
 import { loadConsultationTemplates, startConsultationScheduler, renderConsultations } from './consultation.js';
+import { loadTimeModifiers, updateCharacterConditions } from './time-utils.js';
 
 const EVENT_INTERVAL_MS = 1800000; // 30分に1回
 const EVENT_PROBABILITY = 0.7; // 70%
@@ -23,6 +24,7 @@ function updateDateTime() {
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
     dom.dateElement.textContent = `${year}/${month}/${day}`;
+    updateCharacterConditions();
 }
 
 function startEventScheduler() {
@@ -48,10 +50,12 @@ export async function initializeApp() {
     }
     await loadEmotionLabelTable();
     await loadMoodTables();
+    await loadTimeModifiers();
     await loadConsultationTemplates();
     setupEventListeners();
     setInterval(updateDateTime, 1000);
     updateDateTime();
+    updateCharacterConditions();
     startEventScheduler();
     startConsultationScheduler();
     renderCharacters();
