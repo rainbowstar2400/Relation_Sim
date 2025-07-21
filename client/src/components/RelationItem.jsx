@@ -30,16 +30,16 @@ export default function RelationItem({ charName, relation, onOpen }) {
       </summary>
       <div className="mt-2 ml-2 text-sm">
         <p>[{charName} → {relation.otherName}]</p>
-        <p className="flex items-center mb-1">
+        <div className="flex items-center mb-1">
           <span className="mr-1">好感度:</span>
           <AffectionBar score={relation.affectionTo} />
-        </p>
+        </div>
         <p>呼び方：{relation.nicknameTo ? `「${relation.nicknameTo}」` : '―'}</p>
         <p className="mt-2">[{relation.otherName} → {charName}]</p>
-        <p className="flex items-center mb-1">
+        <div className="flex items-center mb-1">
           <span className="mr-1">好感度:</span>
           <AffectionBar score={relation.affectionFrom} />
-        </p>
+        </div>
         <p>呼び方：{relation.nicknameFrom ? `「${relation.nicknameFrom}」` : '―'}</p>
       </div>
     </details>
