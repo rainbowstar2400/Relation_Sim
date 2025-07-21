@@ -283,6 +283,11 @@ export default function App() {
       .catch(() => alert('読み込みに失敗しました'))
   }
 
+  // 開発用: 手動でランダムイベントを発生させる
+  const handleDevEvent = () => {
+    triggerRandomEvent(state, setState, addLog)
+  }
+
   const showStatus = (char) => {
     setCurrentChar(char)
     setCurrentPair(null)
@@ -299,7 +304,12 @@ export default function App() {
 
   return (
     <div className="max-w-2xl mx-auto border border-gray-600 bg-panel p-4 rounded text-gray-100 min-h-screen">
-      <Header onChangeView={setView} onSave={handleExport} onLoad={handleImport} />
+      <Header
+        onChangeView={setView}
+        onSave={handleExport}
+        onLoad={handleImport}
+        onDevEvent={handleDevEvent}
+      />
       {view === 'main' && (
         <MainView
           characters={state.characters}
