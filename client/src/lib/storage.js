@@ -27,6 +27,7 @@ export function loadStateFromLocal() {
       return l
     })
     parsed.reports = parsed.reports || {}
+    parsed.readLogCount = parsed.readLogCount || 0
     return parsed
   } catch (e) {
     console.error('保存データの読み込みに失敗しました', e)

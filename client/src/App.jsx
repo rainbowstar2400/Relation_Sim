@@ -66,6 +66,7 @@ const initialState = {
   ],
   consultations: [], // 進行中の相談イベント
   logs: [],          // CLI 風ログ
+  readLogCount: 0,
   reports: {},       // 日報履歴
 }
 
@@ -124,6 +125,10 @@ export default function App() {
         c.id === charId ? { ...c, lastConsultation: now } : c
       )
     }))
+  }
+
+  const updateReadLogCount = (count) => {
+    setState(prev => ({ ...prev, readLogCount: count }))
   }
 
   // localStorageから読み込み
@@ -314,11 +319,13 @@ export default function App() {
         <MainView
           characters={state.characters}
           logs={state.logs}
-          trusts={state.trusts}
+          readLogCount={state.readLogCount}
           onSelect={showStatus}
           addLog={addLog}
           updateTrust={updateTrust}
+          updateReadLogCount={updateReadLogCount}
           updateLastConsultation={updateLastConsultation}
+          trusts={state.trusts}
         />
       )}
       {view === 'management' && (
