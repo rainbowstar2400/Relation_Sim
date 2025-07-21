@@ -50,14 +50,14 @@ h2 {
 
 /* ラベルと値の色分け */
 label {
-    color: #b0b0b0;
+    color: #cccccc; /* 視認性向上のため少し明るめに */
 }
 .basic-info p {
-    color: #b0b0b0;
+    color: #cccccc; /* ラベル同様明度を上げる */
 }
 .basic-info span,
 .personality-list li span {
-    color: #ffd166;
+    color: #ffe48f; /* 個別情報はより明るい黄系に */
     font-weight: bold;
 }
 

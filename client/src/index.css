@@ -22,14 +22,14 @@
 @layer components {
   /* ラベルと値の色分け */
   label {
-    @apply text-gray-400;
+    @apply text-gray-300; /* 少し明るめのグレーで視認性を向上 */
   }
   .basic-info p {
-    @apply text-gray-400;
+    @apply text-gray-300;
   }
   .basic-info span,
   .personality-list li span {
-    @apply text-[#ffd166] font-bold;
+    @apply text-[#ffe48f] font-bold; /* ラベルより明るい黄色 */
   }
   .slider-container {
     position: relative;
