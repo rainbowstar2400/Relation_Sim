@@ -3,6 +3,7 @@ body {
     background-color: #454545; /* 少し明るいグレーの背景 */
     color: #e0e0e0; /* 文字色も少し柔らかく */
     font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    font-size: 18px; /* 全体の文字を大きめに */
     margin: 0;
     padding: 20px;
 }
@@ -45,6 +46,19 @@ h2 {
     color: #b0b0b0; /* ヘッダー文字を少し明るく */
     border-bottom: 1px solid #555;
     padding-bottom: 5px;
+}
+
+/* ラベルと値の色分け */
+label {
+    color: #cccccc; /* 視認性向上のため少し明るめに */
+}
+.basic-info p {
+    color: #cccccc; /* ラベル同様明度を上げる */
+}
+.basic-info span,
+.personality-list li span {
+    color: #ffe48f; /* 個別情報はより明るい黄系に */
+    font-weight: bold;
 }
 
 /* みんなの様子エリア */
@@ -143,6 +157,7 @@ button {
     background-color: #666666;
     color: #ffffff;
     border: 2px solid #ffffff;
+    font-size: 16px; /* ボタンの文字サイズは据え置き */
     padding: 6px 12px;
     border-radius: 4px;
     cursor: pointer;
