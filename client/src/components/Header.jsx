@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 
-export default function Header({ onChangeView, onSave, onLoad }) {
+// 開発用イベント発生ボタンのハンドラ onDevEvent を追加
+export default function Header({ onChangeView, onSave, onLoad, onDevEvent }) {
   const [time, setTime] = useState('')
   const [date, setDate] = useState('')
   const fileInputRef = useRef(null)
@@ -22,6 +23,8 @@ export default function Header({ onChangeView, onSave, onLoad }) {
       <button onClick={() => onChangeView('main')}>ホーム</button>
       <button onClick={() => onChangeView('management')}>管理室</button>
       <button onClick={() => onChangeView('daily')}>日報</button>
+      {/* 開発用: 手動でランダムイベントを発生させる */}
+      <button onClick={onDevEvent}>イベント発生（開発用）</button>
       <button onClick={onSave}>セーブ</button>
       <button onClick={() => fileInputRef.current?.click()}>ロード</button>
       <input
