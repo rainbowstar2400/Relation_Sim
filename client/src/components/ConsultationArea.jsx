@@ -25,31 +25,25 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
       .catch(err => console.error('テンプレートの取得に失敗しました', err))
   }, [])
 
-  // 自動生成のスケジューラ
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setConsultations(prev => {
-        if (prev.length >= MAX_AUTO_CONSULTATIONS || templates.length === 0) return prev
-        const available = characters.filter(c => Date.now() - (c.lastConsultation || 0) >= AUTO_INTERVAL_MS)
-        if (available.length === 0) return prev
-        const char = available[Math.floor(Math.random() * available.length)]
-        const template = templates[Math.floor(Math.random() * templates.length)]
-        const id = Date.now()
-        const timeout = setTimeout(() => {
-          setConsultations(p => p.filter(c => c.id !== id))
-        }, AUTO_INTERVAL_MS)
-        updateLastConsultation(char.id)
-        return [...prev, { id, char, template, timeout }]
-      })
-    }, AUTO_INTERVAL_MS)
-    return () => clearInterval(timer)
-  }, [templates, characters])
-
-  // 告白イベントの自動生成
+  // 自動生成のスケジューラ（困りごと・告白をまとめて処理）
   useEffect(() => {
     const timer = setInterval(() => {
       setConsultations(prev => {
         if (prev.length >= MAX_AUTO_CONSULTATIONS) return prev
+
+        const eventOptions = []
+
+        // 困りごと相談候補
+        if (templates.length > 0) {
+          const available = characters.filter(c => Date.now() - (c.lastConsultation || 0) >= AUTO_INTERVAL_MS)
+          if (available.length > 0) {
+            const char = available[Math.floor(Math.random() * available.length)]
+            const template = templates[Math.floor(Math.random() * templates.length)]
+            eventOptions.push({ type: 'trouble', char, template })
+          }
+        }
+
+        // 告白相談候補
         const candidates = []
         characters.forEach(c => {
           if (Date.now() - (c.lastConsultation || 0) < AUTO_INTERVAL_MS) return
@@ -63,39 +57,77 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
             if (emotion === '好きかも' && affection >= 70) candidates.push({ char: c, target: o })
           })
         })
-        if (candidates.length === 0) return prev
-        const pick = candidates[Math.floor(Math.random() * candidates.length)]
-        const id = Date.now()
-        const template = {
-          kind: 'confession',
-          core_prompt: `${pick.target.name}に告白しようと思うんです。どんな感じでいったらいいと思いますか？`,
-          choices: ['ロマンチックに', '真摯に', '面白く']
+        if (candidates.length > 0) {
+          const pick = candidates[Math.floor(Math.random() * candidates.length)]
+          const template = {
+            kind: 'confession',
+            core_prompt: `${pick.target.name}に告白しようと思うんです。どんな感じでいったらいいと思いますか？`,
+            choices: ['ロマンチックに', '真摯に', '面白く']
+          }
+          eventOptions.push({ type: 'confession', char: pick.char, target: pick.target, template })
         }
+
+        if (eventOptions.length === 0) return prev
+        const ev = eventOptions[Math.floor(Math.random() * eventOptions.length)]
+        const id = Date.now()
         const timeout = setTimeout(() => {
-          setConsultations(p => p.filter(ev => ev.id !== id))
+          setConsultations(p => p.filter(c => c.id !== id))
         }, AUTO_INTERVAL_MS)
-        updateLastConsultation(pick.char.id)
-        return [...prev, { id, char: pick.char, target: pick.target, template, timeout, type: 'confession' }]
+        updateLastConsultation(ev.char.id)
+        return [...prev, { id, ...ev, timeout }]
       })
     }, AUTO_INTERVAL_MS)
     return () => clearInterval(timer)
-  }, [characters, relationships, emotions, affections])
+  }, [templates, characters, relationships, emotions, affections])
 
   // 相談イベントを追加
   const addConsultation = () => {
-    if (templates.length === 0) return
     if (consultations.length >= MAX_TOTAL_CONSULTATIONS) return
-    const available = characters.filter(c => Date.now() - (c.lastConsultation || 0) >= AUTO_INTERVAL_MS)
-    if (available.length === 0) return
-    const char = available[Math.floor(Math.random() * available.length)]
-    const template = templates[Math.floor(Math.random() * templates.length)]
+
+    const options = []
+
+    // 困りごと相談候補
+    if (templates.length > 0) {
+      const available = characters.filter(c => Date.now() - (c.lastConsultation || 0) >= AUTO_INTERVAL_MS)
+      if (available.length > 0) {
+        const char = available[Math.floor(Math.random() * available.length)]
+        const template = templates[Math.floor(Math.random() * templates.length)]
+        options.push({ type: 'trouble', char, template })
+      }
+    }
+
+    // 告白相談候補
+    const confessionCands = []
+    characters.forEach(c => {
+      if (Date.now() - (c.lastConsultation || 0) < AUTO_INTERVAL_MS) return
+      characters.forEach(o => {
+        if (c.id === o.id) return
+        const pair = [c.id, o.id].sort()
+        const rel = relationships.find(r => r.pair[0] === pair[0] && r.pair[1] === pair[1])
+        if (!rel || rel.label !== '友達') return
+        const emotion = emotions.find(e => e.from === c.id && e.to === o.id)?.label
+        const affection = affections.find(a => a.from === c.id && a.to === o.id)?.score || 0
+        if (emotion === '好きかも' && affection >= 70) confessionCands.push({ char: c, target: o })
+      })
+    })
+    if (confessionCands.length > 0) {
+      const pick = confessionCands[Math.floor(Math.random() * confessionCands.length)]
+      const template = {
+        kind: 'confession',
+        core_prompt: `${pick.target.name}に告白しようと思うんです。どんな感じでいったらいいと思いますか？`,
+        choices: ['ロマンチックに', '真摯に', '面白く']
+      }
+      options.push({ type: 'confession', char: pick.char, target: pick.target, template })
+    }
+
+    if (options.length === 0) return
+    const ev = options[Math.floor(Math.random() * options.length)]
     const id = Date.now()
     const timeout = setTimeout(() => {
-      setConsultations(prev => prev.filter(ev => ev.id !== id))
+      setConsultations(prev => prev.filter(e => e.id !== id))
     }, AUTO_INTERVAL_MS)
-    const c = { id, char, template, timeout }
-    setConsultations(prev => [...prev, c])
-    updateLastConsultation(char.id)
+    setConsultations(prev => [...prev, { id, ...ev, timeout }])
+    updateLastConsultation(ev.char.id)
   }
 
   const openPopup = (c) => {
