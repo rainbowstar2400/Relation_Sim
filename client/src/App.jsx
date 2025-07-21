@@ -131,6 +131,29 @@ export default function App() {
     setState(prev => ({ ...prev, readLogCount: count }))
   }
 
+  // 関係ラベルを更新
+  const updateRelationship = (idA, idB, label) => {
+    setState(prev => {
+      const pair = [idA, idB].sort()
+      const next = [...prev.relationships]
+      const idx = next.findIndex(r => r.pair[0] === pair[0] && r.pair[1] === pair[1])
+      if (idx >= 0) next[idx] = { pair, label }
+      else next.push({ pair, label })
+      return { ...prev, relationships: next }
+    })
+  }
+
+  // 感情ラベルを更新
+  const updateEmotion = (from, to, label) => {
+    setState(prev => {
+      const next = [...prev.emotions]
+      const idx = next.findIndex(e => e.from === from && e.to === to)
+      if (idx >= 0) next[idx] = { from, to, label }
+      else next.push({ from, to, label })
+      return { ...prev, emotions: next }
+    })
+  }
+
   // localStorageから読み込み
   useEffect(() => {
     const saved = loadStateFromLocal()
@@ -326,6 +349,11 @@ export default function App() {
           updateReadLogCount={updateReadLogCount}
           updateLastConsultation={updateLastConsultation}
           trusts={state.trusts}
+          relationships={state.relationships}
+          emotions={state.emotions}
+          affections={state.affections}
+          updateRelationship={updateRelationship}
+          updateEmotion={updateEmotion}
         />
       )}
       {view === 'management' && (

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 // trusts: 各キャラクターの信頼度
 // updateTrust: 信頼度を更新する関数
 // addLog: ログ追加用関数
-export default function ConsultationArea({ characters, trusts, updateTrust, addLog, updateLastConsultation }) {
+export default function ConsultationArea({ characters, trusts, updateTrust, addLog, updateLastConsultation, relationships, emotions, affections, updateRelationship, updateEmotion }) {
   const [templates, setTemplates] = useState([])
   const [consultations, setConsultations] = useState([])
   const [current, setCurrent] = useState(null)
@@ -45,6 +45,42 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
     return () => clearInterval(timer)
   }, [templates, characters])
 
+  // 告白イベントの自動生成
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setConsultations(prev => {
+        if (prev.length >= MAX_AUTO_CONSULTATIONS) return prev
+        const candidates = []
+        characters.forEach(c => {
+          if (Date.now() - (c.lastConsultation || 0) < AUTO_INTERVAL_MS) return
+          characters.forEach(o => {
+            if (c.id === o.id) return
+            const pair = [c.id, o.id].sort()
+            const rel = relationships.find(r => r.pair[0] === pair[0] && r.pair[1] === pair[1])
+            if (!rel || rel.label !== '友達') return
+            const emotion = emotions.find(e => e.from === c.id && e.to === o.id)?.label
+            const affection = affections.find(a => a.from === c.id && a.to === o.id)?.score || 0
+            if (emotion === '好きかも' && affection >= 70) candidates.push({ char: c, target: o })
+          })
+        })
+        if (candidates.length === 0) return prev
+        const pick = candidates[Math.floor(Math.random() * candidates.length)]
+        const id = Date.now()
+        const template = {
+          kind: 'confession',
+          core_prompt: `${pick.target.name}に告白しようと思うんです。どんな感じでいったらいいと思いますか？`,
+          choices: ['ロマンチックに', '真摯に', '面白く']
+        }
+        const timeout = setTimeout(() => {
+          setConsultations(p => p.filter(ev => ev.id !== id))
+        }, AUTO_INTERVAL_MS)
+        updateLastConsultation(pick.char.id)
+        return [...prev, { id, char: pick.char, target: pick.target, template, timeout, type: 'confession' }]
+      })
+    }, AUTO_INTERVAL_MS)
+    return () => clearInterval(timer)
+  }, [characters, relationships, emotions, affections])
+
   // 相談イベントを追加
   const addConsultation = () => {
     if (templates.length === 0) return
@@ -74,6 +110,22 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
     if (!current) return
     if (answered) {
       closePopup()
+      return
+    }
+    if (current.type === 'confession') {
+      if (!selected) return
+      updateLastConsultation(current.char.id)
+      clearTimeout(current.timeout)
+      const success = Math.random() < 0.3
+      if (success) {
+        updateRelationship(current.char.id, current.target.id, '恋人')
+        addLog(`告白に成功！　${current.char.name}と${current.target.name}が恋人になりました`, 'SYSTEM')
+      } else {
+        updateEmotion(current.char.id, current.target.id, '気まずい')
+        updateEmotion(current.target.id, current.char.id, '気まずい')
+        addLog(`告白に失敗…　${current.char.name}と${current.target.name}は気まずくなりました`, 'SYSTEM')
+      }
+      setAnswered(true)
       return
     }
     let kind = 'neutral'
@@ -119,7 +171,23 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
           <div className="bg-gray-700 p-4 rounded relative w-11/12 max-w-sm pt-12">
             <button className="absolute top-2 right-2" onClick={closePopup}>×</button>
             <p className="mb-2">{current.char.name}「{current.template.core_prompt}」</p>
-            {current.template.form === 'choice' ? (
+            {current.type === 'confession' ? (
+              <div className="mb-2">
+                {current.template.choices.map((opt, idx) => (
+                  <label key={idx} className="block">
+                    <input
+                      type="radio"
+                      name="consult-answer"
+                      value={opt}
+                      className="mr-1"
+                      checked={selected === opt}
+                      onChange={e => setSelected(e.target.value)}
+                    />
+                    {opt}
+                  </label>
+                ))}
+              </div>
+            ) : current.template.form === 'choice' ? (
               <div className="mb-2">
                 {['good', 'neutral', 'bad'].map(type => (
                   <label key={type} className="block">
@@ -144,7 +212,9 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
               />
             )}
             <button onClick={answered ? closePopup : sendAnswer}>{answered ? '完了' : '決定'}</button>
-            {answered && <p className="mt-2">ありがとう！</p>}
+            {answered && (
+              <p className="mt-2">{current.type === 'confession' ? 'じゃあ、いってきます' : 'ありがとう！'}</p>
+            )}
           </div>
         </div>
       )}
