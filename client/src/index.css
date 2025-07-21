@@ -11,7 +11,9 @@
   button {
     /* グレー背景でシンプルなボタンに */
     /* ボタンの文字サイズは据え置き */
-    @apply bg-gray-600 text-white rounded px-2 py-1 text-base;
+    @apply bg-gray-600 rounded px-2 py-1 text-base;
+    /* 文字色を明示的に白にする */
+    color: #ffffff;
   }
   button:hover {
     /* ホバー時は少し明るいグレーに */
