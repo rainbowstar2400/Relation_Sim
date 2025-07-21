@@ -2,7 +2,7 @@ import React from 'react'
 import ConsultationArea from './ConsultationArea.jsx'
 import LogList from './LogList.jsx'
 
-export default function MainView({ characters, onSelect, logs, trusts, addLog, updateTrust, updateLastConsultation }) {
+export default function MainView({ characters, onSelect, logs, readLogCount, updateReadLogCount, trusts, addLog, updateTrust, updateLastConsultation }) {
 
   return (
     <div>
@@ -31,8 +31,8 @@ export default function MainView({ characters, onSelect, logs, trusts, addLog, u
         updateLastConsultation={updateLastConsultation}
       />
       <section className="mb-6">
-        <h2 className="text-sm text-gray-300 border-b border-gray-600 pb-1 mb-2">▼ ログ表示エリア (CLI風)</h2>
-        <LogList logs={logs} />
+        <h2 className="text-sm text-gray-300 border-b border-gray-600 pb-1 mb-2">▼ ログ</h2>
+        <LogList logs={logs} readLogCount={readLogCount} updateReadLogCount={updateReadLogCount} />
       </section>
     </div>
   )
