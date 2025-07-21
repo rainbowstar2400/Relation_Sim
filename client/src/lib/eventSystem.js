@@ -1,6 +1,6 @@
 // eventSystem.js - イベント発生処理
 import { drawMood, loadMoodTables } from './mood.js'
-import { drawEmotionChange, loadEmotionLabelTable } from './emotionLabel.js'
+import { drawEmotionChange, loadEmotionLabelTable, getEmotionLabel } from './emotionLabel.js'
 import { addReportEvent, addReportChange } from './reportUtils.js'
 import { getTimeWeight } from './timeUtils.js'
 
@@ -23,6 +23,33 @@ const moodAffectionModifier = {
   0: 0,
   '-1': -3,
   '-2': -5,
+}
+
+// 関係変化イベントの発生確率
+const FRIEND_EVENT_PROB = 0.05
+const BEST_FRIEND_EVENT_PROB = 0.02
+
+// 現在の関係ラベルを取得
+function getRelationLabel(relationships, idA, idB) {
+  const pair = [idA, idB].sort()
+  const rec = relationships.find(r => r.pair[0] === pair[0] && r.pair[1] === pair[1])
+  return rec ? rec.label : 'なし'
+}
+
+// 関係ラベルを更新
+function updateRelationship(list, idA, idB, label) {
+  const pair = [idA, idB].sort()
+  const next = [...list]
+  const idx = next.findIndex(r => r.pair[0] === pair[0] && r.pair[1] === pair[1])
+  if (idx >= 0) next[idx] = { pair, label }
+  else next.push({ pair, label })
+  return next
+}
+
+// 現在の好感度を取得
+function getAffection(list, from, to) {
+  const rec = list.find(a => a.from === from && a.to === to)
+  return rec ? rec.score : 0
 }
 
 // キャラクター2名をランダムに選ぶ
@@ -67,6 +94,50 @@ export function triggerRandomEvent(state, setState, addLog) {
   const chance = Math.min(1, weightA * weightB)
   if (Math.random() > chance) return
 
+  const now = Date.now()
+  const relation = getRelationLabel(state.relationships, a.id, b.id)
+  const emotionAB = getEmotionLabel(state, a.id, b.id)
+  const emotionBA = getEmotionLabel(state, b.id, a.id)
+  const affAvg = (getAffection(state.affections, a.id, b.id) +
+    getAffection(state.affections, b.id, a.id)) / 2
+
+  // 親友になるイベント
+  if (
+    relation === '友達' &&
+    emotionAB === '好きかも' &&
+    emotionBA === '好きかも' &&
+    affAvg >= 60 &&
+    Math.random() < BEST_FRIEND_EVENT_PROB
+  ) {
+    const talkLogId = addLog(`${a.name}と${b.name}が何やら話しているようです…`)
+    const changeLogId = addLog(`${a.name}と${b.name}が親友になりました`, 'SYSTEM')
+    setState(prev => {
+      let relationships = updateRelationship(prev.relationships, a.id, b.id, '親友')
+      let reports = prev.reports || {}
+      reports = addReportEvent(reports, { timestamp: now, description: '親友になるイベント', logId: talkLogId })
+      reports = addReportChange(reports, `${a.name}と${b.name}が親友になった`, changeLogId)
+      return { ...prev, relationships, reports }
+    })
+    return
+  }
+
+  // 友達になるイベント
+  if (
+    (relation === 'なし' || relation === '認知') &&
+    Math.random() < FRIEND_EVENT_PROB
+  ) {
+    const talkLogId = addLog(`${a.name}と${b.name}が何やら話しているようです…`)
+    const changeLogId = addLog(`${a.name}と${b.name}が友達になりました`, 'SYSTEM')
+    setState(prev => {
+      let relationships = updateRelationship(prev.relationships, a.id, b.id, '友達')
+      let reports = prev.reports || {}
+      reports = addReportEvent(reports, { timestamp: now, description: '友達になるイベント', logId: talkLogId })
+      reports = addReportChange(reports, `${a.name}と${b.name}が友達になった`, changeLogId)
+      return { ...prev, relationships, reports }
+    })
+    return
+  }
+
   const types = ['挨拶', '雑談', '思い出し会話', '二人きりの時間']
   const type = types[Math.floor(Math.random() * types.length)]
 
@@ -90,7 +161,6 @@ export function triggerRandomEvent(state, setState, addLog) {
   const base = baseAffection[type] || 0
   const delta = base + (moodAffectionModifier[mood] || 0)
 
-  const now = Date.now()
   const eventLogId = addLog(desc, 'EVENT', desc)
   let changeLogIdA = null
   let changeLogIdB = null
