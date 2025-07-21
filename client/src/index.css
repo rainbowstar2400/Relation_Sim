@@ -4,12 +4,14 @@
 
 @layer base {
   body {
-    @apply bg-base text-gray-200 font-jp p-5;
+    /* 全体の文字を少し大きくする */
+    @apply bg-base text-gray-200 font-jp p-5 text-lg;
   }
   /* すべてのボタンに共通のデザインを適用 */
   button {
     /* グレー背景でシンプルなボタンに */
-    @apply bg-gray-600 text-white rounded px-2 py-1;
+    /* ボタンの文字サイズは据え置き */
+    @apply bg-gray-600 text-white rounded px-2 py-1 text-base;
   }
   button:hover {
     /* ホバー時は少し明るいグレーに */
@@ -18,6 +20,17 @@
 }
 
 @layer components {
+  /* ラベルと値の色分け */
+  label {
+    @apply text-gray-400;
+  }
+  .basic-info p {
+    @apply text-gray-400;
+  }
+  .basic-info span,
+  .personality-list li span {
+    @apply text-[#ffd166] font-bold;
+  }
   .slider-container {
     position: relative;
     flex-grow: 1;
