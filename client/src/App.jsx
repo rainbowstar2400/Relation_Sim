@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { triggerRandomEvent } from './lib/eventSystem.js'
+import { triggerRandomEvent, initEventSystem } from './lib/eventSystem.js'
 import {
   loadStateFromLocal,
   saveStateToLocal,
@@ -174,12 +174,20 @@ export default function App() {
 
   // 一定間隔でランダムイベントを発生させる
   useEffect(() => {
-    const timer = setInterval(() => {
-      if (Math.random() < EVENT_PROBABILITY) {
-        triggerRandomEvent(state, setState, addLog)
-      }
-    }, EVENT_INTERVAL_MS)
-    return () => clearInterval(timer)
+    let timer
+    const startScheduler = async () => {
+      // テーブル読み込み完了を待ってからスケジュール開始
+      await initEventSystem()
+      timer = setInterval(() => {
+        if (Math.random() < EVENT_PROBABILITY) {
+          triggerRandomEvent(state, setState, addLog)
+        }
+      }, EVENT_INTERVAL_MS)
+    }
+    startScheduler()
+    return () => {
+      if (timer) clearInterval(timer)
+    }
   }, [])
 
   // 日次で好感度の経過日数を評価
