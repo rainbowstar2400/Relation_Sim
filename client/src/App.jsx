@@ -73,6 +73,7 @@ const initialState = {
 export default function App() {
   const [view, setView] = useState('main')
   const [state, setState] = useState(initialState)
+  const [initialized, setInitialized] = useState(false)
   const [currentChar, setCurrentChar] = useState(null)
   const [currentPair, setCurrentPair] = useState(null)
   const [currentLogId, setCurrentLogId] = useState(null)
@@ -160,6 +161,7 @@ export default function App() {
     if (saved) {
       setState(prev => ({ ...prev, ...saved }))
     }
+    setInitialized(true)
   }, [])
 
   // 時間帯補正テーブルを読み込む
@@ -167,10 +169,12 @@ export default function App() {
     loadTimeModifiers()
   }, [])
 
-  // 保存
+  // 保存（初期化後に実行）
   useEffect(() => {
-    saveStateToLocal(state)
-  }, [state])
+    if (initialized) {
+      saveStateToLocal(state)
+    }
+  }, [state, initialized])
 
   // 一定間隔でランダムイベントを発生させる
   useEffect(() => {
