@@ -4,9 +4,14 @@ import { drawEmotionChange, loadEmotionLabelTable, getEmotionLabel } from './emo
 import { addReportEvent, addReportChange } from './reportUtils.js'
 import { getTimeWeight } from './timeUtils.js'
 
-// テーブルを事前読み込み
-loadMoodTables()
-loadEmotionLabelTable()
+// 初期化処理: ムードテーブルと感情ラベルテーブルの読み込み
+export async function initEventSystem() {
+  // 並列で読み込んだ後に完了を返す
+  await Promise.all([
+    loadMoodTables(),
+    loadEmotionLabelTable()
+  ])
+}
 
 // イベント種別ごとの基本好感度変化量
 const baseAffection = {
