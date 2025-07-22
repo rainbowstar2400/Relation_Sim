@@ -177,31 +177,31 @@ export function triggerRandomEvent(state, setState, addLog) {
     addLog(`${a.name}と${b.name}の好感度に変化はありません`, 'SYSTEM')
   }
 
+  // 事前に好感度・感情・レポートを計算しておく
   let emotionLogs = []
-  setState(prev => {
-    let affections = updateAffection(prev.affections, a.id, b.id, delta, now)
-    affections = updateAffection(affections, b.id, a.id, delta, now)
-    let emotions = prev.emotions || []
-    let reports = prev.reports || {}
+  let affections = updateAffection(state.affections, a.id, b.id, delta, now)
+  affections = updateAffection(affections, b.id, a.id, delta, now)
+  let emotions = state.emotions || []
+  let reports = state.reports || {}
 
-    let result = drawEmotionChange(prev, emotions, a.id, b.id, mood, reports)
-    emotions = result.emotions
-    reports = result.reports
-    if (result.log) emotionLogs.push(result.log)
-    result = drawEmotionChange(prev, emotions, b.id, a.id, mood, reports)
-    emotions = result.emotions
-    reports = result.reports
-    if (result.log) emotionLogs.push(result.log)
+  let result = drawEmotionChange(state, emotions, a.id, b.id, mood, reports)
+  emotions = result.emotions
+  reports = result.reports
+  if (result.log) emotionLogs.push(result.log)
 
-    reports = addReportEvent(reports, { timestamp: now, description: desc, logId: eventLogId })
-    if (delta !== 0) {
-      const verb = delta > 0 ? '上昇しました' : '下降しました'
-      reports = addReportChange(reports, `${a.name}→${b.name}の好感度が${verb}`, changeLogIdA)
-      reports = addReportChange(reports, `${b.name}→${a.name}の好感度が${verb}`, changeLogIdB)
-    }
+  result = drawEmotionChange(state, emotions, b.id, a.id, mood, reports)
+  emotions = result.emotions
+  reports = result.reports
+  if (result.log) emotionLogs.push(result.log)
 
-    return { ...prev, affections, emotions, reports }
-  })
+  reports = addReportEvent(reports, { timestamp: now, description: desc, logId: eventLogId })
+  if (delta !== 0) {
+    const verb = delta > 0 ? '上昇しました' : '下降しました'
+    reports = addReportChange(reports, `${a.name}→${b.name}の好感度が${verb}`, changeLogIdA)
+    reports = addReportChange(reports, `${b.name}→${a.name}の好感度が${verb}`, changeLogIdB)
+  }
+
+  setState(prev => ({ ...prev, affections, emotions, reports }))
 
   emotionLogs.forEach(l => addLog(l, 'SYSTEM', l))
 }
