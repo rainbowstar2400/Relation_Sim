@@ -3,14 +3,16 @@ import React, { useEffect, useRef, useState } from 'react'
 function parseLog(line) {
   if (typeof line === 'string') {
     const m = line.match(/^\[(.*?)\]\s*(EVENT|SYSTEM):\s*(.*)$/)
-    if (m) return { id: m[1] + m[2], time: m[1], type: m[2], text: m[3] }
-    return { id: Date.now().toString(36), time: '', type: 'EVENT', text: line }
+    if (m) {
+      return { id: m[1] + m[2], time: m[1], type: m[2], text: m[3], detail: m[3] }
+    }
+    return { id: Date.now().toString(36), time: '', type: 'EVENT', text: line, detail: line }
   }
-  return line
+  return { ...line, detail: line.detail || line.text }
 }
 
 function LogLine({ line }) {
-  const { time, type, text } = parseLog(line)
+  const { time, type, text, detail } = parseLog(line)
   const [shown, setShown] = useState('')
 
   useEffect(() => {
@@ -26,10 +28,15 @@ function LogLine({ line }) {
   const cls = type === 'SYSTEM' ? 'text-orange-300 font-bold' : 'text-blue-400 font-bold'
 
   return (
-    <p className="mb-1">
-      {time && <span className="text-gray-400 mr-1">[{time}]</span>}
-      <span className={cls}>{type}:</span> {shown}
-    </p>
+    <div className="mb-2">
+      <p className="mb-1">
+        {time && <span className="text-gray-400 mr-1">[{time}]</span>}
+        <span className={cls}>{type}:</span> {shown}
+      </p>
+      {detail && detail !== text && shown === text && (
+        <pre className="whitespace-pre-wrap ml-4 text-gray-300">{detail}</pre>
+      )}
+    </div>
   )
 }
 
