@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
+import { getTimeSlot } from "../lib/timeUtils.js"
+import { getEventMood, evaluateConfessionResult, generateConfessionDialogue } from "../lib/confession.js"
 // characters: キャラクター一覧
 // trusts: 各キャラクターの信頼度
 // updateTrust: 信頼度を更新する関数
@@ -64,7 +66,8 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
             core_prompt: `${pick.target.name}に告白しようと思うんです。どんな感じでいったらいいと思いますか？`,
             choices: ['ロマンチックに', '真摯に', '面白く']
           }
-          eventOptions.push({ type: 'confession', char: pick.char, target: pick.target, template })
+          const mood = getEventMood({ affections, relationships, emotions }, pick.char.id, pick.target.id);
+          eventOptions.push({ type: 'confession', char: pick.char, target: pick.target, template, mood })
         }
 
         if (eventOptions.length === 0) return prev
@@ -117,7 +120,8 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
         core_prompt: `${pick.target.name}に告白しようと思うんです。どんな感じでいったらいいと思いますか？`,
         choices: ['ロマンチックに', '真摯に', '面白く']
       }
-      options.push({ type: 'confession', char: pick.char, target: pick.target, template })
+        const mood = getEventMood({ affections, relationships, emotions }, pick.char.id, pick.target.id);
+        options.push({ type: 'confession', char: pick.char, target: pick.target, template, mood })
     }
 
     if (options.length === 0) return
@@ -138,7 +142,7 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
   }
 
   // 回答を送信
-  const sendAnswer = () => {
+  const sendAnswer = async () => {
     if (!current) return
     if (answered) {
       closePopup()
@@ -148,14 +152,32 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
       if (!selected) return
       updateLastConsultation(current.char.id)
       clearTimeout(current.timeout)
-      const success = Math.random() < 0.3
+      const { success } = evaluateConfessionResult(current.mood)
+      let detail = ''
+      try {
+        detail = await generateConfessionDialogue(success, current.char, current.target, {
+          relationLabel: success ? '恋人' : '友達',
+          emotionLabels: {
+            AtoB: emotions.find(e => e.from === current.char.id && e.to === current.target.id)?.label,
+            BtoA: emotions.find(e => e.from === current.target.id && e.to === current.char.id)?.label
+          },
+          affectionScores: {
+            AtoB: affections.find(a => a.from === current.char.id && a.to === current.target.id)?.score || 0,
+            BtoA: affections.find(a => a.from === current.target.id && a.to === current.char.id)?.score || 0
+          },
+          timeSlot: getTimeSlot(),
+          mood: current.mood
+        })
+      } catch (err) {
+        addLog(`会話生成エラー: ${err.message}`, 'SYSTEM')
+      }
       if (success) {
         updateRelationship(current.char.id, current.target.id, '恋人')
-        addLog(`告白に成功！　${current.char.name}と${current.target.name}が恋人になりました`, 'SYSTEM')
+        addLog(`告白に成功！　${current.char.name}と${current.target.name}が恋人になりました`, 'SYSTEM', detail)
       } else {
         updateEmotion(current.char.id, current.target.id, '気まずい')
         updateEmotion(current.target.id, current.char.id, '気まずい')
-        addLog(`告白に失敗…　${current.char.name}と${current.target.name}は気まずくなりました`, 'SYSTEM')
+        addLog(`告白に失敗…　${current.char.name}と${current.target.name}は気まずくなりました`, 'SYSTEM', detail)
       }
       setAnswered(true)
       return

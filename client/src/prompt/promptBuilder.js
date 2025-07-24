@@ -3,6 +3,8 @@ import { smalltalkTemplate } from './templates/smalltalkTemplate.js'
 import { memoryTalkTemplate } from './templates/memoryTalkTemplate.js'
 import { aloneTimeTemplate } from './templates/aloneTimeTemplate.js'
 import { becomeFriendsTemplate } from './templates/becomeFriendsTemplate.js'
+import { confessSuccessTemplate } from './templates/confessSuccessTemplate.js'
+import { confessFailureTemplate } from './templates/confessFailureTemplate.js'
 import { becomeBestFriendsTemplate } from './templates/becomeBestFriendsTemplate.js'
 import { getStyleModifiers } from './styleModifiers.js'
 
@@ -13,7 +15,9 @@ const templateMap = {
   "思い出し会話": memoryTalkTemplate,
   "二人きりの時間": aloneTimeTemplate,
   "友達になる": becomeFriendsTemplate,
-  "親友になる": becomeBestFriendsTemplate
+  "親友になる": becomeBestFriendsTemplate,
+  "告白成功": confessSuccessTemplate,
+  "告白失敗": confessFailureTemplate,
 }
 
 // 雰囲気数値をテキストに変換
