@@ -86,5 +86,15 @@
         "proceed": false
       }
     ]
+  },
+  {
+    "id": "Low-trust",
+    "label": "低信頼度用",
+    "consultationText": "Bに告白するつもりです。許可は取っておいたほうが良いかと思ったので",
+    "choices": [
+      { "text": "していいよ。どうぞ", "resolveMessage": "では行ってきます", "proceed": true },
+      { "text": "そんなこと聞かなくても、行ってきたらいいよ", "resolveMessage": "そうなんですね。わかりました", "proceed": true },
+      { "text": "やめてくれる？", "resolveMessage": "そう言われてしまったらそうするしかないですね", "proceed": false }
+    ]
   }
 ]
