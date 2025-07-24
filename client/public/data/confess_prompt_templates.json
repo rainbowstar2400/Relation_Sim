@@ -1,0 +1,90 @@
+[
+  {
+    "id": "confession-backup",
+    "label": "気持ち確認型",
+    "consultationText": "Bに告白しようと思うんだけど……やっぱり緊張してて",
+    "choices": [
+      {
+        "text": "応援するよ、きっと伝わると思う",
+        "resolveMessage": "よし…行ってみる。背中押してくれてありがとう",
+        "proceed": true
+      },
+      {
+        "text": "どうなるかは分からないけど、やるだけやってみたら？",
+        "resolveMessage": "うん……そうだね。頑張ってみる",
+        "proceed": true
+      },
+      {
+        "text": "やめた方がいいんじゃない？",
+        "resolveMessage": "……わかった。ちょっと落ち着いてみる",
+        "proceed": false
+      }
+    ]
+  },
+  {
+    "id": "confession-mindset",
+    "label": "背中押し型",
+    "consultationText": "ちゃんと気持ち、伝えたいんだ。でも……どう伝えたらいいんだろう？",
+    "choices": [
+      {
+        "text": "素直に、あなたらしく言えばいい",
+        "resolveMessage": "……うん、そうだよね。ありがとう",
+        "proceed": true
+      },
+      {
+        "text": "自信持って！　きっと大丈夫",
+        "resolveMessage": "ありがとう。緊張するけど……やってみる！",
+        "proceed": true
+      },
+      {
+        "text": "今はやめておいたほうがいいかも",
+        "resolveMessage": "そっか……わかった。落ち着いてから考え直してみる",
+        "proceed": false
+      }
+    ]
+  },
+  {
+    "id": "confession-memory",
+    "label": "過去のやりとり型",
+    "consultationText": "この前、一緒に帰ったときにすごく自然に話せて。あのときの感じって、脈あるのかな？",
+    "choices": [
+      {
+        "text": "あれは間違いなくいい雰囲気だったよ",
+        "resolveMessage": "ほんとに…？ なら、アタックしてみようかな",
+        "proceed": true
+      },
+      {
+        "text": "可能性はあると思うよ",
+        "resolveMessage": "そうか、じゃあちょっと積極的にいってみる",
+        "proceed": true
+      },
+      {
+        "text": "あんまり期待しない方がいいかも",
+        "resolveMessage": "あーやっぱり……？　ありがとう、参考になったよ",
+        "proceed": false
+      }
+    ]
+  },
+  {
+    "id": "confession-suggestion",
+    "label": "告白提案型",
+    "consultationText": "最近、Bのことが気になって仕方ないんだ。でも、どうしたらいいか分からなくて……",
+    "choices": [
+      {
+        "text": "いっそ告白してみたら？",
+        "resolveMessage": "うん……やってみようかな。ありがとう！",
+        "proceed": true
+      },
+      {
+        "text": "伝えてみたらすっきりするかも",
+        "resolveMessage": "確かにそうかも……。よし、決めた！　行ってくる！",
+        "proceed": true
+      },
+      {
+        "text": "しばらくすれば落ち着くよ",
+        "resolveMessage": "そっか……。うん、ちょっと気持ち整理してみる",
+        "proceed": false
+      }
+    ]
+  }
+]
