@@ -8,6 +8,7 @@ import { getEventMood, evaluateConfessionResult, generateConfessionDialogue } fr
 // addLog: ログ追加用関数
 export default function ConsultationArea({ characters, trusts, updateTrust, addLog, updateLastConsultation, relationships, emotions, affections, updateRelationship, updateEmotion }) {
   const [templates, setTemplates] = useState([])
+  const [confessTemplates, setConfessTemplates] = useState([])
   const [consultations, setConsultations] = useState([])
   const [current, setCurrent] = useState(null)
   const [selected, setSelected] = useState('')
@@ -25,6 +26,17 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
       })
       .then(data => setTemplates(data))
       .catch(err => console.error('テンプレートの取得に失敗しました', err))
+  }, [])
+
+  // 告白テンプレートも取得
+  useEffect(() => {
+    fetch('/data/confess_prompt_templates.json')
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        return res.json()
+      })
+      .then(data => setConfessTemplates(data))
+      .catch(err => console.error('告白テンプレートの取得に失敗しました', err))
   }, [])
 
   // 自動生成のスケジューラ（困りごと・告白をまとめて処理）
@@ -59,12 +71,13 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
             if (emotion === '好きかも' && affection >= 70) candidates.push({ char: c, target: o })
           })
         })
-        if (candidates.length > 0) {
+        if (candidates.length > 0 && confessTemplates.length > 0) {
           const pick = candidates[Math.floor(Math.random() * candidates.length)]
+          const base = confessTemplates[Math.floor(Math.random() * confessTemplates.length)]
           const template = {
             kind: 'confession',
-            core_prompt: `${pick.target.name}に告白しようと思うんです。どんな感じでいったらいいと思いますか？`,
-            choices: ['ロマンチックに', '真摯に', '面白く']
+            core_prompt: base.consultationText.replace(/B/g, pick.target.name),
+            choices: base.choices.map(c => c.text)
           }
           const mood = getEventMood({ affections, relationships, emotions }, pick.char.id, pick.target.id);
           eventOptions.push({ type: 'confession', char: pick.char, target: pick.target, template, mood })
@@ -81,7 +94,7 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
       })
     }, AUTO_INTERVAL_MS)
     return () => clearInterval(timer)
-  }, [templates, characters, relationships, emotions, affections])
+  }, [templates, confessTemplates, characters, relationships, emotions, affections])
 
   // 相談イベントを追加
   const addConsultation = () => {
@@ -113,15 +126,16 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
         if (emotion === '好きかも' && affection >= 70) confessionCands.push({ char: c, target: o })
       })
     })
-    if (confessionCands.length > 0) {
+    if (confessionCands.length > 0 && confessTemplates.length > 0) {
       const pick = confessionCands[Math.floor(Math.random() * confessionCands.length)]
+      const base = confessTemplates[Math.floor(Math.random() * confessTemplates.length)]
       const template = {
         kind: 'confession',
-        core_prompt: `${pick.target.name}に告白しようと思うんです。どんな感じでいったらいいと思いますか？`,
-        choices: ['ロマンチックに', '真摯に', '面白く']
+        core_prompt: base.consultationText.replace(/B/g, pick.target.name),
+        choices: base.choices.map(c => c.text)
       }
-        const mood = getEventMood({ affections, relationships, emotions }, pick.char.id, pick.target.id);
-        options.push({ type: 'confession', char: pick.char, target: pick.target, template, mood })
+      const mood = getEventMood({ affections, relationships, emotions }, pick.char.id, pick.target.id);
+      options.push({ type: 'confession', char: pick.char, target: pick.target, template, mood })
     }
 
     if (options.length === 0) return
