@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
+import { adjustLineByPersonality } from '../gpt/adjustLine.js'
+
 import { getTimeSlot } from "../lib/timeUtils.js"
 import { getEventMood, evaluateConfessionResult, generateConfessionDialogue } from "../lib/confession.js"
 // characters: キャラクター一覧
@@ -148,8 +150,17 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
     updateLastConsultation(ev.char.id)
   }
 
-  const openPopup = (c) => {
-    setCurrent(c)
+  const openPopup = async (c) => {
+    let text = c.template.core_prompt
+    if (c.type === 'confession') {
+      try {
+        text = await adjustLineByPersonality(text, c.char)
+      } catch (err) {
+        console.error('line adjust error', err)
+      }
+    }
+    const modified = { ...c, template: { ...c.template, core_prompt: text } }
+    setCurrent(modified)
     setSelected('')
     setAnswered(false)
     addLog(`${c.char.name}がプレイヤーに相談しています…`)
@@ -169,7 +180,13 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
       updateLastConsultation(current.char.id)
       clearTimeout(current.timeout)
       if (!choice.proceed) {
-        addLog(choice.resolveMessage)
+        let msg = choice.resolveMessage
+        try {
+          msg = await adjustLineByPersonality(msg, current.char)
+        } catch (err) {
+          console.error('line adjust error', err)
+        }
+        addLog(msg)
         setAnswered(true)
         return
       }
