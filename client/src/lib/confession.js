@@ -1,5 +1,6 @@
 import { drawMood } from './mood.js'
-import { generateConversation } from '../gpt/generateConversation.js'
+import { generateDialogue } from '../gpt/generateDialogue.js'
+import { buildPrompt } from '../prompt/promptBuilder.js'
 
 export function getEventMood(state, idA, idB) {
   return drawMood(state, idA, idB)
@@ -19,7 +20,13 @@ export function evaluateConfessionResult(mood) {
   return { success: Math.random() < rate, rate }
 }
 
-export async function generateConfessionDialogue(success, charA, charB, context) {
+export function buildConfessionPrompt(success, charA, charB, context) {
   const type = success ? '告白成功' : '告白失敗'
-  return generateConversation(type, charA, charB, context)
+  return buildPrompt(type, charA, charB, context)
+}
+
+export async function generateConfessionDialogue(success, charA, charB, context) {
+  const prompt = buildConfessionPrompt(success, charA, charB, context)
+  const text = await generateDialogue(prompt.core_prompt)
+  return text
 }
