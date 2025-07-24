@@ -75,14 +75,25 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
         })
         if (candidates.length > 0 && confessTemplates.length > 0) {
           const pick = candidates[Math.floor(Math.random() * candidates.length)]
-          const base = confessTemplates[Math.floor(Math.random() * confessTemplates.length)]
-          const template = {
-            kind: 'confession',
-            core_prompt: base.consultationText.replace(/B/g, pick.target.name),
-            choices: base.choices
+          const trust = trusts.find(t => t.id === pick.char.id)?.score || 50
+          let base = null
+          if (trust <= 20) {
+            base = confessTemplates.find(t => t.id === 'Low-trust')
+          } else {
+            const normal = confessTemplates.filter(t => t.id !== 'Low-trust')
+            if (normal.length > 0) {
+              base = normal[Math.floor(Math.random() * normal.length)]
+            }
           }
-          const mood = getEventMood({ affections, relationships, emotions }, pick.char.id, pick.target.id);
-          eventOptions.push({ type: 'confession', char: pick.char, target: pick.target, template, mood })
+          if (base) {
+            const template = {
+              kind: 'confession',
+              core_prompt: base.consultationText.replace(/B/g, pick.target.name),
+              choices: base.choices
+            }
+            const mood = getEventMood({ affections, relationships, emotions }, pick.char.id, pick.target.id);
+            eventOptions.push({ type: 'confession', char: pick.char, target: pick.target, template, mood })
+          }
         }
 
         if (eventOptions.length === 0) return prev
@@ -96,7 +107,7 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
       })
     }, AUTO_INTERVAL_MS)
     return () => clearInterval(timer)
-  }, [templates, confessTemplates, characters, relationships, emotions, affections])
+  }, [templates, confessTemplates, characters, relationships, emotions, affections, trusts])
 
   // 相談イベントを追加
   const addConsultation = () => {
@@ -130,14 +141,25 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
     })
     if (confessionCands.length > 0 && confessTemplates.length > 0) {
       const pick = confessionCands[Math.floor(Math.random() * confessionCands.length)]
-      const base = confessTemplates[Math.floor(Math.random() * confessTemplates.length)]
-      const template = {
-        kind: 'confession',
-        core_prompt: base.consultationText.replace(/B/g, pick.target.name),
-        choices: base.choices
+      const trust = trusts.find(t => t.id === pick.char.id)?.score || 50
+      let base = null
+      if (trust <= 20) {
+        base = confessTemplates.find(t => t.id === 'Low-trust')
+      } else {
+        const normal = confessTemplates.filter(t => t.id !== 'Low-trust')
+        if (normal.length > 0) {
+          base = normal[Math.floor(Math.random() * normal.length)]
+        }
       }
-      const mood = getEventMood({ affections, relationships, emotions }, pick.char.id, pick.target.id);
-      options.push({ type: 'confession', char: pick.char, target: pick.target, template, mood })
+      if (base) {
+        const template = {
+          kind: 'confession',
+          core_prompt: base.consultationText.replace(/B/g, pick.target.name),
+          choices: base.choices
+        }
+        const mood = getEventMood({ affections, relationships, emotions }, pick.char.id, pick.target.id);
+        options.push({ type: 'confession', char: pick.char, target: pick.target, template, mood })
+      }
     }
 
     if (options.length === 0) return
