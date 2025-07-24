@@ -153,13 +153,13 @@ export async function triggerRandomEvent(state, setState, addLog) {
       desc = `${a.name}と${b.name}が軽く挨拶を交わした。`
       break
     case '雑談':
-      desc = `${a.name}と${b.name}が楽しそうに雑談している。`
+      desc = `${a.name}と${b.name}が雑談している。`
       break
     case '思い出し会話':
       desc = `${a.name}と${b.name}が昔の出来事を思い出して語り合っている。`
       break
     case '二人きりの時間':
-      desc = `${a.name}と${b.name}が静かに二人きりの時間を過ごしている。`
+      desc = `${a.name}と${b.name}が二人きりの時間を過ごしている。`
       break
   }
 
