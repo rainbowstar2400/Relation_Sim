@@ -182,9 +182,13 @@ export default function App() {
     const startScheduler = async () => {
       // テーブル読み込み完了を待ってからスケジュール開始
       await initEventSystem()
-      timer = setInterval(() => {
+      timer = setInterval(async () => {
         if (Math.random() < EVENT_PROBABILITY) {
-          triggerRandomEvent(state, setState, addLog)
+          try {
+            await triggerRandomEvent(state, setState, addLog)
+          } catch (err) {
+            addLog(`イベント実行エラー: ${err.message}`, 'SYSTEM')
+          }
         }
       }, EVENT_INTERVAL_MS)
     }
@@ -324,8 +328,12 @@ export default function App() {
   }
 
   // 開発用: 手動でランダムイベントを発生させる
-  const handleDevEvent = () => {
-    triggerRandomEvent(state, setState, addLog)
+  const handleDevEvent = async () => {
+    try {
+      await triggerRandomEvent(state, setState, addLog)
+    } catch (err) {
+      addLog(`イベント実行エラー: ${err.message}`, 'SYSTEM')
+    }
   }
 
   const showStatus = (char) => {
