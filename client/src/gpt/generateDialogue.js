@@ -1,9 +1,4 @@
-import dotenv from "dotenv"
-import { fileURLToPath } from "url"
-
-dotenv.config()
-
-const apiKey = process.env.OPENAI_API_KEY
+const apiKey = import.meta.env.VITE_OPENAI_API_KEY
 if (!apiKey) {
   throw new Error("OpenAI APIキーが設定されていません")
 }
@@ -36,9 +31,9 @@ export async function generateDialogue(promptText) {
   return data.choices[0].message.content.trim()
 }
 
-// デバッグ実行ブロック: このファイルを直接実行した場合のみ動作
-if (fileURLToPath(import.meta.url) === process.argv[1]) {
-  const samplePrompt = `キャラクターAとBが夕方に二人で話しています。会話スタイルは["open", "gentle"]。関係は友達。雰囲気はややポジティブ。5ターンの会話を自然に書いてください。`
+// デバッグ実行ブロック: Node.js で直接実行されたときのみ動作
+if (typeof process !== 'undefined' && process.argv[1] === new URL(import.meta.url).pathname) {
+  const samplePrompt = `キャラクターAとBが夕方に二人で話しています。会話スタイル["open", "gentle"]。関係は友達。雰囲気はややポジティブ。5ターンの会話を自然に書いてください。`
 
   generateDialogue(samplePrompt).then(result => {
     console.log("GPT出力:\n", result)
