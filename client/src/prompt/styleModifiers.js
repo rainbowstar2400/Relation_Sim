@@ -1,4 +1,3 @@
-import { fileURLToPath } from 'url'
 
 /**
  * 性格情報から style modifiers を取得します。
@@ -42,7 +41,10 @@ export function getStyleModifiers(personality) {
 }
 
 // 実行例（デバッグ用）: `node styleModifiers.js` で確認可能
-if (fileURLToPath(import.meta.url) === process.argv[1]) {
+if (
+  typeof process !== 'undefined' &&
+  process.argv[1] === new URL(import.meta.url).pathname
+) {
   console.log('styleModifiers example:', getStyleModifiers({
     sociability: 4,
     empathy: 3,

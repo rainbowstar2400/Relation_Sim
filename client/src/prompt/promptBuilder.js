@@ -5,7 +5,6 @@ import { aloneTimeTemplate } from './templates/aloneTimeTemplate.js'
 import { becomeFriendsTemplate } from './templates/becomeFriendsTemplate.js'
 import { becomeBestFriendsTemplate } from './templates/becomeBestFriendsTemplate.js'
 import { getStyleModifiers } from './styleModifiers.js'
-import { fileURLToPath } from 'url'
 
 // イベントタイプごとのテンプレート対応表
 const templateMap = {
@@ -83,7 +82,10 @@ export function buildPrompt(eventType, characterA, characterB, context) {
 }
 
 // デバッグ実行用: `node promptBuilder.js` で単体確認可能
-if (fileURLToPath(import.meta.url) === process.argv[1]) {
+if (
+  typeof process !== 'undefined' &&
+  process.argv[1] === new URL(import.meta.url).pathname
+) {
   const sampleChar = {
     name: "ユウタ",
     mbti: "INFP",
