@@ -2,7 +2,8 @@
 import { drawMood, loadMoodTables } from './mood.js'
 import { drawEmotionChange, loadEmotionLabelTable, getEmotionLabel } from './emotionLabel.js'
 import { addReportEvent, addReportChange } from './reportUtils.js'
-import { getTimeWeight } from './timeUtils.js'
+import { getTimeWeight, getTimeSlot } from './timeUtils.js'
+import { generateConversation } from '../gpt/generateConversation.js'
 
 // 初期化処理: ムードテーブルと感情ラベルテーブルの読み込み
 export async function initEventSystem() {
@@ -90,7 +91,7 @@ function updateAffection(list, from, to, delta, ts = null) {
 // ランダムイベントを発生させるメイン関数
 // setState: React の状態更新関数
 // addLog: ログ追加用関数
-export function triggerRandomEvent(state, setState, addLog) {
+export async function triggerRandomEvent(state, setState, addLog) {
   const pair = getRandomPair(state.characters)
   if (!pair) return
   const [a, b] = pair
@@ -166,7 +167,21 @@ export function triggerRandomEvent(state, setState, addLog) {
   const base = baseAffection[type] || 0
   const delta = base + (moodAffectionModifier[mood] || 0)
 
-  const eventLogId = addLog(desc, 'EVENT', desc)
+  // GPT 会話生成
+  let detail = desc
+  try {
+    detail = await generateConversation(type, a, b, {
+      relationLabel: relation,
+      emotionLabels: { AtoB: emotionAB, BtoA: emotionBA },
+      affectionScores: { AtoB: getAffection(state.affections, a.id, b.id), BtoA: getAffection(state.affections, b.id, a.id) },
+      timeSlot: getTimeSlot(),
+      mood
+    })
+  } catch (err) {
+    addLog(`会話生成エラー: ${err.message}`, 'SYSTEM')
+  }
+
+  const eventLogId = addLog(desc, 'EVENT', detail)
   let changeLogIdA = null
   let changeLogIdB = null
   if (delta !== 0) {
