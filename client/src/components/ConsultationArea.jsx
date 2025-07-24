@@ -77,7 +77,7 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
           const template = {
             kind: 'confession',
             core_prompt: base.consultationText.replace(/B/g, pick.target.name),
-            choices: base.choices.map(c => c.text)
+            choices: base.choices
           }
           const mood = getEventMood({ affections, relationships, emotions }, pick.char.id, pick.target.id);
           eventOptions.push({ type: 'confession', char: pick.char, target: pick.target, template, mood })
@@ -132,7 +132,7 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
       const template = {
         kind: 'confession',
         core_prompt: base.consultationText.replace(/B/g, pick.target.name),
-        choices: base.choices.map(c => c.text)
+        choices: base.choices
       }
       const mood = getEventMood({ affections, relationships, emotions }, pick.char.id, pick.target.id);
       options.push({ type: 'confession', char: pick.char, target: pick.target, template, mood })
@@ -164,8 +164,15 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
     }
     if (current.type === 'confession') {
       if (!selected) return
+      const choice = current.template.choices.find(c => c.text === selected)
+      if (!choice) return
       updateLastConsultation(current.char.id)
       clearTimeout(current.timeout)
+      if (!choice.proceed) {
+        addLog(choice.resolveMessage)
+        setAnswered(true)
+        return
+      }
       const { success } = evaluateConfessionResult(current.mood)
       let detail = ''
       try {
@@ -241,17 +248,17 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
             <p className="mb-2">{current.char.name}「{current.template.core_prompt}」</p>
             {current.type === 'confession' ? (
               <div className="mb-2">
-                {current.template.choices.map((opt, idx) => (
+                {current.template.choices.map((choice, idx) => (
                   <label key={idx} className="block">
                     <input
                       type="radio"
                       name="consult-answer"
-                      value={opt}
+                      value={choice.text}
                       className="mr-1"
-                      checked={selected === opt}
+                      checked={selected === choice.text}
                       onChange={e => setSelected(e.target.value)}
                     />
-                    {opt}
+                    {choice.text}
                   </label>
                 ))}
               </div>
