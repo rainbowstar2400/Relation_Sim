@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { mbtiQuestions, mbtiDescriptions, mbtiTypes, calculateMbti } from '../lib/mbti.js'
 import RangeSlider from './RangeSlider.jsx'
 import { speechTemplates } from '../lib/speechTemplates.js'
+import { drawSleepTimes } from '../lib/timeUtils.js'
 
 const defaultAffections = {
   'なし': 0,
@@ -110,6 +111,7 @@ export default function ManagementRoom({
     if (!name) return
     const id = editingId || 'char_' + Date.now()
     const existing = characters.find(c => c.id === id)
+    const times = existing ? { sleepStart: existing.sleepStart, sleepEnd: existing.sleepEnd } : drawSleepTimes(activityPattern)
     const char = {
       id,
       name,
@@ -122,6 +124,8 @@ export default function ManagementRoom({
       activityPattern,
       interests: interests.split(',').map(i => i.trim()).filter(i => i),
       condition: existing?.condition || '活動中',
+      sleepStart: times.sleepStart,
+      sleepEnd: times.sleepEnd,
       lastConsultation: existing?.lastConsultation || 0
     }
     const rels = []
