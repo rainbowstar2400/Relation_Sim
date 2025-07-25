@@ -122,7 +122,7 @@ export default function LogList({ logs = [], readLogCount = 0, updateReadLogCoun
       </div>
       <div
         ref={logRef}
-        className="h-[26rem] overflow-y-auto bg-black border border-gray-600 p-3 font-mono rounded text-gray-100"
+        className="h-[32rem] overflow-y-auto bg-black border border-gray-600 p-3 font-mono rounded text-gray-100"
       >
         {ordered.map((line) => (
           <LogLine key={parseLog(line).id} line={line} />

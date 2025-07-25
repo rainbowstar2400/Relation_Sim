@@ -35,7 +35,7 @@ export default function MainView({ characters, onSelect, logs, readLogCount, upd
         updateRelationship={updateRelationship}
         updateEmotion={updateEmotion}
       />
-      <section className="mb-6">
+      <section className="mb-2">
         <h2 className="text-sm text-gray-300 border-b border-gray-600 pb-1 mb-2">▼ ログ</h2>
         <LogList logs={logs} readLogCount={readLogCount} updateReadLogCount={updateReadLogCount} />
       </section>

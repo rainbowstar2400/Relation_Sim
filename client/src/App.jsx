@@ -357,7 +357,7 @@ export default function App() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto border border-gray-600 bg-panel p-4 rounded text-gray-100 min-h-screen">
+    <div className="max-w-[50rem] mx-auto border border-gray-600 bg-panel p-4 rounded text-gray-100 min-h-screen">
       <Header
         onChangeView={setView}
         onSave={handleExport}
