@@ -6,20 +6,21 @@
  */
 export function getStyleModifiers(personality) {
   const {
-    sociability = 0,
-    empathy = 0,
+    social = 0,
+    kindness = 0,
     stubbornness = 0,
+    activity = 0,
     expressiveness = 0,
   } = personality || {}
 
   const modifiers = []
 
   // 基本判定
-  if (sociability >= 3) modifiers.push('open')
-  else if (sociability <= 1) modifiers.push('reserved')
+  if (social >= 3) modifiers.push('open')
+  else if (social <= 1) modifiers.push('reserved')
 
-  if (empathy >= 3) modifiers.push('gentle')
-  else if (empathy <= 1) modifiers.push('blunt')
+  if (kindness >= 3) modifiers.push('gentle')
+  else if (kindness <= 1) modifiers.push('blunt')
 
   if (stubbornness >= 3) modifiers.push('firm')
 
@@ -27,8 +28,8 @@ export function getStyleModifiers(personality) {
   else if (expressiveness <= 1) modifiers.push('dry')
 
   // 複合判定
-  if (sociability >= 3 && expressiveness >= 3) modifiers.push('casual')
-  if (stubbornness <= 1 && empathy >= 3) modifiers.push('deliberate')
+  if (social >= 3 && expressiveness >= 3) modifiers.push('casual')
+  if (stubbornness <= 1 && kindness >= 3) modifiers.push('deliberate')
 
   // 重複を除外し、最大3件まで返す
   const unique = []
@@ -46,10 +47,10 @@ if (
   process.argv[1] === new URL(import.meta.url).pathname
 ) {
   console.log('styleModifiers example:', getStyleModifiers({
-    sociability: 4,
-    empathy: 3,
+    social: 4,
+    kindness: 3,
     stubbornness: 1,
-    activeness: 2,
+    activity: 2,
     expressiveness: 4,
   }))
 }

@@ -35,13 +35,13 @@ function moodToText(value) {
 // 性格オブジェクトを指定フォーマットの文字列へ
 function formatPersonality(p = {}) {
   const {
-    sociability = 0,
-    empathy = 0,
+    social = 0,
+    kindness = 0,
     stubbornness = 0,
-    activeness = 0,
+    activity = 0,
     expressiveness = 0
   } = p
-  return `社交性：${sociability}/5、気配り：${empathy}/5、頑固さ：${stubbornness}/5、行動力：${activeness}/5、表現力：${expressiveness}/5`
+  return `社交性：${social}/5、気配り：${kindness}/5、頑固さ：${stubbornness}/5、行動力：${activity}/5、表現力：${expressiveness}/5`
 }
 
 /**
@@ -120,10 +120,10 @@ if (
     gender: "男性",
     mbti: "INFP",
     personality: {
-      sociability: 4,
-      empathy: 3,
+      social: 4,
+      kindness: 3,
       stubbornness: 1,
-      activeness: 3,
+      activity: 3,
       expressiveness: 4
     }
   }
