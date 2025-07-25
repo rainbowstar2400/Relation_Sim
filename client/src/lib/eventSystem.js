@@ -97,7 +97,7 @@ function updateAffection(list, from, to, delta, ts = null) {
 // ランダムイベントを発生させるメイン関数
 // setState: React の状態更新関数
 // addLog: ログ追加用関数
-export async function triggerRandomEvent(state, setState, addLog) {
+export async function triggerRandomEvent(state, setState, addLog, updateLog) {
   const pair = getRandomPair(state.characters)
   if (!pair) return
   const [a, b] = pair
@@ -125,22 +125,22 @@ export async function triggerRandomEvent(state, setState, addLog) {
   ) {
     const talkDesc = `${a.name}と${b.name}が何やら話しているようです…`
     const mood = drawMood(state, a.id, b.id)
-    let detail = talkDesc
-    try {
-      detail = await generateConversation('親友になる', a, b, {
-        relationLabel: relation,
-        emotionLabels: { AtoB: emotionAB, BtoA: emotionBA },
-        affectionScores: { AtoB: getAffection(state.affections, a.id, b.id), BtoA: getAffection(state.affections, b.id, a.id) },
-        timeSlot: getTimeSlot(),
-        date: getDateString(),
-        mood,
-        nicknames: { AtoB: nickAB, BtoA: nickBA }
+    const talkLogId = addLog(talkDesc, 'EVENT')
+    generateConversation('親友になる', a, b, {
+      relationLabel: relation,
+      emotionLabels: { AtoB: emotionAB, BtoA: emotionBA },
+      affectionScores: { AtoB: getAffection(state.affections, a.id, b.id), BtoA: getAffection(state.affections, b.id, a.id) },
+      timeSlot: getTimeSlot(),
+      date: getDateString(),
+      mood,
+      nicknames: { AtoB: nickAB, BtoA: nickBA }
+    })
+      .then(detail => updateLog(talkLogId, undefined, detail))
+      .catch(err => {
+        addLog(`会話生成エラー: ${err.message}`, 'SYSTEM')
       })
-    } catch (err) {
-      addLog(`会話生成エラー: ${err.message}`, 'SYSTEM')
-    }
 
-    const talkLogId = addLog(talkDesc, 'EVENT', detail)
+    const changeLogId = addLog(`${a.name}と${b.name}が親友になりました`, 'SYSTEM')
     const changeLogId = addLog(`${a.name}と${b.name}が親友になりました`, 'SYSTEM')
     setState(prev => {
       let relationships = updateRelationship(prev.relationships, a.id, b.id, '親友')
@@ -159,22 +159,21 @@ export async function triggerRandomEvent(state, setState, addLog) {
   ) {
     const talkDesc = `${a.name}と${b.name}が何やら話しているようです…`
     const mood = drawMood(state, a.id, b.id)
-    let detail = talkDesc
-    try {
-      detail = await generateConversation('友達になる', a, b, {
-        relationLabel: relation,
-        emotionLabels: { AtoB: emotionAB, BtoA: emotionBA },
-        affectionScores: { AtoB: getAffection(state.affections, a.id, b.id), BtoA: getAffection(state.affections, b.id, a.id) },
-        timeSlot: getTimeSlot(),
-        date: getDateString(),
-        mood,
-        nicknames: { AtoB: nickAB, BtoA: nickBA }
+    const talkLogId = addLog(talkDesc, 'EVENT')
+    generateConversation('友達になる', a, b, {
+      relationLabel: relation,
+      emotionLabels: { AtoB: emotionAB, BtoA: emotionBA },
+      affectionScores: { AtoB: getAffection(state.affections, a.id, b.id), BtoA: getAffection(state.affections, b.id, a.id) },
+      timeSlot: getTimeSlot(),
+      date: getDateString(),
+      mood,
+      nicknames: { AtoB: nickAB, BtoA: nickBA }
+    })
+      .then(detail => updateLog(talkLogId, undefined, detail))
+      .catch(err => {
+        addLog(`会話生成エラー: ${err.message}`, 'SYSTEM')
       })
-    } catch (err) {
-      addLog(`会話生成エラー: ${err.message}`, 'SYSTEM')
-    }
 
-    const talkLogId = addLog(talkDesc, 'EVENT', detail)
     const changeLogId = addLog(`${a.name}と${b.name}が友達になりました`, 'SYSTEM')
     setState(prev => {
       let relationships = updateRelationship(prev.relationships, a.id, b.id, '友達')
@@ -210,22 +209,21 @@ export async function triggerRandomEvent(state, setState, addLog) {
   const delta = base + (moodAffectionModifier[mood] || 0)
 
   // GPT 会話生成
-  let detail = desc
-  try {
-    detail = await generateConversation(type, a, b, {
-      relationLabel: relation,
-      emotionLabels: { AtoB: emotionAB, BtoA: emotionBA },
-      affectionScores: { AtoB: getAffection(state.affections, a.id, b.id), BtoA: getAffection(state.affections, b.id, a.id) },
-      timeSlot: getTimeSlot(),
-      date: getDateString(),
-      mood,
-      nicknames: { AtoB: nickAB, BtoA: nickBA }
+  const eventLogId = addLog(desc, 'EVENT')
+  generateConversation(type, a, b, {
+    relationLabel: relation,
+    emotionLabels: { AtoB: emotionAB, BtoA: emotionBA },
+    affectionScores: { AtoB: getAffection(state.affections, a.id, b.id), BtoA: getAffection(state.affections, b.id, a.id) },
+    timeSlot: getTimeSlot(),
+    date: getDateString(),
+    mood,
+    nicknames: { AtoB: nickAB, BtoA: nickBA }
+  })
+    .then(detail => updateLog(eventLogId, undefined, detail))
+    .catch(err => {
+      addLog(`会話生成エラー: ${err.message}`, 'SYSTEM')
     })
-  } catch (err) {
-    addLog(`会話生成エラー: ${err.message}`, 'SYSTEM')
-  }
 
-  const eventLogId = addLog(desc, 'EVENT', detail)
   let changeLogIdA = null
   let changeLogIdB = null
   if (delta !== 0) {

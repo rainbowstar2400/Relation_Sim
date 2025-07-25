@@ -107,6 +107,23 @@ export default function App() {
     }))
   }
 
+  // ログIDを指定して内容を更新
+  // text や detail を個別に指定して変更できる
+  const updateLog = (id, text, detail) => {
+    setState(prev => ({
+      ...prev,
+      logs: prev.logs.map(l =>
+        l.id === id
+          ? {
+              ...l,
+              ...(text !== undefined ? { text } : {}),
+              ...(detail !== undefined ? { detail } : {})
+            }
+          : l
+      )
+    }))
+  }
+
   // 信頼度を変更
   // 信頼度を変更
   const updateTrust = (charId, delta) => {
@@ -199,7 +216,7 @@ export default function App() {
       timer = setInterval(async () => {
         if (Math.random() < EVENT_PROBABILITY) {
           try {
-            await triggerRandomEvent(state, setState, addLog)
+            await triggerRandomEvent(state, setState, addLog, updateLog)
           } catch (err) {
             addLog(`イベント実行エラー: ${err.message}`, 'SYSTEM')
           }
@@ -344,7 +361,7 @@ export default function App() {
   // 開発用: 手動でランダムイベントを発生させる
   const handleDevEvent = async () => {
     try {
-      await triggerRandomEvent(state, setState, addLog)
+      await triggerRandomEvent(state, setState, addLog, updateLog)
     } catch (err) {
       addLog(`イベント実行エラー: ${err.message}`, 'SYSTEM')
     }
