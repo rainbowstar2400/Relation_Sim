@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { mbtiQuestions, mbtiDescriptions, mbtiTypes, calculateMbti } from '../lib/mbti.js'
 import RangeSlider from './RangeSlider.jsx'
+import { speechTemplates } from '../lib/speechTemplates.js'
 
 const defaultAffections = {
   'なし': 0,
@@ -28,9 +29,8 @@ export default function ManagementRoom({
   const [age, setAge] = useState('')
   const [gender, setGender] = useState('男性')
   const [personality, setPersonality] = useState(blankPersonality)
-  const [talkPreset, setTalkPreset] = useState('丁寧')
-  const [firstPerson, setFirstPerson] = useState('')
-  const [suffix, setSuffix] = useState('')
+  const [talkTemplate, setTalkTemplate] = useState('優しい敬語')
+  const [talkDesc, setTalkDesc] = useState('')
   const [activityPattern, setActivityPattern] = useState('通常')
   const [interests, setInterests] = useState('')
   const [mbtiMode, setMbtiMode] = useState('diag')
@@ -40,6 +40,17 @@ export default function ManagementRoom({
   const [showQuestions, setShowQuestions] = useState(false)
   const [tempRelations, setTempRelations] = useState({})
 
+  const handleTemplateChange = (e) => {
+    const value = e.target.value
+    setTalkTemplate(value)
+    const found = speechTemplates.find(t => t.template === value)
+    if (value === 'その他') {
+      setTalkDesc('')
+    } else {
+      setTalkDesc(found?.description || '')
+    }
+  }
+
   // 編集開始
   const startEdit = (char) => {
     setEditingId(char.id)
@@ -47,9 +58,10 @@ export default function ManagementRoom({
     setAge(char.age || '')
     setGender(char.gender || '男性')
     setPersonality(char.personality || blankPersonality)
-    setTalkPreset(char.talkStyle?.preset || '丁寧')
-    setFirstPerson(char.talkStyle?.firstPerson || '')
-    setSuffix(char.talkStyle?.suffix || '')
+    const tmpl = char.talkStyle?.template || '優しい敬語'
+    setTalkTemplate(tmpl)
+    const found = speechTemplates.find(t => t.template === tmpl)
+    setTalkDesc(char.talkStyle?.description ?? found?.description ?? '')
     setActivityPattern(char.activityPattern || '通常')
     setInterests((char.interests || []).join(', '))
     setMbtiManual(char.mbti || 'INFP')
@@ -81,9 +93,8 @@ export default function ManagementRoom({
     setAge('')
     setGender('男性')
     setPersonality(blankPersonality)
-    setTalkPreset('丁寧')
-    setFirstPerson('')
-    setSuffix('')
+    setTalkTemplate('優しい敬語')
+    setTalkDesc(speechTemplates.find(t=>t.template==='優しい敬語')?.description || '')
     setActivityPattern('通常')
     setInterests('')
     setMbtiMode('diag')
@@ -107,7 +118,7 @@ export default function ManagementRoom({
       personality,
       mbti: mbtiMode === 'diag' ? (mbtiResult || calculateMbti(mbtiSliders, personality)) : mbtiManual,
       mbti_slider: mbtiMode === 'diag' ? mbtiSliders : [],
-      talkStyle: { preset: talkPreset, firstPerson, suffix },
+      talkStyle: { template: talkTemplate, description: talkDesc },
       activityPattern,
       interests: interests.split(',').map(i => i.trim()).filter(i => i),
       condition: existing?.condition || '活動中',
@@ -239,18 +250,20 @@ export default function ManagementRoom({
                 onChange={e=>setPersonality(prev=>({...prev,[key]:parseInt(e.target.value)}))} />
             </div>
           ))}
-          <h4>話し方</h4>
-          <div className="mb-2">
-            <label className="mr-2"><input type="radio" name="talk" value="丁寧" checked={talkPreset==='丁寧'} onChange={e=>setTalkPreset(e.target.value)} />丁寧</label>
-            <label className="ml-4 mr-2"><input type="radio" name="talk" value="くだけた" checked={talkPreset==='くだけた'} onChange={e=>setTalkPreset(e.target.value)} />くだけた</label>
-          </div>
-          <div className="mb-2">
-            <label className="mr-2">一人称:</label>
-            <input className="text-black" value={firstPerson} onChange={e=>setFirstPerson(e.target.value)} />
-          </div>
-          <div className="mb-2">
-            <label className="mr-2">語尾:</label>
-            <input className="text-black" value={suffix} onChange={e=>setSuffix(e.target.value)} />
+          <h4>話し方テンプレート</h4>
+          <div className="mb-2 flex items-center">
+            <select className="text-black mr-2" value={talkTemplate} onChange={handleTemplateChange}>
+              {speechTemplates.map(t => (
+                <option key={t.template} value={t.template}>
+                  {t.template === 'その他' ? 'その他（自由入力）' : t.template}
+                </option>
+              ))}
+            </select>
+            {talkTemplate === 'その他' ? (
+              <input className="text-black flex-1" value={talkDesc} onChange={e=>setTalkDesc(e.target.value)} placeholder="自由記述" />
+            ) : (
+              <span>{talkDesc}</span>
+            )}
           </div>
           <h4>活動傾向</h4>
           <div className="mb-2">

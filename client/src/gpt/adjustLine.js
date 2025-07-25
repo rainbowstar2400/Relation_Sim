@@ -2,13 +2,13 @@ import { generateDialogue } from './generateDialogue.js'
 import { getStyleModifiers } from '../prompt/styleModifiers.js'
 
 function buildAdjustmentPrompt(text, char) {
-  const talkPreset = char.talkStyle?.preset || ''
+  const talkTemplate = char.talkStyle?.template || ''
   const modifiers = getStyleModifiers(char.personality || {})
   return `以下のセリフを、指定されたキャラクターの性格に合った自然な口調に言い換えてください。
 
 # キャラクター情報
 - 名前: ${char.name}
-- 話し方プリセット: ${talkPreset}
+ - 話し方テンプレート: ${talkTemplate}
 - style_modifiers: ${JSON.stringify(modifiers)}
 
 # セリフ
