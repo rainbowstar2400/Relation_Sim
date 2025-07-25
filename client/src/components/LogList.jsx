@@ -68,26 +68,31 @@ export default function LogList({ logs = [], readLogCount = 0, updateReadLogCoun
     return () => div.removeEventListener('scroll', checkScroll)
   }, [order])
 
-  // 画面表示時に一度だけ既読範囲の末尾までスクロール
+  // 画面表示時に既読範囲の末尾までスクロール
   useEffect(() => {
-    const div = logRef.current
-    const end = readEndRef.current
-    if (!div) return
-    if (order === 'old') {
-      if (end) {
-        div.scrollTop = Math.max(0, end.offsetTop - div.clientHeight)
+    // 表示完了後 1 秒待ってからスクロールする
+    const timer = setTimeout(() => {
+      const div = logRef.current
+      const end = readEndRef.current
+      if (!div) return
+      if (order === 'old') {
+        if (end) {
+          // 境界要素の位置にスクロール
+          div.scrollTop = Math.max(0, end.offsetTop - div.clientHeight)
+        } else {
+          div.scrollTop = div.scrollHeight
+        }
       } else {
-        div.scrollTop = div.scrollHeight
+        if (end) {
+          div.scrollTop = end.offsetTop
+        } else {
+          div.scrollTop = 0
+        }
       }
-    } else {
-      if (end) {
-        div.scrollTop = end.offsetTop
-      } else {
-        div.scrollTop = 0
-      }
-    }
-    // 初期状態でバナー表示を判定
-    checkScroll()
+      // 初期状態でバナー表示を判定
+      checkScroll()
+    }, 1000)
+    return () => clearTimeout(timer)
   }, [])
 
   useEffect(() => {
