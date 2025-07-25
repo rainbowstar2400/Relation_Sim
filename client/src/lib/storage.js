@@ -65,7 +65,6 @@ export function importStateFromFile(file) {
           return l
         })
         data.reports = data.reports || {}
-        data.reports = data.reports || {}
         resolve(data)
       } catch (e) {
         reject(e)
