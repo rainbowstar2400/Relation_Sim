@@ -324,7 +324,7 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
       {current && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
           {/* ポップアップの幅はログ表示エリアと合わせる */}
-          <div className="bg-gray-700 p-4 rounded relative w-full max-w-2xl pt-12">
+          <div className="bg-gray-700 p-4 rounded relative w-full max-w-[50rem] pt-12">
             <button className="absolute top-2 right-2" onClick={closePopup}>×</button>
             <p className="mb-2">{current.char.name}「{current.template.core_prompt}」</p>
             {current.template.choices && current.template.choices.length > 0 ? (
