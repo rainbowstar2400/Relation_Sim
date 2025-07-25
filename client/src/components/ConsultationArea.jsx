@@ -3,32 +3,33 @@ import React, { useEffect, useState } from 'react'
 import { adjustLineByPersonality } from '../gpt/adjustLine.js'
 
 import { getTimeSlot } from "../lib/timeUtils.js"
+import { generateConsultation } from '../gpt/generateConsultation.js'
 import { getEventMood, evaluateConfessionResult, generateConfessionDialogue } from "../lib/confession.js"
 // characters: キャラクター一覧
 // trusts: 各キャラクターの信頼度
 // updateTrust: 信頼度を更新する関数
 // addLog: ログ追加用関数
 export default function ConsultationArea({ characters, trusts, updateTrust, addLog, updateLastConsultation, relationships, emotions, affections, updateRelationship, updateEmotion }) {
-  const [templates, setTemplates] = useState([])
   const [confessTemplates, setConfessTemplates] = useState([])
   const [consultations, setConsultations] = useState([])
   const [current, setCurrent] = useState(null)
   const [selected, setSelected] = useState('')
   const [answered, setAnswered] = useState(false)
+  const [replyText, setReplyText] = useState('')
   const AUTO_INTERVAL_MS = 3600000 // 1時間ごと
   const MAX_AUTO_CONSULTATIONS = 2 // 自動生成時の上限
   const MAX_TOTAL_CONSULTATIONS = 3 // 手動追加も含めた上限
 
-  // 初回マウント時に相談テンプレートを取得
-  useEffect(() => {
-    fetch('/data/trouble_prompt_templates.json')
-      .then(res => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        return res.json()
-      })
-      .then(data => setTemplates(data))
-      .catch(err => console.error('テンプレートの取得に失敗しました', err))
-  }, [])
+  const genres = ['雑談', '興味', '悩み']
+  const chooseGenre = () => genres[Math.floor(Math.random() * genres.length)]
+  const chooseLevel = (trust) => {
+    if (trust > 80) return 3
+    if (trust > 60) return 2
+    if (trust > 40) return 1
+    return 0
+  }
+
+
 
   // 告白テンプレートも取得
   useEffect(() => {
@@ -43,86 +44,103 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
 
   // 自動生成のスケジューラ（困りごと・告白をまとめて処理）
   useEffect(() => {
-    const timer = setInterval(() => {
-      setConsultations(prev => {
-        if (prev.length >= MAX_AUTO_CONSULTATIONS) return prev
+    const timer = setInterval(async () => {
+      if (consultations.length >= MAX_AUTO_CONSULTATIONS) return
 
-        const eventOptions = []
+      const eventOptions = []
 
-        // 困りごと相談候補
-        if (templates.length > 0) {
-          const available = characters.filter(c => Date.now() - (c.lastConsultation || 0) >= AUTO_INTERVAL_MS)
-          if (available.length > 0) {
-            const char = available[Math.floor(Math.random() * available.length)]
-            const template = templates[Math.floor(Math.random() * templates.length)]
-            eventOptions.push({ type: 'trouble', char, template })
-          }
-        }
+      // 困りごと相談候補
+      const available = characters.filter(c => Date.now() - (c.lastConsultation || 0) >= AUTO_INTERVAL_MS)
+      if (available.length > 0) {
+        const char = available[Math.floor(Math.random() * available.length)]
+        eventOptions.push({ type: 'trouble', char })
+      }
 
-        // 告白相談候補
-        const candidates = []
-        characters.forEach(c => {
-          if (Date.now() - (c.lastConsultation || 0) < AUTO_INTERVAL_MS) return
-          characters.forEach(o => {
-            if (c.id === o.id) return
-            const pair = [c.id, o.id].sort()
-            const rel = relationships.find(r => r.pair[0] === pair[0] && r.pair[1] === pair[1])
-            if (!rel || rel.label !== '友達') return
-            const emotion = emotions.find(e => e.from === c.id && e.to === o.id)?.label
-            const affection = affections.find(a => a.from === c.id && a.to === o.id)?.score || 0
-            if (emotion === '好きかも' && affection >= 70) candidates.push({ char: c, target: o })
-          })
+      // 告白相談候補
+      const candidates = []
+      characters.forEach(c => {
+        if (Date.now() - (c.lastConsultation || 0) < AUTO_INTERVAL_MS) return
+        characters.forEach(o => {
+          if (c.id === o.id) return
+          const pair = [c.id, o.id].sort()
+          const rel = relationships.find(r => r.pair[0] === pair[0] && r.pair[1] === pair[1])
+          if (!rel || rel.label !== '友達') return
+          const emotion = emotions.find(e => e.from === c.id && e.to === o.id)?.label
+          const affection = affections.find(a => a.from === c.id && a.to === o.id)?.score || 0
+          if (emotion === '好きかも' && affection >= 70) candidates.push({ char: c, target: o })
         })
-        if (candidates.length > 0 && confessTemplates.length > 0) {
-          const pick = candidates[Math.floor(Math.random() * candidates.length)]
-          const trust = trusts.find(t => t.id === pick.char.id)?.score || 50
-          let base = null
-          if (trust <= 20) {
-            base = confessTemplates.find(t => t.id === 'Low-trust')
-          } else {
-            const normal = confessTemplates.filter(t => t.id !== 'Low-trust')
-            if (normal.length > 0) {
-              base = normal[Math.floor(Math.random() * normal.length)]
-            }
-          }
-          if (base) {
-            const template = {
-              kind: 'confession',
-              core_prompt: base.consultationText.replace(/B/g, pick.target.name),
-              choices: base.choices
-            }
-            const mood = getEventMood({ affections, relationships, emotions }, pick.char.id, pick.target.id);
-            eventOptions.push({ type: 'confession', char: pick.char, target: pick.target, template, mood })
+      })
+      if (candidates.length > 0 && confessTemplates.length > 0) {
+        const pick = candidates[Math.floor(Math.random() * candidates.length)]
+        const trust = trusts.find(t => t.id === pick.char.id)?.score || 50
+        let base = null
+        if (trust <= 20) {
+          base = confessTemplates.find(t => t.id === 'Low-trust')
+        } else {
+          const normal = confessTemplates.filter(t => t.id !== 'Low-trust')
+          if (normal.length > 0) {
+            base = normal[Math.floor(Math.random() * normal.length)]
           }
         }
+        if (base) {
+          const template = {
+            kind: 'confession',
+            core_prompt: base.consultationText.replace(/B/g, pick.target.name),
+            choices: base.choices
+          }
+          const mood = getEventMood({ affections, relationships, emotions }, pick.char.id, pick.target.id);
+          eventOptions.push({ type: 'confession', char: pick.char, target: pick.target, template, mood })
+        }
+      }
 
-        if (eventOptions.length === 0) return prev
-        const ev = eventOptions[Math.floor(Math.random() * eventOptions.length)]
+      if (eventOptions.length === 0) return
+      const ev = eventOptions[Math.floor(Math.random() * eventOptions.length)]
+
+      if (ev.type === 'trouble') {
+        const trust = trusts.find(t => t.id === ev.char.id)?.score || 50
+        const level = chooseLevel(trust)
+        const genre = chooseGenre()
+        try {
+          const res = await generateConsultation({ character: ev.char, genre, level, trust })
+          const template = {
+            form: res.choices ? 'choice' : 'fill',
+            core_prompt: res.prompt,
+            choices: res.choices || [],
+            responses: res.responses || [],
+            trust_change: res.trust_change || 0
+          }
+          const id = Date.now()
+          const timeout = setTimeout(() => {
+            setConsultations(p => p.filter(c => c.id !== id))
+          }, AUTO_INTERVAL_MS)
+          updateLastConsultation(ev.char.id)
+          setConsultations(prev => [...prev, { id, type: 'trouble', char: ev.char, template, timeout }])
+        } catch (err) {
+          console.error('consultation generate error', err)
+        }
+      } else {
         const id = Date.now()
         const timeout = setTimeout(() => {
           setConsultations(p => p.filter(c => c.id !== id))
         }, AUTO_INTERVAL_MS)
         updateLastConsultation(ev.char.id)
-        return [...prev, { id, ...ev, timeout }]
-      })
+        setConsultations(prev => [...prev, { id, ...ev, timeout }])
+      }
     }, AUTO_INTERVAL_MS)
     return () => clearInterval(timer)
-  }, [templates, confessTemplates, characters, relationships, emotions, affections, trusts])
+  }, [confessTemplates, characters, relationships, emotions, affections, trusts, consultations])
 
   // 相談イベントを追加
-  const addConsultation = () => {
+  const addConsultation = async () => {
     if (consultations.length >= MAX_TOTAL_CONSULTATIONS) return
 
     const options = []
 
     // 困りごと相談候補
-    if (templates.length > 0) {
-      const available = characters.filter(c => Date.now() - (c.lastConsultation || 0) >= AUTO_INTERVAL_MS)
-      if (available.length > 0) {
-        const char = available[Math.floor(Math.random() * available.length)]
-        const template = templates[Math.floor(Math.random() * templates.length)]
-        options.push({ type: 'trouble', char, template })
-      }
+    const available = characters.filter(c => Date.now() - (c.lastConsultation || 0) >= AUTO_INTERVAL_MS)
+    if (available.length > 0) {
+      const char = available[Math.floor(Math.random() * available.length)]
+      options.push({ type: 'trouble', char })
     }
 
     // 告白相談候補
@@ -164,12 +182,36 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
 
     if (options.length === 0) return
     const ev = options[Math.floor(Math.random() * options.length)]
-    const id = Date.now()
-    const timeout = setTimeout(() => {
-      setConsultations(prev => prev.filter(e => e.id !== id))
-    }, AUTO_INTERVAL_MS)
-    setConsultations(prev => [...prev, { id, ...ev, timeout }])
-    updateLastConsultation(ev.char.id)
+    if (ev.type === 'trouble') {
+      const trust = trusts.find(t => t.id === ev.char.id)?.score || 50
+      const level = chooseLevel(trust)
+      const genre = chooseGenre()
+      try {
+        const res = await generateConsultation({ character: ev.char, genre, level, trust })
+        const template = {
+          form: res.choices ? 'choice' : 'fill',
+          core_prompt: res.prompt,
+          choices: res.choices || [],
+          responses: res.responses || [],
+          trust_change: res.trust_change || 0
+        }
+        const id = Date.now()
+        const timeout = setTimeout(() => {
+          setConsultations(prev => prev.filter(e => e.id !== id))
+        }, AUTO_INTERVAL_MS)
+        setConsultations(prev => [...prev, { id, type: 'trouble', char: ev.char, template, timeout }])
+        updateLastConsultation(ev.char.id)
+      } catch (err) {
+        console.error('consultation generate error', err)
+      }
+    } else {
+      const id = Date.now()
+      const timeout = setTimeout(() => {
+        setConsultations(prev => prev.filter(e => e.id !== id))
+      }, AUTO_INTERVAL_MS)
+      setConsultations(prev => [...prev, { id, ...ev, timeout }])
+      updateLastConsultation(ev.char.id)
+    }
   }
 
   const openPopup = async (c) => {
@@ -185,6 +227,7 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
     setCurrent(modified)
     setSelected('')
     setAnswered(false)
+    setReplyText('')
     addLog(`${c.char.name}がプレイヤーに相談しています…`)
   }
 
@@ -242,17 +285,14 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
       setAnswered(true)
       return
     }
-    let kind = 'neutral'
+    let idx = 0
     if (current.template.form === 'choice') {
       if (!selected) return
-      kind = selected
+      idx = current.template.choices.findIndex(c => c.text ? c.text === selected : c === selected)
+      if (idx < 0) idx = 0
     }
-    let delta = 0
-    if (kind === 'good') delta = Math.floor(Math.random() * 3) + 3
-    else if (kind === 'neutral') delta = Math.floor(Math.random() * 3)
-    else delta = -(Math.floor(Math.random() * 3) + 2)
-
-    updateTrust(current.char.id, delta)
+    updateTrust(current.char.id, current.template.trust_change || 0)
+    setReplyText(current.template.responses?.[idx] || '')
     updateLastConsultation(current.char.id)
     clearTimeout(current.timeout)
     setAnswered(true)
@@ -327,7 +367,7 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
             )}
             <button onClick={answered ? closePopup : sendAnswer}>{answered ? '完了' : '決定'}</button>
             {answered && (
-              <p className="mt-2">{current.type === 'confession' ? 'じゃあ、いってきます' : 'ありがとう！'}</p>
+              <p className="mt-2">{current.type === 'confession' ? 'じゃあ、いってきます' : replyText || 'ありがとう！'}</p>
             )}
           </div>
         </div>
