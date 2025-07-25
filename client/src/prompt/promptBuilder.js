@@ -73,15 +73,27 @@ export function buildPrompt(eventType, characterA, characterB, context) {
     .replaceAll('{timeSlot}', context.timeSlot)
     .replaceAll('{moodText}', moodText)
 
-  const styleModifiers = getStyleModifiers(characterA.personality)
-  core += `\n会話スタイルの特徴：${JSON.stringify(styleModifiers)}`
+  const styleModifiersA = getStyleModifiers(characterA.personality)
+  const styleModifiersB = getStyleModifiers(characterB.personality)
+  core += `\n${characterA.name}の会話スタイルの特徴：${JSON.stringify(styleModifiersA)}`
+  core += `\n${characterB.name}の会話スタイルの特徴：${JSON.stringify(styleModifiersB)}`
+
+  const talkA = characterA.talkStyle || {}
+  const talkB = characterB.talkStyle || {}
+  core += `\n${characterA.name}の話し方: プレセット「${talkA.preset || '不明'}」、一人称「${talkA.firstPerson || ''}」、語尾「${talkA.suffix || ''}」`
+  core += `\n${characterB.name}の話し方: プレセット「${talkB.preset || '不明'}」、一人称「${talkB.firstPerson || ''}」、語尾「${talkB.suffix || ''}」`
+
+  const interestsA = (characterA.interests || []).join('、') || '特になし'
+  const interestsB = (characterB.interests || []).join('、') || '特になし'
+  core += `\n${characterA.name}の興味関心: ${interestsA}`
+  core += `\n${characterB.name}の興味関心: ${interestsB}`
 
   return {
     core_prompt: core,
     event_type: eventType,
     time_slot: context.timeSlot,
     mood: moodText,
-    style_modifiers: styleModifiers
+    style_modifiers: styleModifiersA
   }
 }
 
