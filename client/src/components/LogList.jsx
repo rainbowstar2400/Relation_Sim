@@ -42,6 +42,7 @@ function LogLine({ line }) {
 
 export default function LogList({ logs = [], readLogCount = 0, updateReadLogCount }) {
   const logRef = useRef(null)
+  const readEndRef = useRef(null) // 既読と未読の境目
   const [order, setOrder] = useState('old')
   const [showBanner, setShowBanner] = useState(false)
   const prevLen = useRef(logs.length)
@@ -67,11 +68,26 @@ export default function LogList({ logs = [], readLogCount = 0, updateReadLogCoun
     return () => div.removeEventListener('scroll', checkScroll)
   }, [order])
 
+  // 画面表示時に一度だけ既読範囲の末尾までスクロール
   useEffect(() => {
     const div = logRef.current
+    const end = readEndRef.current
     if (!div) return
-    div.scrollTop = div.scrollHeight
-    if (updateReadLogCount) updateReadLogCount(logs.length)
+    if (order === 'old') {
+      if (end) {
+        div.scrollTop = Math.max(0, end.offsetTop - div.clientHeight)
+      } else {
+        div.scrollTop = div.scrollHeight
+      }
+    } else {
+      if (end) {
+        div.scrollTop = end.offsetTop
+      } else {
+        div.scrollTop = 0
+      }
+    }
+    // 初期状態でバナー表示を判定
+    checkScroll()
   }, [])
 
   useEffect(() => {
@@ -101,6 +117,7 @@ export default function LogList({ logs = [], readLogCount = 0, updateReadLogCoun
   const unreadLogs = logs.slice(readLogCount)
   const displayed = [...readLogs, ...unreadLogs]
   const ordered = order === 'old' ? displayed : [...displayed].slice().reverse()
+  const boundaryIndex = order === 'old' ? readLogs.length : unreadLogs.length
 
   const handleBannerClick = () => {
     const div = logRef.current
@@ -124,8 +141,11 @@ export default function LogList({ logs = [], readLogCount = 0, updateReadLogCoun
         ref={logRef}
         className="h-[32rem] overflow-y-auto bg-black border border-gray-600 p-3 font-mono rounded text-gray-100"
       >
-        {ordered.map((line) => (
-          <LogLine key={parseLog(line).id} line={line} />
+        {ordered.map((line, idx) => (
+          <React.Fragment key={parseLog(line).id}>
+            <LogLine line={line} />
+            {idx === boundaryIndex - 1 && <div ref={readEndRef} />}
+          </React.Fragment>
         ))}
       </div>
       {showBanner && (
