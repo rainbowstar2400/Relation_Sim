@@ -325,21 +325,24 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
           <div className="bg-gray-700 p-4 rounded relative w-11/12 max-w-sm pt-12">
             <button className="absolute top-2 right-2" onClick={closePopup}>×</button>
             <p className="mb-2">{current.char.name}「{current.template.core_prompt}」</p>
-            {current.type === 'confession' ? (
+            {current.template.choices && current.template.choices.length > 0 ? (
               <div className="mb-2">
-                {current.template.choices.map((choice, idx) => (
-                  <label key={idx} className="block">
-                    <input
-                      type="radio"
-                      name="consult-answer"
-                      value={choice.text}
-                      className="mr-1"
-                      checked={selected === choice.text}
-                      onChange={e => setSelected(e.target.value)}
-                    />
-                    {choice.text}
-                  </label>
-                ))}
+                {current.template.choices.map((choice, idx) => {
+                  const value = choice.text || choice
+                  return (
+                    <label key={idx} className="block">
+                      <input
+                        type="radio"
+                        name="consult-answer"
+                        value={value}
+                        className="mr-1"
+                        checked={selected === value}
+                        onChange={e => setSelected(e.target.value)}
+                      />
+                      {value}
+                    </label>
+                  )
+                })}
               </div>
             ) : current.template.form === 'choice' ? (
               <div className="mb-2">
