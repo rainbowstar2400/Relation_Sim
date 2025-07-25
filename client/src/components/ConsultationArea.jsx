@@ -9,7 +9,7 @@ import { getEventMood, evaluateConfessionResult, generateConfessionDialogue } fr
 // trusts: 各キャラクターの信頼度
 // updateTrust: 信頼度を更新する関数
 // addLog: ログ追加用関数
-export default function ConsultationArea({ characters, trusts, updateTrust, addLog, removeLog, updateLastConsultation, relationships, emotions, affections, updateRelationship, updateEmotion }) {
+export default function ConsultationArea({ characters, trusts, updateTrust, addLog, removeLog, updateLastConsultation, relationships, emotions, affections, nicknames, updateRelationship, updateEmotion }) {
   const [confessTemplates, setConfessTemplates] = useState([])
   const [consultations, setConsultations] = useState([])
   const [current, setCurrent] = useState(null)
@@ -277,7 +277,11 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
           },
           timeSlot: getTimeSlot(),
           date: getDateString(),
-          mood: current.mood
+          mood: current.mood,
+          nicknames: {
+            AtoB: nicknames.find(n => n.from === current.char.id && n.to === current.target.id)?.nickname,
+            BtoA: nicknames.find(n => n.from === current.target.id && n.to === current.char.id)?.nickname
+          }
         })
       } catch (err) {
         addLog(`会話生成エラー: ${err.message}`, 'SYSTEM')

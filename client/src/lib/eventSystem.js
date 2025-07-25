@@ -58,6 +58,12 @@ function getAffection(list, from, to) {
   return rec ? rec.score : 0
 }
 
+// 呼び方を取得
+function getNickname(list, from, to) {
+  const rec = list.find(n => n.from === from && n.to === to)
+  return rec ? rec.nickname : ''
+}
+
 // キャラクター2名をランダムに選ぶ
 function getRandomPair(characters) {
   const active = characters.filter(
@@ -104,6 +110,8 @@ export async function triggerRandomEvent(state, setState, addLog) {
   const relation = getRelationLabel(state.relationships, a.id, b.id)
   const emotionAB = getEmotionLabel(state, a.id, b.id)
   const emotionBA = getEmotionLabel(state, b.id, a.id)
+  const nickAB = getNickname(state.nicknames, a.id, b.id)
+  const nickBA = getNickname(state.nicknames, b.id, a.id)
   const affAvg = (getAffection(state.affections, a.id, b.id) +
     getAffection(state.affections, b.id, a.id)) / 2
 
@@ -125,7 +133,8 @@ export async function triggerRandomEvent(state, setState, addLog) {
         affectionScores: { AtoB: getAffection(state.affections, a.id, b.id), BtoA: getAffection(state.affections, b.id, a.id) },
         timeSlot: getTimeSlot(),
         date: getDateString(),
-        mood
+        mood,
+        nicknames: { AtoB: nickAB, BtoA: nickBA }
       })
     } catch (err) {
       addLog(`会話生成エラー: ${err.message}`, 'SYSTEM')
@@ -158,7 +167,8 @@ export async function triggerRandomEvent(state, setState, addLog) {
         affectionScores: { AtoB: getAffection(state.affections, a.id, b.id), BtoA: getAffection(state.affections, b.id, a.id) },
         timeSlot: getTimeSlot(),
         date: getDateString(),
-        mood
+        mood,
+        nicknames: { AtoB: nickAB, BtoA: nickBA }
       })
     } catch (err) {
       addLog(`会話生成エラー: ${err.message}`, 'SYSTEM')
@@ -208,7 +218,8 @@ export async function triggerRandomEvent(state, setState, addLog) {
       affectionScores: { AtoB: getAffection(state.affections, a.id, b.id), BtoA: getAffection(state.affections, b.id, a.id) },
       timeSlot: getTimeSlot(),
       date: getDateString(),
-      mood
+      mood,
+      nicknames: { AtoB: nickAB, BtoA: nickBA }
     })
   } catch (err) {
     addLog(`会話生成エラー: ${err.message}`, 'SYSTEM')
