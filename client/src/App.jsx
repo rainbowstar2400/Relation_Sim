@@ -99,6 +99,14 @@ export default function App() {
     return id
   }
 
+  // ログIDを指定して削除
+  const removeLog = (id) => {
+    setState(prev => ({
+      ...prev,
+      logs: prev.logs.filter(l => l.id !== id)
+    }))
+  }
+
   // 信頼度を変更
   // 信頼度を変更
   const updateTrust = (charId, delta) => {
@@ -371,6 +379,7 @@ export default function App() {
           readLogCount={state.readLogCount}
           onSelect={showStatus}
           addLog={addLog}
+          removeLog={removeLog}
           updateTrust={updateTrust}
           updateReadLogCount={updateReadLogCount}
           updateLastConsultation={updateLastConsultation}

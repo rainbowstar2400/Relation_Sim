@@ -9,13 +9,14 @@ import { getEventMood, evaluateConfessionResult, generateConfessionDialogue } fr
 // trusts: 各キャラクターの信頼度
 // updateTrust: 信頼度を更新する関数
 // addLog: ログ追加用関数
-export default function ConsultationArea({ characters, trusts, updateTrust, addLog, updateLastConsultation, relationships, emotions, affections, updateRelationship, updateEmotion }) {
+export default function ConsultationArea({ characters, trusts, updateTrust, addLog, removeLog, updateLastConsultation, relationships, emotions, affections, updateRelationship, updateEmotion }) {
   const [confessTemplates, setConfessTemplates] = useState([])
   const [consultations, setConsultations] = useState([])
   const [current, setCurrent] = useState(null)
   const [selected, setSelected] = useState('')
   const [answered, setAnswered] = useState(false)
   const [replyText, setReplyText] = useState('')
+  const [logId, setLogId] = useState(null)
   const AUTO_INTERVAL_MS = 3600000 // 1時間ごと
   const MAX_AUTO_CONSULTATIONS = 2 // 自動生成時の上限
   const MAX_TOTAL_CONSULTATIONS = 3 // 手動追加も含めた上限
@@ -228,7 +229,8 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
     setSelected('')
     setAnswered(false)
     setReplyText('')
-    addLog(`${c.char.name}がプレイヤーに相談しています…`)
+    const id = addLog(`${c.char.name}がプレイヤーに相談しています…`)
+    setLogId(id)
   }
 
   // 回答を送信
@@ -238,6 +240,11 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
       closePopup()
       return
     }
+    if (logId) {
+      removeLog(logId)
+      setLogId(null)
+    }
+    addLog('相談に回答しました。')
     if (current.type === 'confession') {
       if (!selected) return
       const choice = current.template.choices.find(c => c.text === selected)
@@ -301,7 +308,12 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
 
   // ポップアップを閉じる
   const closePopup = () => {
-    if (answered && current) {
+    if (!answered) {
+      if (logId) {
+        removeLog(logId)
+        setLogId(null)
+      }
+    } else if (current) {
       clearTimeout(current.timeout)
       setConsultations(prev => prev.filter(ev => ev.id !== current.id))
     }
