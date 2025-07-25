@@ -14,7 +14,9 @@ function parseLog(line) {
 function LogLine({ line }) {
   const { time, type, text, detail } = parseLog(line)
   const [shown, setShown] = useState('')
+  const [detailShown, setDetailShown] = useState('')
 
+  // テキスト部分をタイピング表示
   useEffect(() => {
     let i = 0
     const timer = setInterval(() => {
@@ -25,6 +27,19 @@ function LogLine({ line }) {
     return () => clearInterval(timer)
   }, [text])
 
+  // detail が後から更新された場合もタイピング表示する
+  useEffect(() => {
+    setDetailShown('')
+    if (!detail || shown !== text) return
+    let i = 0
+    const timer = setInterval(() => {
+      i++
+      setDetailShown(detail.slice(0, i))
+      if (i >= detail.length) clearInterval(timer)
+    }, 20)
+    return () => clearInterval(timer)
+  }, [detail, shown, text])
+
   const cls = type === 'SYSTEM' ? 'text-orange-300 font-bold' : 'text-blue-400 font-bold'
 
   return (
@@ -34,7 +49,7 @@ function LogLine({ line }) {
         <span className={cls}>{type}:</span> {shown}
       </p>
       {detail && detail !== text && shown === text && (
-        <pre className="whitespace-pre-wrap ml-4 text-gray-300">{detail}</pre>
+        <pre className="whitespace-pre-wrap ml-4 text-gray-300">{detailShown}</pre>
       )}
     </div>
   )
