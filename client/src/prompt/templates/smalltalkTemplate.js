@@ -1,5 +1,5 @@
 export const smalltalkTemplate = `
-以下のキャラクター同士が、{timeSlot}の時間帯に雑談をしています。
+以下のキャラクター同士が、{date} の {timeSlot} の時間帯に雑談をしています。
 雰囲気は{moodText}です。
 
 - {characterA.name}（{characterA.age}歳・{characterA.gender}）：{personalityA}

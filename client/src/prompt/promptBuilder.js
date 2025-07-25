@@ -75,6 +75,7 @@ export function buildPrompt(eventType, characterA, characterB, context) {
     .replaceAll('{emotionAtoB}', context.emotionLabels?.AtoB)
     .replaceAll('{emotionBtoA}', context.emotionLabels?.BtoA)
     .replaceAll('{timeSlot}', context.timeSlot)
+    .replaceAll('{date}', context.date)
     .replaceAll('{moodText}', moodText)
 
   const styleModifiersA = getStyleModifiers(characterA.personality)
@@ -96,6 +97,7 @@ export function buildPrompt(eventType, characterA, characterB, context) {
     core_prompt: core,
     event_type: eventType,
     time_slot: context.timeSlot,
+    date: context.date,
     mood: moodText,
     style_modifiers: styleModifiersA
   }

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 
 import { adjustLineByPersonality } from '../gpt/adjustLine.js'
 
-import { getTimeSlot } from "../lib/timeUtils.js"
+import { getTimeSlot, getDateString } from "../lib/timeUtils.js"
 import { generateConsultation } from '../gpt/generateConsultation.js'
 import { getEventMood, evaluateConfessionResult, generateConfessionDialogue } from "../lib/confession.js"
 // characters: キャラクター一覧
@@ -269,6 +269,7 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
             BtoA: affections.find(a => a.from === current.target.id && a.to === current.char.id)?.score || 0
           },
           timeSlot: getTimeSlot(),
+          date: getDateString(),
           mood: current.mood
         })
       } catch (err) {

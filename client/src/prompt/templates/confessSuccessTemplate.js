@@ -1,6 +1,6 @@
 export const confessSuccessTemplate = `
 以下のキャラクターのうち、{characterA.name}が{characterB.name}に対して告白し、恋人関係になる場面を描写してください。
-時間帯は{timeSlot}、雰囲気は{moodText}です。
+日付は{date}、時間帯は{timeSlot}、雰囲気は{moodText}です。
 
 - {characterA.name}（{characterA.age}歳・{characterA.gender}）：{personalityA}
 - {characterB.name}（{characterB.age}歳・{characterB.gender}）：{personalityB}
