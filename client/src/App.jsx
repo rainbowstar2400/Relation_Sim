@@ -20,56 +20,14 @@ const EVENT_PROBABILITY = 0.7
 
 // 初期状態を Code/js/state.js の構造に合わせて定義
 const initialState = {
-  characters: [
-    {
-      id: 'char_001',
-      name: '碧',
-      age: 17,
-      gender: '男性',
-      personality: { social: 4, kindness: 3, stubbornness: 2, activity: 5, expressiveness: 4 },
-      mbti: 'INFP',
-      talkStyle: { template: 'タメ口', description: 'フレンドリーな砕けた口調：「〜だよ」「〜じゃん」など' },
-      activityPattern: '夜型',
-      interests: ['読書', '散歩'],
-      condition: '活動中',
-      lastConsultation: 0,
-    },
-    {
-      id: 'char_002',
-      name: '彩花',
-      age: 17,
-      gender: '女性',
-      personality: { social: 5, kindness: 4, stubbornness: 1, activity: 3, expressiveness: 5 },
-      mbti: 'ESFJ',
-      talkStyle: { template: '優しい敬語', description: '「〜です」「〜ます」など丁寧で穏やかな話し方' },
-      activityPattern: '朝型',
-      interests: ['お菓子作り', 'カフェ巡り'],
-      condition: '活動中',
-      lastConsultation: 0,
-    },
-    {
-      id: 'char_003',
-      name: '志音',
-      age: 16,
-      gender: '男性',
-      personality: { social: 2, kindness: 5, stubbornness: 4, activity: 2, expressiveness: 2 },
-      mbti: 'ISFP',
-      talkStyle: { template: 'タメ口', description: 'フレンドリーな砕けた口調：「〜だよ」「〜じゃん」など' },
-      activityPattern: '通常',
-      interests: ['音楽鑑賞'],
-      condition: '活動中',
-      lastConsultation: 0,
-    },
-  ],
+  // キャラクター情報は空の状態から開始する
+  characters: [],
   relationships: [], // キャラクター同士の関係
   nicknames: [],     // 呼び方設定
   affections: [],    // 好感度一覧
   emotions: [],      // 感情ラベル一覧
-  trusts: [          // プレイヤーへの信頼度
-    { id: 'char_001', score: 50 },
-    { id: 'char_002', score: 50 },
-    { id: 'char_003', score: 50 },
-  ],
+  // 信頼度もキャラクター追加時に設定する
+  trusts: [],
   consultations: [], // 進行中の相談イベント
   logs: [],          // CLI 風ログ
   readLogCount: 0,
