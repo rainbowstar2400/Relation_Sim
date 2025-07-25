@@ -146,7 +146,6 @@ export default function CharacterStatus({
         )}
       </ul>
 
-      <button className="mt-4" onClick={onBack}>メインに戻る</button>
     </section>
   )
 }

@@ -140,7 +140,6 @@ export default function DailyReport({ reports = {}, characters = [], onBack, onO
         )}
       </ul>
 
-      <button onClick={onBack}>メインに戻る</button>
     </section>
   )
 }

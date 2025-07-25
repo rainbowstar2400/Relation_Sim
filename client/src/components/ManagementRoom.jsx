@@ -385,7 +385,6 @@ export default function ManagementRoom({
           </li>
         ))}
       </ul>
-      <button className="mt-4" onClick={onBack}>メイン画面に戻る</button>
     </section>
   )
 }
