@@ -101,6 +101,12 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
         const trust = trusts.find(t => t.id === ev.char.id)?.score || 50
         const level = chooseLevel(trust)
         const genre = chooseGenre()
+        const id = Date.now()
+        const timeout = setTimeout(() => {
+          setConsultations(p => p.filter(c => c.id !== id))
+        }, AUTO_INTERVAL_MS)
+        updateLastConsultation(ev.char.id)
+        setConsultations(prev => [...prev, { id, type: 'trouble', char: ev.char, loading: true, timeout }])
         try {
           const res = await generateConsultation({ character: ev.char, genre, level, trust })
           const template = {
@@ -110,14 +116,10 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
             responses: res.responses || [],
             trust_change: res.trust_change || 0
           }
-          const id = Date.now()
-          const timeout = setTimeout(() => {
-            setConsultations(p => p.filter(c => c.id !== id))
-          }, AUTO_INTERVAL_MS)
-          updateLastConsultation(ev.char.id)
-          setConsultations(prev => [...prev, { id, type: 'trouble', char: ev.char, template, timeout }])
+          setConsultations(prev => prev.map(c => c.id === id ? { ...c, template, loading: false } : c))
         } catch (err) {
           console.error('consultation generate error', err)
+          setConsultations(prev => prev.filter(c => c.id !== id))
         }
       } else {
         const id = Date.now()
@@ -125,7 +127,7 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
           setConsultations(p => p.filter(c => c.id !== id))
         }, AUTO_INTERVAL_MS)
         updateLastConsultation(ev.char.id)
-        setConsultations(prev => [...prev, { id, ...ev, timeout }])
+        setConsultations(prev => [...prev, { id, ...ev, timeout, loading: false }])
       }
     }, AUTO_INTERVAL_MS)
     return () => clearInterval(timer)
@@ -187,6 +189,12 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
       const trust = trusts.find(t => t.id === ev.char.id)?.score || 50
       const level = chooseLevel(trust)
       const genre = chooseGenre()
+      const id = Date.now()
+      const timeout = setTimeout(() => {
+        setConsultations(prev => prev.filter(e => e.id !== id))
+      }, AUTO_INTERVAL_MS)
+      setConsultations(prev => [...prev, { id, type: 'trouble', char: ev.char, loading: true, timeout }])
+      updateLastConsultation(ev.char.id)
       try {
         const res = await generateConsultation({ character: ev.char, genre, level, trust })
         const template = {
@@ -196,26 +204,23 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
           responses: res.responses || [],
           trust_change: res.trust_change || 0
         }
-        const id = Date.now()
-        const timeout = setTimeout(() => {
-          setConsultations(prev => prev.filter(e => e.id !== id))
-        }, AUTO_INTERVAL_MS)
-        setConsultations(prev => [...prev, { id, type: 'trouble', char: ev.char, template, timeout }])
-        updateLastConsultation(ev.char.id)
+        setConsultations(prev => prev.map(e => e.id === id ? { ...e, template, loading: false } : e))
       } catch (err) {
         console.error('consultation generate error', err)
+        setConsultations(prev => prev.filter(e => e.id !== id))
       }
     } else {
       const id = Date.now()
       const timeout = setTimeout(() => {
         setConsultations(prev => prev.filter(e => e.id !== id))
       }, AUTO_INTERVAL_MS)
-      setConsultations(prev => [...prev, { id, ...ev, timeout }])
+      setConsultations(prev => [...prev, { id, ...ev, timeout, loading: false }])
       updateLastConsultation(ev.char.id)
     }
   }
 
   const openPopup = async (c) => {
+    if (c.loading) return
     let text = c.template.core_prompt
     if (c.type === 'confession') {
       try {
@@ -330,8 +335,10 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
       <ul className="mb-2 list-none">
         {consultations.map(c => (
           <li key={c.id} className="flex justify-between bg-gray-700 rounded px-2 py-1 mb-1">
-            <span>・{c.char.name}から相談があります</span>
-            <button onClick={() => openPopup(c)}>対応する</button>
+            <span>
+              ・{c.loading ? '相談を受付中...' : `${c.char.name}から相談があります`}
+            </span>
+            <button onClick={() => openPopup(c)} disabled={c.loading}>対応する</button>
           </li>
         ))}
       </ul>
