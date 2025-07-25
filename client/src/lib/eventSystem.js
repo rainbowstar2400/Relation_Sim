@@ -141,7 +141,6 @@ export async function triggerRandomEvent(state, setState, addLog, updateLog) {
       })
 
     const changeLogId = addLog(`${a.name}と${b.name}が親友になりました`, 'SYSTEM')
-    const changeLogId = addLog(`${a.name}と${b.name}が親友になりました`, 'SYSTEM')
     setState(prev => {
       let relationships = updateRelationship(prev.relationships, a.id, b.id, '親友')
       let reports = prev.reports || {}
