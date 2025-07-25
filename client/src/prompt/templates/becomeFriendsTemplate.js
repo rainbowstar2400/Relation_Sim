@@ -2,8 +2,8 @@ export const becomeFriendsTemplate = `
 以下のキャラクター同士が、はじめてしっかりと会話を交わし、打ち解け始める様子を描写してください。
 時間帯は{timeSlot}、雰囲気は{moodText}です。
 
-- {characterA.name}：{personalityA}
-- {characterB.name}：{personalityB}
+- {characterA.name}（{characterA.age}歳・{characterA.gender}）：{personalityA}
+- {characterB.name}（{characterB.age}歳・{characterB.gender}）：{personalityB}
 - 関係：{relationLabel}（変化前は「認知」）
 - 感情：A→B: {emotionAtoB}、B→A: {emotionBtoA}
 

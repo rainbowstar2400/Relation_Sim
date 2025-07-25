@@ -24,6 +24,8 @@ const initialState = {
     {
       id: 'char_001',
       name: '碧',
+      age: 17,
+      gender: '男性',
       personality: { social: 4, kindness: 3, stubbornness: 2, activity: 5, expressiveness: 4 },
       mbti: 'INFP',
       talkStyle: { preset: 'くだけた', firstPerson: '俺', suffix: '〜じゃん' },
@@ -35,6 +37,8 @@ const initialState = {
     {
       id: 'char_002',
       name: '彩花',
+      age: 17,
+      gender: '女性',
       personality: { social: 5, kindness: 4, stubbornness: 1, activity: 3, expressiveness: 5 },
       mbti: 'ESFJ',
       talkStyle: { preset: '丁寧', firstPerson: '私', suffix: '〜です' },
@@ -46,6 +50,8 @@ const initialState = {
     {
       id: 'char_003',
       name: '志音',
+      age: 16,
+      gender: '男性',
       personality: { social: 2, kindness: 5, stubbornness: 4, activity: 2, expressiveness: 2 },
       mbti: 'ISFP',
       talkStyle: { preset: 'くだけた', firstPerson: 'ボク', suffix: '〜だよ' },
