@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { triggerRandomEvent, initEventSystem } from './lib/eventSystem.js'
 import {
   loadStateFromLocal,
@@ -79,10 +79,16 @@ const initialState = {
 export default function App() {
   const [view, setView] = useState('main')
   const [state, setState] = useState(initialState)
+  const stateRef = useRef(state)
   const [initialized, setInitialized] = useState(false)
   const [currentChar, setCurrentChar] = useState(null)
   const [currentPair, setCurrentPair] = useState(null)
   const [currentLogId, setCurrentLogId] = useState(null)
+
+  // state の最新値を保持する参照
+  useEffect(() => {
+    stateRef.current = state
+  }, [state])
 
   // ログを追加するヘルパー
   // text: 表示テキスト
@@ -199,7 +205,7 @@ export default function App() {
       timer = setInterval(async () => {
         if (Math.random() < EVENT_PROBABILITY) {
           try {
-            await triggerRandomEvent(state, setState, addLog)
+            await triggerRandomEvent(stateRef.current, setState, addLog)
           } catch (err) {
             addLog(`イベント実行エラー: ${err.message}`, 'SYSTEM')
           }
@@ -344,7 +350,7 @@ export default function App() {
   // 開発用: 手動でランダムイベントを発生させる
   const handleDevEvent = async () => {
     try {
-      await triggerRandomEvent(state, setState, addLog)
+      await triggerRandomEvent(stateRef.current, setState, addLog)
     } catch (err) {
       addLog(`イベント実行エラー: ${err.message}`, 'SYSTEM')
     }
