@@ -78,6 +78,8 @@ export default function CharacterStatus({
       <h2 className="text-sm text-gray-300 border-b border-gray-600 pb-1 mb-2">▼ ステータス</h2>
       <div className="basic-info mb-2">
         <p>名前: {char.name}</p>
+        <p>年齢: {char.age ?? '不明'}</p>
+        <p>性別: {char.gender || '不明'}</p>
         <p>MBTI: {char.mbti}</p>
         <p>話し方プリセット: {talk.preset || '未設定'}</p>
         <p>一人称: {talk.firstPerson || '未設定'}</p>

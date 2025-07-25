@@ -25,6 +25,8 @@ export default function ManagementRoom({
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [name, setName] = useState('')
+  const [age, setAge] = useState('')
+  const [gender, setGender] = useState('男性')
   const [personality, setPersonality] = useState(blankPersonality)
   const [talkPreset, setTalkPreset] = useState('丁寧')
   const [firstPerson, setFirstPerson] = useState('')
@@ -42,6 +44,8 @@ export default function ManagementRoom({
   const startEdit = (char) => {
     setEditingId(char.id)
     setName(char.name)
+    setAge(char.age || '')
+    setGender(char.gender || '男性')
     setPersonality(char.personality || blankPersonality)
     setTalkPreset(char.talkStyle?.preset || '丁寧')
     setFirstPerson(char.talkStyle?.firstPerson || '')
@@ -74,6 +78,8 @@ export default function ManagementRoom({
   const resetForm = () => {
     setEditingId(null)
     setName('')
+    setAge('')
+    setGender('男性')
     setPersonality(blankPersonality)
     setTalkPreset('丁寧')
     setFirstPerson('')
@@ -96,6 +102,8 @@ export default function ManagementRoom({
     const char = {
       id,
       name,
+      age: age ? parseInt(age) : undefined,
+      gender,
       personality,
       mbti: mbtiMode === 'diag' ? (mbtiResult || calculateMbti(mbtiSliders, personality)) : mbtiManual,
       mbti_slider: mbtiMode === 'diag' ? mbtiSliders : [],
@@ -207,6 +215,18 @@ export default function ManagementRoom({
           <div className="mb-2">
             <label className="mr-2">名前:</label>
             <input className="text-black" value={name} onChange={e=>setName(e.target.value)} required />
+          </div>
+          <div className="mb-2">
+            <label className="mr-2">年齢:</label>
+            <input type="number" className="text-black w-20" value={age} onChange={e=>setAge(e.target.value)} />
+          </div>
+          <div className="mb-2">
+            <label className="mr-2">性別:</label>
+            <select className="text-black" value={gender} onChange={e=>setGender(e.target.value)}>
+              <option value="男性">男性</option>
+              <option value="女性">女性</option>
+              <option value="その他">その他</option>
+            </select>
           </div>
           <h4>性格パラメータ (1-5)</h4>
           {Object.keys(personality).map(key => (

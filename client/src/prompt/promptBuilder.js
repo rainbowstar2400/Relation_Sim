@@ -63,6 +63,10 @@ export function buildPrompt(eventType, characterA, characterB, context) {
   let core = template
     .replaceAll('{characterA.name}', characterA.name)
     .replaceAll('{characterB.name}', characterB.name)
+    .replaceAll('{characterA.age}', characterA.age ?? '不明')
+    .replaceAll('{characterB.age}', characterB.age ?? '不明')
+    .replaceAll('{characterA.gender}', characterA.gender || '不明')
+    .replaceAll('{characterB.gender}', characterB.gender || '不明')
     .replaceAll('{mbtiA}', characterA.mbti || '不明')
     .replaceAll('{mbtiB}', characterB.mbti || '不明')
     .replaceAll('{personalityA}', personalityA)
@@ -104,6 +108,8 @@ if (
 ) {
   const sampleChar = {
     name: "ユウタ",
+    age: 18,
+    gender: "男性",
     mbti: "INFP",
     personality: {
       sociability: 4,

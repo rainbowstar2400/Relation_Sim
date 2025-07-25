@@ -2,8 +2,8 @@ export const greetingTemplate = `
 以下のキャラクター同士が、{timeSlot}の時間帯に軽く挨拶を交わしています。
 雰囲気は{moodText}です。
 
-- {characterA.name}：{personalityA}
-- {characterB.name}：{personalityB}
+- {characterA.name}（{characterA.age}歳・{characterA.gender}）：{personalityA}
+- {characterB.name}（{characterB.age}歳・{characterB.gender}）：{personalityB}
 - 関係：{relationLabel}
 - 感情：A→B: {emotionAtoB}、B→A: {emotionBtoA}
 
