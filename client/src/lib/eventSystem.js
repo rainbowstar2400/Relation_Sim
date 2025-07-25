@@ -115,7 +115,22 @@ export async function triggerRandomEvent(state, setState, addLog) {
     affAvg >= 60 &&
     Math.random() < BEST_FRIEND_EVENT_PROB
   ) {
-    const talkLogId = addLog(`${a.name}と${b.name}が何やら話しているようです…`)
+    const talkDesc = `${a.name}と${b.name}が何やら話しているようです…`
+    const mood = drawMood(state, a.id, b.id)
+    let detail = talkDesc
+    try {
+      detail = await generateConversation('親友になる', a, b, {
+        relationLabel: relation,
+        emotionLabels: { AtoB: emotionAB, BtoA: emotionBA },
+        affectionScores: { AtoB: getAffection(state.affections, a.id, b.id), BtoA: getAffection(state.affections, b.id, a.id) },
+        timeSlot: getTimeSlot(),
+        mood
+      })
+    } catch (err) {
+      addLog(`会話生成エラー: ${err.message}`, 'SYSTEM')
+    }
+
+    const talkLogId = addLog(talkDesc, 'EVENT', detail)
     const changeLogId = addLog(`${a.name}と${b.name}が親友になりました`, 'SYSTEM')
     setState(prev => {
       let relationships = updateRelationship(prev.relationships, a.id, b.id, '親友')
@@ -132,7 +147,22 @@ export async function triggerRandomEvent(state, setState, addLog) {
     (relation === 'なし' || relation === '認知') &&
     Math.random() < FRIEND_EVENT_PROB
   ) {
-    const talkLogId = addLog(`${a.name}と${b.name}が何やら話しているようです…`)
+    const talkDesc = `${a.name}と${b.name}が何やら話しているようです…`
+    const mood = drawMood(state, a.id, b.id)
+    let detail = talkDesc
+    try {
+      detail = await generateConversation('友達になる', a, b, {
+        relationLabel: relation,
+        emotionLabels: { AtoB: emotionAB, BtoA: emotionBA },
+        affectionScores: { AtoB: getAffection(state.affections, a.id, b.id), BtoA: getAffection(state.affections, b.id, a.id) },
+        timeSlot: getTimeSlot(),
+        mood
+      })
+    } catch (err) {
+      addLog(`会話生成エラー: ${err.message}`, 'SYSTEM')
+    }
+
+    const talkLogId = addLog(talkDesc, 'EVENT', detail)
     const changeLogId = addLog(`${a.name}と${b.name}が友達になりました`, 'SYSTEM')
     setState(prev => {
       let relationships = updateRelationship(prev.relationships, a.id, b.id, '友達')
