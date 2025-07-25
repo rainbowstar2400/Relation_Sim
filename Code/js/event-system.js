@@ -24,7 +24,7 @@ const moodAffectionModifier = {
 };
 
 function getRandomPair() {
-    const activeChars = state.characters.filter(c => c.condition !== '就寝中' && c.condition !== '風邪');
+    const activeChars = state.characters.filter(c => c.condition !== '就寝中');
     if (activeChars.length < 2) return null;
     const idx1 = Math.floor(Math.random() * activeChars.length);
     let idx2 = idx1;
