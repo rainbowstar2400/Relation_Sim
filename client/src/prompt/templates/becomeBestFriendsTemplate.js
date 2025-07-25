@@ -1,6 +1,6 @@
 export const becomeBestFriendsTemplate = `
 以下のキャラクター同士が、これまでの関係の中で特に大事な会話を交わし、強い友情を感じる場面を描写してください。
-時間帯は{timeSlot}、雰囲気は{moodText}です。
+日付は{date}、時間帯は{timeSlot}、雰囲気は{moodText}です。
 
 - {characterA.name}（{characterA.age}歳・{characterA.gender}）：{personalityA}
 - {characterB.name}（{characterB.age}歳・{characterB.gender}）：{personalityB}

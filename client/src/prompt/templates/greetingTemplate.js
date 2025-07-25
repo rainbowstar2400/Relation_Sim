@@ -1,5 +1,5 @@
 export const greetingTemplate = `
-以下のキャラクター同士が、{timeSlot}の時間帯に軽く挨拶を交わしています。
+以下のキャラクター同士が、{date} の {timeSlot} の時間帯に軽く挨拶を交わしています。
 雰囲気は{moodText}です。
 
 - {characterA.name}（{characterA.age}歳・{characterA.gender}）：{personalityA}

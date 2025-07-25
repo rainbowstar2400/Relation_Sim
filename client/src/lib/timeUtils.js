@@ -30,6 +30,14 @@ export function getTimeSlot(date = new Date()) {
   return 'midnight'
 }
 
+// YYYY/MM/DD 形式の日付文字列を返すヘルパー
+export function getDateString(date = new Date()) {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}/${m}/${d}`
+}
+
 export function getTimeWeight(activityPattern) {
   const slot = getTimeSlot()
   const pat = mapPattern(activityPattern)

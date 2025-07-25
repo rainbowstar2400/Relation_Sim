@@ -2,7 +2,7 @@
 import { drawMood, loadMoodTables } from './mood.js'
 import { drawEmotionChange, loadEmotionLabelTable, getEmotionLabel } from './emotionLabel.js'
 import { addReportEvent, addReportChange } from './reportUtils.js'
-import { getTimeWeight, getTimeSlot } from './timeUtils.js'
+import { getTimeWeight, getTimeSlot, getDateString } from './timeUtils.js'
 import { generateConversation } from '../gpt/generateConversation.js'
 
 // 初期化処理: ムードテーブルと感情ラベルテーブルの読み込み
@@ -124,6 +124,7 @@ export async function triggerRandomEvent(state, setState, addLog) {
         emotionLabels: { AtoB: emotionAB, BtoA: emotionBA },
         affectionScores: { AtoB: getAffection(state.affections, a.id, b.id), BtoA: getAffection(state.affections, b.id, a.id) },
         timeSlot: getTimeSlot(),
+        date: getDateString(),
         mood
       })
     } catch (err) {
@@ -156,6 +157,7 @@ export async function triggerRandomEvent(state, setState, addLog) {
         emotionLabels: { AtoB: emotionAB, BtoA: emotionBA },
         affectionScores: { AtoB: getAffection(state.affections, a.id, b.id), BtoA: getAffection(state.affections, b.id, a.id) },
         timeSlot: getTimeSlot(),
+        date: getDateString(),
         mood
       })
     } catch (err) {
@@ -205,6 +207,7 @@ export async function triggerRandomEvent(state, setState, addLog) {
       emotionLabels: { AtoB: emotionAB, BtoA: emotionBA },
       affectionScores: { AtoB: getAffection(state.affections, a.id, b.id), BtoA: getAffection(state.affections, b.id, a.id) },
       timeSlot: getTimeSlot(),
+      date: getDateString(),
       mood
     })
   } catch (err) {
