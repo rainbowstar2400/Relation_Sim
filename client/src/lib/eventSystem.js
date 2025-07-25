@@ -66,9 +66,7 @@ function getNickname(list, from, to) {
 
 // キャラクター2名をランダムに選ぶ
 function getRandomPair(characters) {
-  const active = characters.filter(
-    c => c.condition !== '就寝中' && c.condition !== '風邪'
-  )
+  const active = characters.filter(c => c.condition !== '就寝中')
   if (active.length < 2) return null
   const idx1 = Math.floor(Math.random() * active.length)
   let idx2 = idx1

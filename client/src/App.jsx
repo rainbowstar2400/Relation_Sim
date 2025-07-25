@@ -229,29 +229,19 @@ export default function App() {
       const hour = now.getHours()
       setState(prev => {
         const characters = prev.characters.map(c => {
-          const base = isSleeping(c.activityPattern, hour) ? '就寝中' : '活動中'
-          let condition = c.condition
-          let recoverAt = c.recoverAt
+          const condition =
+            isSleeping(c.activityPattern, hour) ? '就寝中' : '活動中'
 
-          // 風邪の継続判定
-          if (condition === '風邪') {
-            if (recoverAt && Date.now() >= recoverAt) {
-              condition = base
-              recoverAt = null
-            }
-          } else {
-            condition = base
+          if (condition !== c.condition) {
+            const { recoverAt, ...rest } = c
+            return { ...rest, condition }
           }
 
-          // 1時間あたり約5%の確率で風邪を発症
-          if (condition !== '風邪' && Math.random() < 0.05 / 3600) {
-            condition = '風邪'
-            recoverAt = Date.now() + 3 * 86400000
+          if ('recoverAt' in c) {
+            const { recoverAt, ...rest } = c
+            return rest
           }
 
-          if (condition !== c.condition || recoverAt !== c.recoverAt) {
-            return { ...c, condition, recoverAt }
-          }
           return c
         })
         return { ...prev, characters }
