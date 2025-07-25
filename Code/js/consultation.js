@@ -67,7 +67,7 @@ function selectTemplate(trust) {
 function chooseCharacter() {
     const now = Date.now();
     const candidates = state.characters.filter(c => {
-        if (c.condition && (c.condition === '就寝中' || c.condition === '風邪')) return false;
+        if (c.condition && c.condition === '就寝中') return false;
         if (now - (c.lastConsultation || 0) < 3600000) return false;
         return true;
     });
