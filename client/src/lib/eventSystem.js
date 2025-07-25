@@ -125,30 +125,31 @@ export async function triggerRandomEvent(state, setState, addLog, updateLog) {
   ) {
     const talkDesc = `${a.name}と${b.name}が何やら話しているようです…`
     const mood = drawMood(state, a.id, b.id)
-    const talkLogId = addLog(talkDesc, 'EVENT')
-    generateConversation('親友になる', a, b, {
-      relationLabel: relation,
-      emotionLabels: { AtoB: emotionAB, BtoA: emotionBA },
-      affectionScores: { AtoB: getAffection(state.affections, a.id, b.id), BtoA: getAffection(state.affections, b.id, a.id) },
-      timeSlot: getTimeSlot(),
-      date: getDateString(),
-      mood,
-      nicknames: { AtoB: nickAB, BtoA: nickBA }
-    })
-      .then(detail => updateLog(talkLogId, undefined, detail))
-      .catch(err => {
-        addLog(`会話生成エラー: ${err.message}`, 'SYSTEM')
+  const talkLogId = addLog(talkDesc, 'EVENT')
+  generateConversation('親友になる', a, b, {
+    relationLabel: relation,
+    emotionLabels: { AtoB: emotionAB, BtoA: emotionBA },
+    affectionScores: { AtoB: getAffection(state.affections, a.id, b.id), BtoA: getAffection(state.affections, b.id, a.id) },
+    timeSlot: getTimeSlot(),
+    date: getDateString(),
+    mood,
+    nicknames: { AtoB: nickAB, BtoA: nickBA }
+  })
+    .then(detail => {
+      updateLog(talkLogId, undefined, detail)
+      const changeLogId = addLog(`${a.name}と${b.name}が親友になりました`, 'SYSTEM')
+      setState(prev => {
+        let relationships = updateRelationship(prev.relationships, a.id, b.id, '親友')
+        let reports = prev.reports || {}
+        reports = addReportEvent(reports, { timestamp: now, description: '親友になるイベント', logId: talkLogId })
+        reports = addReportChange(reports, `${a.name}と${b.name}が親友になった`, changeLogId)
+        return { ...prev, relationships, reports }
       })
-
-    const changeLogId = addLog(`${a.name}と${b.name}が親友になりました`, 'SYSTEM')
-    setState(prev => {
-      let relationships = updateRelationship(prev.relationships, a.id, b.id, '親友')
-      let reports = prev.reports || {}
-      reports = addReportEvent(reports, { timestamp: now, description: '親友になるイベント', logId: talkLogId })
-      reports = addReportChange(reports, `${a.name}と${b.name}が親友になった`, changeLogId)
-      return { ...prev, relationships, reports }
     })
-    return
+    .catch(err => {
+      addLog(`会話生成エラー: ${err.message}`, 'SYSTEM')
+    })
+  return
   }
 
   // 友達になるイベント
@@ -156,10 +157,10 @@ export async function triggerRandomEvent(state, setState, addLog, updateLog) {
     (relation === 'なし' || relation === '認知') &&
     Math.random() < FRIEND_EVENT_PROB
   ) {
-    const talkDesc = `${a.name}と${b.name}が何やら話しているようです…`
-    const mood = drawMood(state, a.id, b.id)
-    const talkLogId = addLog(talkDesc, 'EVENT')
-    generateConversation('友達になる', a, b, {
+  const talkDesc = `${a.name}と${b.name}が何やら話しているようです…`
+  const mood = drawMood(state, a.id, b.id)
+  const talkLogId = addLog(talkDesc, 'EVENT')
+  generateConversation('友達になる', a, b, {
       relationLabel: relation,
       emotionLabels: { AtoB: emotionAB, BtoA: emotionBA },
       affectionScores: { AtoB: getAffection(state.affections, a.id, b.id), BtoA: getAffection(state.affections, b.id, a.id) },
@@ -168,20 +169,21 @@ export async function triggerRandomEvent(state, setState, addLog, updateLog) {
       mood,
       nicknames: { AtoB: nickAB, BtoA: nickBA }
     })
-      .then(detail => updateLog(talkLogId, undefined, detail))
-      .catch(err => {
-        addLog(`会話生成エラー: ${err.message}`, 'SYSTEM')
+    .then(detail => {
+      updateLog(talkLogId, undefined, detail)
+      const changeLogId = addLog(`${a.name}と${b.name}が友達になりました`, 'SYSTEM')
+      setState(prev => {
+        let relationships = updateRelationship(prev.relationships, a.id, b.id, '友達')
+        let reports = prev.reports || {}
+        reports = addReportEvent(reports, { timestamp: now, description: '友達になるイベント', logId: talkLogId })
+        reports = addReportChange(reports, `${a.name}と${b.name}が友達になった`, changeLogId)
+        return { ...prev, relationships, reports }
       })
-
-    const changeLogId = addLog(`${a.name}と${b.name}が友達になりました`, 'SYSTEM')
-    setState(prev => {
-      let relationships = updateRelationship(prev.relationships, a.id, b.id, '友達')
-      let reports = prev.reports || {}
-      reports = addReportEvent(reports, { timestamp: now, description: '友達になるイベント', logId: talkLogId })
-      reports = addReportChange(reports, `${a.name}と${b.name}が友達になった`, changeLogId)
-      return { ...prev, relationships, reports }
     })
-    return
+    .catch(err => {
+      addLog(`会話生成エラー: ${err.message}`, 'SYSTEM')
+    })
+  return
   }
 
   const types = ['挨拶', '雑談', '思い出し会話', '二人きりの時間']
@@ -218,47 +220,49 @@ export async function triggerRandomEvent(state, setState, addLog, updateLog) {
     mood,
     nicknames: { AtoB: nickAB, BtoA: nickBA }
   })
-    .then(detail => updateLog(eventLogId, undefined, detail))
+    .then(detail => {
+      updateLog(eventLogId, undefined, detail)
+
+      let changeLogIdA = null
+      let changeLogIdB = null
+      if (delta !== 0) {
+        const verb = delta > 0 ? '上昇しました' : '下降しました'
+        changeLogIdA = addLog(`${a.name}→${b.name}の好感度が${verb}`, 'SYSTEM')
+        changeLogIdB = addLog(`${b.name}→${a.name}の好感度が${verb}`, 'SYSTEM')
+      } else {
+        addLog(`${a.name}と${b.name}の好感度に変化はありません`, 'SYSTEM')
+      }
+
+      // 好感度・感情・レポートを計算
+      let emotionLogs = []
+      let affections = updateAffection(state.affections, a.id, b.id, delta, now)
+      affections = updateAffection(affections, b.id, a.id, delta, now)
+      let emotions = state.emotions || []
+      let reports = state.reports || {}
+
+      let result = drawEmotionChange(state, emotions, a.id, b.id, mood, reports)
+      emotions = result.emotions
+      reports = result.reports
+      if (result.log) emotionLogs.push(result.log)
+
+      result = drawEmotionChange(state, emotions, b.id, a.id, mood, reports)
+      emotions = result.emotions
+      reports = result.reports
+      if (result.log) emotionLogs.push(result.log)
+
+      reports = addReportEvent(reports, { timestamp: now, description: desc, logId: eventLogId })
+      if (delta !== 0) {
+        const verb = delta > 0 ? '上昇しました' : '下降しました'
+        reports = addReportChange(reports, `${a.name}→${b.name}の好感度が${verb}`, changeLogIdA)
+        reports = addReportChange(reports, `${b.name}→${a.name}の好感度が${verb}`, changeLogIdB)
+      }
+
+      setState(prev => ({ ...prev, affections, emotions, reports }))
+
+      emotionLogs.forEach(l => addLog(l, 'SYSTEM', l))
+    })
     .catch(err => {
       addLog(`会話生成エラー: ${err.message}`, 'SYSTEM')
     })
-
-  let changeLogIdA = null
-  let changeLogIdB = null
-  if (delta !== 0) {
-    const verb = delta > 0 ? '上昇しました' : '下降しました'
-    changeLogIdA = addLog(`${a.name}→${b.name}の好感度が${verb}`, 'SYSTEM')
-    changeLogIdB = addLog(`${b.name}→${a.name}の好感度が${verb}`, 'SYSTEM')
-  } else {
-    addLog(`${a.name}と${b.name}の好感度に変化はありません`, 'SYSTEM')
-  }
-
-  // 事前に好感度・感情・レポートを計算しておく
-  let emotionLogs = []
-  let affections = updateAffection(state.affections, a.id, b.id, delta, now)
-  affections = updateAffection(affections, b.id, a.id, delta, now)
-  let emotions = state.emotions || []
-  let reports = state.reports || {}
-
-  let result = drawEmotionChange(state, emotions, a.id, b.id, mood, reports)
-  emotions = result.emotions
-  reports = result.reports
-  if (result.log) emotionLogs.push(result.log)
-
-  result = drawEmotionChange(state, emotions, b.id, a.id, mood, reports)
-  emotions = result.emotions
-  reports = result.reports
-  if (result.log) emotionLogs.push(result.log)
-
-  reports = addReportEvent(reports, { timestamp: now, description: desc, logId: eventLogId })
-  if (delta !== 0) {
-    const verb = delta > 0 ? '上昇しました' : '下降しました'
-    reports = addReportChange(reports, `${a.name}→${b.name}の好感度が${verb}`, changeLogIdA)
-    reports = addReportChange(reports, `${b.name}→${a.name}の好感度が${verb}`, changeLogIdB)
-  }
-
-  setState(prev => ({ ...prev, affections, emotions, reports }))
-
-  emotionLogs.forEach(l => addLog(l, 'SYSTEM', l))
 }
 
