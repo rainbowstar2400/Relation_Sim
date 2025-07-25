@@ -12,7 +12,7 @@ function buildConsultPrompt(character, genre, level, trust) {
     `レベル: ${level}\n` +
     `style_modifiers: ${JSON.stringify(modifiers)}\n` +
     `# 出力形式\n` +
-    `{ "prompt": "相談文", "choices": ["選択肢A", "選択肢B"], "trust_change": 0, "responses": ["返答A", "返答B"] }`
+    `{ "prompt": "相談文", "choices": ["<選択肢1>", "<選択肢2>", "<選択肢3>"], "trust_change": 0, "responses": ["<返答1>", "<返答2>", "<返答3>"] }`
 }
 
 /**
@@ -28,7 +28,17 @@ export async function generateConsultation({ character, genre, level, trust }) {
   const prompt = buildConsultPrompt(character, genre, level, trust)
   const text = await generateDialogue(prompt)
   try {
-    return JSON.parse(text)
+    const res = JSON.parse(text)
+    // GPT から不完全なデータが返ってきた場合に備えてプレースホルダを除去
+    const sanitize = (arr, pattern) =>
+      (Array.isArray(arr) ? arr : [])
+        .map(v => String(v))
+        .filter(v => !pattern.test(v))
+        .slice(0, 3)
+
+    res.choices = sanitize(res.choices, /^選択肢[ABC]?$|^<選択肢\d+>$/)
+    res.responses = sanitize(res.responses, /^返答[ABC]?$|^<返答\d+>$/)
+    return res
   } catch (err) {
     console.error('parse error', err)
     throw new Error('GPT 出力の解析に失敗しました')
