@@ -14,7 +14,12 @@ import RelationDetail from './components/RelationDetail.jsx'
 import DailyReport from './components/DailyReport.jsx'
 import LogDetail from './components/LogDetail.jsx'
 import { addReportChange } from './lib/reportUtils.js'
-import { loadTimeModifiers, isSleeping } from './lib/timeUtils.js'
+import {
+  loadTimeModifiers,
+  drawSleepTimes,
+  getCharacterCondition,
+  getDateString
+} from './lib/timeUtils.js'
 const EVENT_INTERVAL_MS = 1800000 // 30分ごと
 const EVENT_PROBABILITY = 0.7
 
@@ -222,29 +227,42 @@ export default function App() {
     }
   }, [])
 
-  // キャラ状態を時間帯や確率で更新
+  // キャラ状態と就寝時間を更新
   useEffect(() => {
+    const lastUpdate = { current: '' }
+
     const updateCondition = () => {
       const now = new Date()
-      const hour = now.getHours()
+      const minutes = now.getHours() * 60 + now.getMinutes()
+      const dateStr = getDateString(now)
+      const needReroll = now.getHours() === 12 && lastUpdate.current !== dateStr
+
       setState(prev => {
+        let changed = false
         const characters = prev.characters.map(c => {
-          const condition =
-            isSleeping(c.activityPattern, hour) ? '就寝中' : '活動中'
-
-          if (condition !== c.condition) {
-            const { recoverAt, ...rest } = c
-            return { ...rest, condition }
+          let sleepStart = c.sleepStart
+          let sleepEnd = c.sleepEnd
+          if (needReroll || sleepStart === undefined || sleepEnd === undefined) {
+            const times = drawSleepTimes(c.activityPattern)
+            sleepStart = times.sleepStart
+            sleepEnd = times.sleepEnd
+            changed = true
           }
-
-          if ('recoverAt' in c) {
+          const condition = getCharacterCondition({ sleepStart, sleepEnd }, minutes)
+          if (
+            condition !== c.condition ||
+            sleepStart !== c.sleepStart ||
+            sleepEnd !== c.sleepEnd ||
+            'recoverAt' in c
+          ) {
+            changed = true
             const { recoverAt, ...rest } = c
-            return rest
+            return { ...rest, condition, sleepStart, sleepEnd }
           }
-
           return c
         })
-        return { ...prev, characters }
+        if (needReroll) lastUpdate.current = dateStr
+        return changed ? { ...prev, characters } : prev
       })
     }
 

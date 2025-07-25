@@ -46,23 +46,47 @@ export function getTimeWeight(activityPattern) {
   return global * personal
 }
 
-export function isSleeping(activityPattern, hour) {
-  const pat = mapPattern(activityPattern)
-  switch (pat) {
-    case 'morning':
-      return hour >= 22 || hour < 5
-    case 'night':
-      return hour >= 2 && hour < 8
-    default:
-      return hour >= 0 && hour < 6
+function randMinute(min, max) {
+  if (min <= max) {
+    return min + Math.floor(Math.random() * (max - min + 1))
   }
+  const range = (1440 - min) + (max + 1)
+  const r = Math.floor(Math.random() * range)
+  return (min + r) % 1440
+}
+
+const sleepRanges = {
+  morning: { start: [1260, 1380], end: [180, 300] },
+  normal: { start: [1380, 60], end: [300, 420] },
+  night: { start: [60, 180], end: [420, 540] }
+}
+
+export function drawSleepTimes(pattern) {
+  const pat = mapPattern(pattern)
+  const range = sleepRanges[pat] || sleepRanges.normal
+  return {
+    sleepStart: randMinute(range.start[0], range.start[1]),
+    sleepEnd: randMinute(range.end[0], range.end[1])
+  }
+}
+
+function inPeriod(start, end, now) {
+  if (start <= end) {
+    return now >= start && now < end
+  }
+  return now >= start || now < end
+}
+
+export function getCharacterCondition(char, nowMinutes) {
+  if (char.sleepStart === undefined || char.sleepEnd === undefined) return '活動中'
+  if (inPeriod(char.sleepStart, char.sleepEnd, nowMinutes)) return '就寝中'
+  const prepStart = (char.sleepStart - 30 + 1440) % 1440
+  if (inPeriod(prepStart, char.sleepStart, nowMinutes)) return '就寝準備中'
+  return '活動中'
 }
 
 export function updateCharacterConditions(characters) {
   const now = new Date()
-  const hour = now.getHours()
-  return characters.map(c => {
-    const asleep = isSleeping(c.activityPattern, hour)
-    return { ...c, condition: asleep ? '就寝中' : '活動中' }
-  })
+  const minutes = now.getHours() * 60 + now.getMinutes()
+  return characters.map(c => ({ ...c, condition: getCharacterCondition(c, minutes) }))
 }
