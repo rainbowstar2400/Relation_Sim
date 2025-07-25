@@ -387,6 +387,7 @@ export default function App() {
           relationships={state.relationships}
           emotions={state.emotions}
           affections={state.affections}
+          nicknames={state.nicknames}
           updateRelationship={updateRelationship}
           updateEmotion={updateEmotion}
         />

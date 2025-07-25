@@ -2,7 +2,7 @@ import React from 'react'
 import ConsultationArea from './ConsultationArea.jsx'
 import LogList from './LogList.jsx'
 
-export default function MainView({ characters, onSelect, logs, readLogCount, updateReadLogCount, trusts, addLog, removeLog, updateTrust, updateLastConsultation, relationships, emotions, affections, updateRelationship, updateEmotion }) {
+export default function MainView({ characters, onSelect, logs, readLogCount, updateReadLogCount, trusts, addLog, removeLog, updateTrust, updateLastConsultation, relationships, emotions, affections, nicknames, updateRelationship, updateEmotion }) {
 
   return (
     <div>
@@ -33,6 +33,7 @@ export default function MainView({ characters, onSelect, logs, readLogCount, upd
         relationships={relationships}
         emotions={emotions}
         affections={affections}
+        nicknames={nicknames}
         updateRelationship={updateRelationship}
         updateEmotion={updateEmotion}
       />

@@ -50,6 +50,7 @@ function formatPersonality(p = {}) {
  * @param {Object} characterA - キャラクターAの情報
  * @param {Object} characterB - キャラクターBの情報
  * @param {Object} context - 関係性や感情などの状況情報
+ * @param {Object} [context.nicknames] - A→B と B→A の呼び方
  * @returns {Object} プロンプトおよび補足情報
  */
 export function buildPrompt(eventType, characterA, characterB, context) {
@@ -77,6 +78,11 @@ export function buildPrompt(eventType, characterA, characterB, context) {
     .replaceAll('{timeSlot}', context.timeSlot)
     .replaceAll('{date}', context.date)
     .replaceAll('{moodText}', moodText)
+
+  // お互いの呼び方情報を追加
+  const nicknameAB = context.nicknames?.AtoB || characterB.name
+  const nicknameBA = context.nicknames?.BtoA || characterA.name
+  core += `\n呼び方: ${characterA.name}→「${nicknameAB}」、${characterB.name}→「${nicknameBA}」`
 
   const styleModifiersA = getStyleModifiers(characterA.personality)
   const styleModifiersB = getStyleModifiers(characterB.personality)
