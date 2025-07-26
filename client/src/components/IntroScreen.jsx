@@ -20,15 +20,13 @@ export default function IntroScreen({ onStart }) {
   }, [visible])
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="bg-black bg-opacity-50 p-4 rounded text-xl w-full max-w-md">
-        {texts.map((t, i) => (
-          <p key={i} className={`mb-4 ${i < visible ? '' : 'invisible'}`}>{t}</p>
-        ))}
-        <div className={`mt-4 text-center ${visible === texts.length ? '' : 'invisible'}`}>
-          <button onClick={onStart}>▶ はじめる</button>
-        </div>
-      </div>
+    <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4 p-4">
+      {texts.map((t, i) => (
+        <p key={i} className={`mb-4 ${i < visible ? '' : 'invisible'}`}>{t}</p>
+      ))}
+      {visible === texts.length && (
+        <button onClick={onStart}>▶ はじめる</button>
+      )}
     </div>
   )
 }
