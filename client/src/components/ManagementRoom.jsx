@@ -280,7 +280,7 @@ export default function ManagementRoom({
             <label className="mr-2">興味・関心:</label>
             <input className="text-black" value={interests} onChange={e=>setInterests(e.target.value)} placeholder="例: 読書, 映画鑑賞" />
           </div>
-          <h4>初期関係設定</h4>
+          <h4>元々の関係</h4>
           <div className="border p-2 mb-2">
             <div className="mb-2">
               <label className="mr-2">相手を選択:</label>
