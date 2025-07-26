@@ -14,7 +14,6 @@ import RelationDetail from './components/RelationDetail.jsx'
 import DailyReport from './components/DailyReport.jsx'
 import LogDetail from './components/LogDetail.jsx'
 import StartScreen from './components/StartScreen.jsx'
-import IntroScreen from './components/IntroScreen.jsx'
 import Popup from './components/Popup.jsx'
 import { addReportChange } from './lib/reportUtils.js'
 import {
@@ -47,6 +46,7 @@ const initialState = {
 export default function App() {
   const [view, setView] = useState('main')
   const [isStarting, setIsStarting] = useState(true)
+  const [showIntro, setShowIntro] = useState(false)
   const [state, setState] = useState(initialState)
   const stateRef = useRef(state)
   const [initialized, setInitialized] = useState(false)
@@ -362,12 +362,13 @@ export default function App() {
   const handleNewGame = () => {
     setState({ ...initialState, tutorialStep: 1 })
     localStorage.removeItem('relation_sim_state')
-    setIsStarting(false)
     setInitialized(true)
-    setView('intro')
+    setShowIntro(true)
   }
 
   const handleIntroFinish = () => {
+    setShowIntro(false)
+    setIsStarting(false)
     setView('management')
     setState(prev => ({ ...prev, tutorialStep: 2 }))
   }
@@ -434,7 +435,12 @@ export default function App() {
   return (
     <div className="max-w-[50rem] mx-auto border border-gray-600 bg-panel p-4 rounded text-gray-100 min-h-screen">
       {isStarting ? (
-        <StartScreen onContinue={handleLoadSaveData} onNewGame={handleNewGame} />
+        <StartScreen
+          onContinue={handleLoadSaveData}
+          onNewGame={handleNewGame}
+          showIntro={showIntro}
+          onIntroFinish={handleIntroFinish}
+        />
       ) : (
         <>
           <Header
@@ -443,9 +449,6 @@ export default function App() {
             onLoad={handleImport}
             onDevEvent={handleDevEvent}
           />
-      {view === 'intro' && (
-        <IntroScreen onStart={handleIntroFinish} />
-      )}
       {view === 'main' && (
         <MainView
           characters={state.characters}
