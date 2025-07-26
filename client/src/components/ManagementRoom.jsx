@@ -47,6 +47,8 @@ export default function ManagementRoom({
   // 「元々の関係」セクションの表示制御
   const [showRelationSection, setShowRelationSection] = useState(characters.length > 1)
   const relationRef = useRef(null)
+  // 二人目登録開始のポップアップ表示制御
+  const [secondStartShown, setSecondStartShown] = useState(false)
 
   useEffect(() => {
     if (tutorialStep === 2 && characters.length === 0) {
@@ -131,12 +133,30 @@ export default function ManagementRoom({
     resetForm()
     if (tutorialStep === 2 && characters.length === 1) {
       setShowRelationSection(true)
+      setSecondStartShown(false)
+    } else if (characters.length <= 1) {
+      setShowRelationSection(false)
+    }
+  }
+
+  // 名前入力中の処理
+  const handleNameChange = (e) => {
+    setName(e.target.value)
+  }
+
+  // 入力欄を離れたときにチュートリアル用ポップアップを表示
+  const handleNameBlur = () => {
+    if (
+      tutorialStep === 2 &&
+      characters.length === 1 &&
+      !secondStartShown &&
+      name.trim()
+    ) {
+      setSecondStartShown(true)
       if (onSecondRegisterStart) onSecondRegisterStart()
       setTimeout(() => {
         relationRef.current?.scrollIntoView({ behavior: 'smooth' })
       }, 0)
-    } else if (characters.length <= 1) {
-      setShowRelationSection(false)
     }
   }
 
@@ -267,7 +287,13 @@ export default function ManagementRoom({
           <h3 className="mb-2">{editingId ? '住人情報編集' : '新規住人登録'}</h3>
           <div className="mb-2">
             <label className="mr-2">名前:</label>
-            <input className="text-black" value={name} onChange={e=>setName(e.target.value)} required />
+            <input
+              className="text-black"
+              value={name}
+              onChange={handleNameChange}
+              onBlur={handleNameBlur}
+              required
+            />
           </div>
           <div className="mb-2">
             <label className="mr-2">年齢:</label>
