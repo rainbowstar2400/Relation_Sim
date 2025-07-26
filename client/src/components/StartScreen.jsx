@@ -10,22 +10,40 @@ export default function StartScreen({ onContinue, onNewGame, showIntro, onIntroF
     'まずは、一人目の住人を迎え入れてみましょう。',
   ]
 
-  const [visible, setVisible] = useState(0)
+  // 表示完了した段落の一覧
+  const [finished, setFinished] = useState([])
+  // タイピング中の段落テキスト
+  const [typing, setTyping] = useState('')
 
-  // showIntro が切り替わったときに段落表示をリセット
+  // showIntro が切り替わったときに状態をリセット
   useEffect(() => {
     if (showIntro) {
-      setVisible(0)
+      setFinished([])
+      setTyping('')
     }
   }, [showIntro])
 
-  // 段落を順に表示
+  // 段落を1つずつタイピング表示
   useEffect(() => {
-    if (showIntro && visible < texts.length) {
-      const timer = setTimeout(() => setVisible(v => v + 1), 1500)
-      return () => clearTimeout(timer)
-    }
-  }, [showIntro, visible])
+    if (!showIntro) return
+    if (finished.length >= texts.length) return
+
+    const full = texts[finished.length].replace(/。/g, '。\n')
+    let i = 0
+    setTyping('')
+    const timer = setInterval(() => {
+      i++
+      setTyping(full.slice(0, i))
+      if (i >= full.length) {
+        clearInterval(timer)
+        setTimeout(() => {
+          setFinished(prev => [...prev, full])
+          setTyping('')
+        }, 300)
+      }
+    }, 50)
+    return () => clearInterval(timer)
+  }, [showIntro, finished])
 
   const handleSelectFile = (e) => {
     const file = e.target.files?.[0]
@@ -50,10 +68,13 @@ export default function StartScreen({ onContinue, onNewGame, showIntro, onIntroF
         </>
       ) : (
         <>
-          {texts.map((t, i) => (
-            <p key={i} className={`mb-4 ${i < visible ? '' : 'invisible'}`}>{t}</p>
+          {finished.map((t, i) => (
+            <p key={i} className="mb-4 whitespace-pre-wrap font-mono">{t}</p>
           ))}
-          {visible === texts.length && (
+          {typing && (
+            <p className="mb-4 whitespace-pre-wrap font-mono">{typing}</p>
+          )}
+          {finished.length === texts.length && !typing && (
             <button onClick={onIntroFinish}>▶ はじめる</button>
           )}
         </>
