@@ -13,6 +13,7 @@ import CharacterStatus from './components/CharacterStatus.jsx'
 import RelationDetail from './components/RelationDetail.jsx'
 import DailyReport from './components/DailyReport.jsx'
 import LogDetail from './components/LogDetail.jsx'
+import StartScreen from './components/StartScreen.jsx'
 import { addReportChange } from './lib/reportUtils.js'
 import {
   loadTimeModifiers,
@@ -41,6 +42,7 @@ const initialState = {
 
 export default function App() {
   const [view, setView] = useState('main')
+  const [isStarting, setIsStarting] = useState(true)
   const [state, setState] = useState(initialState)
   const stateRef = useRef(state)
   const [initialized, setInitialized] = useState(false)
@@ -140,12 +142,13 @@ export default function App() {
 
   // localStorageから読み込み
   useEffect(() => {
+    if (isStarting) return
     const saved = loadStateFromLocal()
     if (saved) {
       setState(prev => ({ ...prev, ...saved }))
     }
     setInitialized(true)
-  }, [])
+  }, [isStarting])
 
   // 時間帯補正テーブルを読み込む
   useEffect(() => {
@@ -313,6 +316,23 @@ export default function App() {
       .catch(() => alert('読み込みに失敗しました'))
   }
 
+  // スタート画面: セーブデータを読み込む
+  const handleLoadSaveData = (file) => {
+    importStateFromFile(file)
+      .then(loaded => {
+        setState(prev => ({ ...prev, ...loaded }))
+        setIsStarting(false)
+      })
+      .catch(() => alert('セーブデータの読み込みに失敗しました'))
+  }
+
+  // スタート画面: 新しく始める
+  const handleNewGame = () => {
+    setState(initialState)
+    localStorage.removeItem('relation_sim_state')
+    setIsStarting(false)
+  }
+
   // 開発用: 手動でランダムイベントを発生させる
   const handleDevEvent = async () => {
     try {
@@ -338,12 +358,16 @@ export default function App() {
 
   return (
     <div className="max-w-[50rem] mx-auto border border-gray-600 bg-panel p-4 rounded text-gray-100 min-h-screen">
-      <Header
-        onChangeView={setView}
-        onSave={handleExport}
-        onLoad={handleImport}
-        onDevEvent={handleDevEvent}
-      />
+      {isStarting ? (
+        <StartScreen onContinue={handleLoadSaveData} onNewGame={handleNewGame} />
+      ) : (
+        <>
+          <Header
+            onChangeView={setView}
+            onSave={handleExport}
+            onLoad={handleImport}
+            onDevEvent={handleDevEvent}
+          />
       {view === 'main' && (
         <MainView
           characters={state.characters}
@@ -426,6 +450,8 @@ export default function App() {
           log={state.logs.find(l => l.id === currentLogId)}
           onBack={() => setView('daily')}
         />
+      )}
+        </>
       )}
     </div>
   )
