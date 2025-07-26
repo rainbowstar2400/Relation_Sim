@@ -9,31 +9,25 @@ export default function DailyReport({ reports = {}, characters = [], onBack, onO
   const [date, setDate] = useState(todayStr())
   const [events, setEvents] = useState([])
   const [changes, setChanges] = useState([])
-  // 複数選択されたキャラ名を配列で保持
-  const [selectedChars, setSelectedChars] = useState([])
+  // 住人の選択値を保持（1人のみ選択）
+  const [selectedChar, setSelectedChar] = useState('')
   const [changeType, setChangeType] = useState('all')
 
-  // キャラ選択時の処理
+  // 住人選択時の処理
   const handleCharChange = (e) => {
-    const values = Array.from(e.target.selectedOptions).map((o) => o.value)
-    // 先頭の "" (全員) が選択された場合は選択をリセット
-    if (values.includes('')) {
-      setSelectedChars([])
-    } else {
-      setSelectedChars(values)
-    }
+    const value = e.target.value
+    setSelectedChar(value)
   }
 
   // 日付変更や reports 更新時にリストを再取得
   useEffect(() => {
     const data = reports[date] || { events: [], changes: [] }
-    let evs = data.events
-    let chgs = data.changes
+    let evs = data.events.filter(ev => !ev.description?.startsWith('SYSTEM:'))
+    let chgs = data.changes.filter(chg => !chg.description?.startsWith('SYSTEM:'))
 
-    // キャラが選ばれている場合は該当キャラを含む項目のみ表示
-    if (selectedChars.length > 0) {
-      const matchChar = (text = '') =>
-        selectedChars.some(name => text.includes(name))
+    // 住人が選ばれている場合は該当キャラを含む項目のみ表示
+    if (selectedChar) {
+      const matchChar = (text = '') => text.includes(selectedChar)
       evs = evs.filter(ev => matchChar(ev.description))
       chgs = chgs.filter(chg => matchChar(chg.description))
     }
@@ -57,7 +51,7 @@ export default function DailyReport({ reports = {}, characters = [], onBack, onO
 
     setEvents(evs)
     setChanges(chgs)
-  }, [date, reports, selectedChars, changeType])
+  }, [date, reports, selectedChar, changeType])
 
   const formatTime = (ts) => new Date(ts).toTimeString().slice(0, 5)
 
@@ -81,8 +75,7 @@ export default function DailyReport({ reports = {}, characters = [], onBack, onO
         <select
           id="char-select"
           className="text-black"
-          multiple
-          value={selectedChars}
+          value={selectedChar}
           onChange={handleCharChange}
         >
           <option value="">全員</option>
@@ -90,7 +83,7 @@ export default function DailyReport({ reports = {}, characters = [], onBack, onO
             <option key={c.id} value={c.name}>{c.name}</option>
           ))}
         </select>
-        <label htmlFor="change-type" className="ml-2 mr-1">変化タイプ:</label>
+        <label htmlFor="change-type" className="ml-2 mr-1">フィルタ:</label>
         <select
           id="change-type"
           className="text-black"
@@ -98,14 +91,14 @@ export default function DailyReport({ reports = {}, characters = [], onBack, onO
           onChange={(e) => setChangeType(e.target.value)}
         >
           <option value="all">すべて</option>
-          <option value="event">イベント</option>
-          <option value="relation">関係</option>
-          <option value="emotion">印象</option>
+          <option value="event">会話のみ</option>
+          <option value="relation">関係変化</option>
+          <option value="emotion">印象変化</option>
         </select>
       </div>
 
       {/* 発生イベント一覧 */}
-      <h3 className="mb-1">発生イベント</h3>
+      <h3 className="mb-1">会話履歴</h3>
       <ul className="mb-2 list-none pl-4">
         {events.length === 0 ? (
           <li>イベントがありません</li>
@@ -129,11 +122,7 @@ export default function DailyReport({ reports = {}, characters = [], onBack, onO
           <li>変化はありません</li>
         ) : (
           changes.map((chg, idx) => (
-            <li
-              key={idx}
-              className={chg.logId ? 'cursor-pointer text-blue-300' : ''}
-              onClick={() => chg.logId && onOpenLog && onOpenLog(chg.logId)}
-            >
+            <li key={idx}>
               [{chg.time}] {chg.description}
             </li>
           ))

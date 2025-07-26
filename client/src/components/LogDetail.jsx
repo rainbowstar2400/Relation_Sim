@@ -18,9 +18,11 @@ export default function LogDetail({ log = null, onBack }) {
         {log.time && <span className="mr-1">[{log.time}]</span>}
         {log.type}: {log.text}
       </p>
-      <pre className="whitespace-pre-wrap mb-4 bg-gray-700 p-2 rounded">
-        {log.detail || '詳細はありません'}
-      </pre>
+      {log.type !== 'SYSTEM' && (
+        <pre className="whitespace-pre-wrap mb-4 bg-gray-700 p-2 rounded">
+          {log.detail || '詳細はありません'}
+        </pre>
+      )}
       <button onClick={onBack}>戻る</button>
     </section>
   )
