@@ -313,9 +313,11 @@ export default function App() {
             '場合によっては、関係性や印象が変わることもあります。\n\n' +
             'すべての出来事は、このログから見守ることができます。\n\n' +
             'なお、古いログは確認済みになると、順次非表示になります。'
-          showPopup(secondText, () => {
-            setState(prev => ({ ...prev, tutorialStep: 4 }))
-          })
+          setTimeout(() => {
+            showPopup(secondText, () => {
+              setState(prev => ({ ...prev, tutorialStep: 4 }))
+            })
+          }, 1000)
         })
       }, 1000)
     }
