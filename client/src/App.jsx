@@ -14,6 +14,8 @@ import RelationDetail from './components/RelationDetail.jsx'
 import DailyReport from './components/DailyReport.jsx'
 import LogDetail from './components/LogDetail.jsx'
 import StartScreen from './components/StartScreen.jsx'
+import IntroScreen from './components/IntroScreen.jsx'
+import Popup from './components/Popup.jsx'
 import { addReportChange } from './lib/reportUtils.js'
 import {
   loadTimeModifiers,
@@ -51,6 +53,7 @@ export default function App() {
   const [currentChar, setCurrentChar] = useState(null)
   const [currentPair, setCurrentPair] = useState(null)
   const [currentLogId, setCurrentLogId] = useState(null)
+  const [popup, setPopup] = useState(null)
 
   // state の最新値を保持する参照
   useEffect(() => {
@@ -330,6 +333,16 @@ export default function App() {
       .catch(() => alert('読み込みに失敗しました'))
   }
 
+  // ポップアップ表示ヘルパー
+  const showPopup = (text, afterClose) => {
+    setPopup({ text, afterClose })
+  }
+
+  const closePopup = () => {
+    if (popup?.afterClose) popup.afterClose()
+    setPopup(null)
+  }
+
   // スタート画面: セーブデータを読み込む
   const handleLoadSaveData = (file) => {
     importStateFromFile(file)
@@ -347,11 +360,16 @@ export default function App() {
 
   // スタート画面: 新しく始める
   const handleNewGame = () => {
-    setState({ ...initialState, tutorialStep: 2 })
+    setState({ ...initialState, tutorialStep: 1 })
     localStorage.removeItem('relation_sim_state')
     setIsStarting(false)
     setInitialized(true)
+    setView('intro')
+  }
+
+  const handleIntroFinish = () => {
     setView('management')
+    setState(prev => ({ ...prev, tutorialStep: 2 }))
   }
 
   // 開発用: 手動でランダムイベントを発生させる
@@ -366,7 +384,7 @@ export default function App() {
   // チュートリアル用コールバック
   const handleFirstRegisterComplete = () => {
     if (state.tutorialStep === 2) {
-      alert(
+      showPopup(
         '一人目の住人が登録できました！\n' +
           '登録した住人は、こちらの住人一覧に表示されます。\n\n' +
           '次は、二人目の住人を登録してみましょう。\n' +
@@ -377,7 +395,7 @@ export default function App() {
 
   const handleSecondRegisterStart = () => {
     if (state.tutorialStep === 2) {
-      alert(
+      showPopup(
         '二人目以降の住人には、他の住人との関係性を予め設定することができます。\n\n' +
           'この「好感度」は、お互いについてどれだけ好ましく思っているかを示します。'
       )
@@ -386,14 +404,16 @@ export default function App() {
 
   const handleSecondRegisterComplete = () => {
     if (state.tutorialStep === 2) {
-      alert(
+      showPopup(
         '二人目の住人の登録が完了しました！\n\n' +
           'これで箱庭の暮らしが始まります。\n' +
           'どんな関係が生まれていくのか、ぜひ見守ってみてください。\n\n' +
-          'それでは、ホームへ進みましょう。'
+          'それでは、ホームへ進みましょう。',
+        () => {
+          setView('main')
+          setState(prev => ({ ...prev, tutorialStep: 3 }))
+        }
       )
-      setView('main')
-      setState(prev => ({ ...prev, tutorialStep: 3 }))
     }
   }
 
@@ -423,6 +443,9 @@ export default function App() {
             onLoad={handleImport}
             onDevEvent={handleDevEvent}
           />
+      {view === 'intro' && (
+        <IntroScreen onStart={handleIntroFinish} />
+      )}
       {view === 'main' && (
         <MainView
           characters={state.characters}
@@ -509,6 +532,9 @@ export default function App() {
           log={state.logs.find(l => l.id === currentLogId)}
           onBack={() => setView('daily')}
         />
+      )}
+      {popup && (
+        <Popup message={popup.text} onClose={closePopup} />
       )}
         </>
       )}
