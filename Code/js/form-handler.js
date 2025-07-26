@@ -97,7 +97,7 @@ export function setupFormHandlers() {
         state.currentlyEditingId = null;
         resetFormState();
         dom.formTitle.textContent = 'キャラクター追加フォーム';
-        dom.submitButton.textContent = '追加する';
+        dom.submitButton.textContent = '登録する';
         dom.addCharacterForm.style.display = 'block';
         dom.showAddFormButton.style.display = 'none';
         dom.addCharacterForm.dataset.newId = 'char_' + Date.now();
