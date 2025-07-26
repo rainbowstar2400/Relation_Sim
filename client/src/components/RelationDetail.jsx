@@ -21,6 +21,7 @@ export default function RelationDetail({
   relationships = [],
   affections = [],
   emotions = [],
+  nicknames = [],
   logs = [],
   onBack,
 }) {
@@ -33,6 +34,11 @@ export default function RelationDetail({
 
   const emotionAB = getEmotionLabel({ emotions }, charA.id, charB.id) || 'なし'
   const emotionBA = getEmotionLabel({ emotions }, charB.id, charA.id) || 'なし'
+
+  const nicknameAB =
+    nicknames.find(n => n.from === charA.id && n.to === charB.id)?.nickname || ''
+  const nicknameBA =
+    nicknames.find(n => n.from === charB.id && n.to === charA.id)?.nickname || ''
 
   // 両名が登場するログを抽出し新しいものから5件表示
   const histories = logs
@@ -47,14 +53,14 @@ export default function RelationDetail({
   return (
     <section className="mb-6">
       <h2 className="text-sm text-gray-300 border-b border-gray-600 pb-1 mb-2">
-        ▼ {charA.name}⇄{charB.name} 関係詳細
+        ▼ {charA.name} ⇄ {charB.name} 関係詳細
       </h2>
-      <div className="flex justify-between mb-2">
+      <div className="grid grid-cols-2 gap-4 mb-2">
         <div>
-          <p>キャラA: {charA.name}</p>
+          <p>{charA.name}</p>
         </div>
         <div>
-          <p>キャラB: {charB.name}</p>
+          <p>{charB.name}</p>
         </div>
       </div>
       <p className="mb-2">関係ラベル: {label}</p>
@@ -65,7 +71,8 @@ export default function RelationDetail({
             <span className="mr-1">好感度:</span>
             <AffectionBar score={affectionAB} />
           </p>
-          <p>感情ラベル: {emotionAB}</p>
+          <p>印象: {emotionAB}</p>
+          <p>呼び方: {nicknameAB ? `「${nicknameAB}」` : '―'}</p>
         </div>
         <div>
           <p className="mb-1">[{charB.name} → {charA.name}]</p>
@@ -73,11 +80,12 @@ export default function RelationDetail({
             <span className="mr-1">好感度:</span>
             <AffectionBar score={affectionBA} />
           </p>
-          <p>感情ラベル: {emotionBA}</p>
+          <p>印象: {emotionBA}</p>
+          <p>呼び方: {nicknameBA ? `「${nicknameBA}」` : '―'}</p>
         </div>
       </div>
-      <h3 className="text-sm text-gray-300 border-b border-gray-600 pb-1 mb-2">▼ 最近のやり取り履歴</h3>
-      <ul className="list-disc pl-4 mb-2">
+      <h3 className="text-sm text-gray-300 border-b border-gray-600 pb-1 mb-2">▼ 直近の関わり</h3>
+      <ul className="list-none pl-4 mb-2">
         {histories.length === 0 ? (
           <li>履歴なし</li>
         ) : (
