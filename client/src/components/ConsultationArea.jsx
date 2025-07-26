@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, forwardRef, useImperativeHandle } from 'react'
 
 import { adjustLineByPersonality } from '../gpt/adjustLine.js'
 
@@ -9,7 +9,7 @@ import { getEventMood, evaluateConfessionResult, generateConfessionDialogue } fr
 // trusts: 各キャラクターの信頼度
 // updateTrust: 信頼度を更新する関数
 // addLog: ログ追加用関数
-export default function ConsultationArea({ characters, trusts, updateTrust, addLog, removeLog, updateLastConsultation, relationships, emotions, affections, nicknames, updateRelationship, updateEmotion }) {
+export default forwardRef(function ConsultationArea({ characters, trusts, updateTrust, addLog, removeLog, updateLastConsultation, relationships, emotions, affections, nicknames, updateRelationship, updateEmotion, onTutorialComplete }, ref) {
   const [confessTemplates, setConfessTemplates] = useState([])
   const [consultations, setConsultations] = useState([])
   const [current, setCurrent] = useState(null)
@@ -219,6 +219,24 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
     }
   }
 
+  // チュートリアル用の相談を追加
+  const addTutorialConsultation = (char) => {
+    if (consultations.length >= MAX_TOTAL_CONSULTATIONS) return
+    const id = Date.now()
+    const timeout = setTimeout(() => {
+      setConsultations(prev => prev.filter(e => e.id !== id))
+    }, AUTO_INTERVAL_MS)
+    const template = {
+      form: 'choice',
+      core_prompt: '実は少し迷っていることがあるんだ。どう思う？',
+      choices: ['A: いいと思う', 'B: そうだね', 'C: やめておこう'],
+      trust_change: 1
+    }
+    const event = { id, type: 'trouble', char, template, timeout, loading: false }
+    setConsultations(prev => [...prev, event])
+    openPopup(event)
+  }
+
   const openPopup = async (c) => {
     if (c.loading) return
     let text = c.template.core_prompt
@@ -327,7 +345,10 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
       setConsultations(prev => prev.filter(ev => ev.id !== current.id))
     }
     setCurrent(null)
+    if (answered && onTutorialComplete) onTutorialComplete()
   }
+
+  useImperativeHandle(ref, () => ({ addTutorialConsultation }))
 
   return (
     <section className="mb-6">
@@ -409,4 +430,4 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
       )}
     </section>
   )
-}
+})
