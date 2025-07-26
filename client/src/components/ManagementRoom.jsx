@@ -221,12 +221,12 @@ export default function ManagementRoom({
   return (
     <section id="management-room" className="mb-6">
       <h2 className="text-sm text-gray-300 border-b border-gray-600 pb-1 mb-2">▼ 管理室</h2>
-      {!showForm && (
-        <button onClick={() => {setShowForm(true);resetForm()}}>+ キャラクター追加</button>
-      )}
+        {!showForm && (
+        <button onClick={() => {setShowForm(true);resetForm()}}>+ 新規住人登録</button>
+        )}
       {showForm && (
         <form onSubmit={handleSubmit} className="mb-4 border p-2">
-          <h3 className="mb-2">{editingId ? 'キャラクター編集' : 'キャラクター追加'}</h3>
+          <h3 className="mb-2">{editingId ? '住人情報編集' : '新規住人登録'}</h3>
           <div className="mb-2">
             <label className="mr-2">名前:</label>
             <input className="text-black" value={name} onChange={e=>setName(e.target.value)} required />
@@ -243,18 +243,18 @@ export default function ManagementRoom({
               <option value="その他">その他</option>
             </select>
           </div>
-          <h4>性格パラメータ (1-5)</h4>
+          <h4>性格 (1-5)</h4>
           {Object.keys(personality).map(key => (
             <div className="mb-2" key={key}>
               <label className="mr-2">{ key === 'social' ? '社交性' :
-                key === 'kindness' ? '気配り傾向' :
+                key === 'kindness' ? '気配り' :
                 key === 'stubbornness' ? '頑固さ' :
                 key === 'activity' ? '行動力' : '表現力'}: {personality[key]}</label>
               <RangeSlider min={1} max={5} value={personality[key]}
                 onChange={e=>setPersonality(prev=>({...prev,[key]:parseInt(e.target.value)}))} />
             </div>
           ))}
-          <h4>話し方テンプレート</h4>
+          <h4>話し方</h4>
           <div className="mb-2 flex items-center">
             <select className="text-black mr-2" value={talkTemplate} onChange={handleTemplateChange}>
               {speechTemplates.map(t => (
@@ -280,7 +280,7 @@ export default function ManagementRoom({
             <label className="mr-2">興味・関心:</label>
             <input className="text-black" value={interests} onChange={e=>setInterests(e.target.value)} placeholder="例: 読書, 映画鑑賞" />
           </div>
-          <h4>初期関係設定</h4>
+          <h4>元々の関係</h4>
           <div className="border p-2 mb-2">
             <div className="mb-2">
               <label className="mr-2">相手を選択:</label>
@@ -320,10 +320,10 @@ export default function ManagementRoom({
               <label className="mr-2">相手からの呼ばれ方:</label>
               <input className="text-black" value={relForm.nicknameFrom} onChange={e=>setRelForm(prev=>({...prev,nicknameFrom:e.target.value}))} />
             </div>
-            <button type="button" onClick={saveRelation}>この関係を保存</button>
+            <button type="button" onClick={saveRelation}>この関係を登録</button>
             <div className="mt-2">
               {Object.keys(tempRelations).length === 0 ? (
-                <p>設定済みの関係はありません。</p>
+                <p>特に関係を持っていません。</p>
               ) : (
                 <ul className="ml-4 list-none">
                   {Object.entries(tempRelations).map(([id,data])=> (
@@ -377,7 +377,7 @@ export default function ManagementRoom({
           <button type="button" className="ml-2" onClick={()=>{setShowForm(false);resetForm()}}>キャンセル</button>
         </form>
       )}
-      <h3 className="mb-2">▼ 既存キャラクター一覧</h3>
+      <h3 className="mb-2">▼ 住人一覧</h3>
       <ul className="list-none pl-4">
         {characters.map(c => (
           <li key={c.id} className="mb-1 flex justify-between items-center">

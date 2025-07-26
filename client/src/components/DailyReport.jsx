@@ -77,7 +77,7 @@ export default function DailyReport({ reports = {}, characters = [], onBack, onO
         />
       </div>
       <div className="flex items-center mb-2 gap-2">
-        <label htmlFor="char-select" className="mr-1">キャラ:</label>
+        <label htmlFor="char-select" className="mr-1">住人:</label>
         <select
           id="char-select"
           className="text-black"
