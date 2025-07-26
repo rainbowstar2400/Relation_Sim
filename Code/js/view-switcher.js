@@ -34,7 +34,7 @@ export function switchView(viewToShow) {
 
 export function resetFormState() {
     dom.formTitle.textContent = 'キャラクター追加フォーム';
-    dom.submitButton.textContent = '追加する';
+    dom.submitButton.textContent = '登録する';
     dom.addCharacterForm.reset();
     for (const key in dom.personalityValues) {
         dom.personalityValues[key].textContent = '3';
