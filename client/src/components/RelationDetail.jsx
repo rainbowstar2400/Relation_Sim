@@ -63,7 +63,7 @@ export default function RelationDetail({
           <p>{charB.name}</p>
         </div>
       </div>
-      <p className="mb-2">関係ラベル: {label}</p>
+      <p className="mb-2">関係: {label}</p>
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div>
           <p className="mb-1">[{charA.name} → {charB.name}]</p>
