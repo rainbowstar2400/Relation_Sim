@@ -142,13 +142,15 @@ export default function App() {
 
   // localStorageから読み込み
   useEffect(() => {
-    if (isStarting) return
     const saved = loadStateFromLocal()
     if (saved) {
       setState(prev => ({ ...prev, ...saved }))
+      setIsStarting(false)
+      setInitialized(true)
+    } else {
+      setIsStarting(true)
     }
-    setInitialized(true)
-  }, [isStarting])
+  }, [])
 
   // 時間帯補正テーブルを読み込む
   useEffect(() => {
@@ -322,6 +324,7 @@ export default function App() {
       .then(loaded => {
         setState(prev => ({ ...prev, ...loaded }))
         setIsStarting(false)
+        setInitialized(true)
       })
       .catch(() => alert('セーブデータの読み込みに失敗しました'))
   }
@@ -331,6 +334,7 @@ export default function App() {
     setState(initialState)
     localStorage.removeItem('relation_sim_state')
     setIsStarting(false)
+    setInitialized(true)
   }
 
   // 開発用: 手動でランダムイベントを発生させる
