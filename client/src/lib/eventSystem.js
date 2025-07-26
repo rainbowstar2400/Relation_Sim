@@ -91,6 +91,66 @@ function updateAffection(list, from, to, delta, ts = null) {
   return next
 }
 
+// チュートリアル用の挨拶イベント
+// 特定の2人が挨拶を交わす固定イベントを発生させます
+// mood は常に0(普通)とし、好感度は双方+1
+export async function triggerGreetingTutorial(state, setState, addLog, idA, idB) {
+  const a = state.characters.find(c => c.id === idA)
+  const b = state.characters.find(c => c.id === idB)
+  if (!a || !b) return
+
+  const now = Date.now()
+  const relation = getRelationLabel(state.relationships, a.id, b.id)
+  const emotionAB = getEmotionLabel(state, a.id, b.id)
+  const emotionBA = getEmotionLabel(state, b.id, a.id)
+  const nickAB = getNickname(state.nicknames, a.id, b.id)
+  const nickBA = getNickname(state.nicknames, b.id, a.id)
+
+  const desc = `${a.name}と${b.name}が軽く挨拶を交わした。`
+  let detail = desc
+  try {
+    detail = await generateConversation('挨拶', a, b, {
+      relationLabel: relation,
+      emotionLabels: { AtoB: emotionAB, BtoA: emotionBA },
+      affectionScores: { AtoB: getAffection(state.affections, a.id, b.id), BtoA: getAffection(state.affections, b.id, a.id) },
+      timeSlot: getTimeSlot(),
+      date: getDateString(),
+      mood: 0,
+      nicknames: { AtoB: nickAB, BtoA: nickBA }
+    })
+  } catch (err) {
+    addLog(`会話生成エラー: ${err.message}`, 'SYSTEM')
+  }
+
+  const eventLogId = addLog(desc, 'EVENT', detail)
+  const changeLogIdA = addLog(`${a.name}→${b.name}の好感度が上昇しました`, 'SYSTEM')
+  const changeLogIdB = addLog(`${b.name}→${a.name}の好感度が上昇しました`, 'SYSTEM')
+
+  let emotionLogs = []
+  let affections = updateAffection(state.affections, a.id, b.id, 1, now)
+  affections = updateAffection(affections, b.id, a.id, 1, now)
+  let emotions = state.emotions || []
+  let reports = state.reports || {}
+
+  let result = drawEmotionChange(state, emotions, a.id, b.id, 0, reports)
+  emotions = result.emotions
+  reports = result.reports
+  if (result.log) emotionLogs.push(result.log)
+
+  result = drawEmotionChange(state, emotions, b.id, a.id, 0, reports)
+  emotions = result.emotions
+  reports = result.reports
+  if (result.log) emotionLogs.push(result.log)
+
+  reports = addReportEvent(reports, { timestamp: now, description: desc, logId: eventLogId })
+  reports = addReportChange(reports, `${a.name}→${b.name}の好感度が上昇しました`, changeLogIdA)
+  reports = addReportChange(reports, `${b.name}→${a.name}の好感度が上昇しました`, changeLogIdB)
+
+  setState(prev => ({ ...prev, affections, emotions, reports }))
+
+  emotionLogs.forEach(l => addLog(l, 'SYSTEM', l))
+}
+
 
 // ランダムイベントを発生させるメイン関数
 // setState: React の状態更新関数
