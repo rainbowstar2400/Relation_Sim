@@ -317,9 +317,9 @@ export default function App() {
             showPopup(secondText, () => {
               setState(prev => ({ ...prev, tutorialStep: 4 }))
             })
-          }, 1000)
+          }, 3000)
         })
-      }, 1000)
+      }, 3000)
     }
     return () => {
       if (timer) clearTimeout(timer)
