@@ -241,7 +241,7 @@ export default forwardRef(function ConsultationArea({ characters, trusts, update
         core_prompt: res.prompt,
         choices: res.choices || [],
         responses: res.responses || [],
-        trust_change: 1
+        trust_change: 5
       }
       setConsultations(prev =>
         prev.map(e => (e.id === id ? { ...e, template, loading: false } : e))
