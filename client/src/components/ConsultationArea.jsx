@@ -220,25 +220,45 @@ export default forwardRef(function ConsultationArea({ characters, trusts, update
   }
 
   // チュートリアル用の相談を追加
-  const addTutorialConsultation = (char) => {
-    if (consultations.length >= MAX_TOTAL_CONSULTATIONS) return
+  const addTutorialConsultation = async (char, disabled = false) => {
+    if (consultations.length >= MAX_TOTAL_CONSULTATIONS) return null
+    const trust = trusts.find(t => t.id === char.id)?.score || 50
+    const level = chooseLevel(trust)
+    const genre = chooseGenre()
     const id = Date.now()
     const timeout = setTimeout(() => {
       setConsultations(prev => prev.filter(e => e.id !== id))
     }, AUTO_INTERVAL_MS)
-    const template = {
-      form: 'choice',
-      core_prompt: '実は少し迷っていることがあるんだ。どう思う？',
-      choices: ['A: いいと思う', 'B: そうだね', 'C: やめておこう'],
-      trust_change: 1
+    setConsultations(prev => [
+      ...prev,
+      { id, type: 'trouble', char, loading: true, timeout, disabled }
+    ])
+    updateLastConsultation(char.id)
+    try {
+      const res = await generateConsultation({ character: char, genre, level, trust })
+      const template = {
+        form: res.choices ? 'choice' : 'fill',
+        core_prompt: res.prompt,
+        choices: res.choices || [],
+        responses: res.responses || [],
+        trust_change: 1
+      }
+      setConsultations(prev =>
+        prev.map(e => (e.id === id ? { ...e, template, loading: false } : e))
+      )
+    } catch (err) {
+      console.error('consultation generate error', err)
+      setConsultations(prev => prev.filter(e => e.id !== id))
     }
-    const event = { id, type: 'trouble', char, template, timeout, loading: false }
-    setConsultations(prev => [...prev, event])
-    openPopup(event)
+    return id
+  }
+
+  const enableConsultation = (id) => {
+    setConsultations(prev => prev.map(e => (e.id === id ? { ...e, disabled: false } : e)))
   }
 
   const openPopup = async (c) => {
-    if (c.loading) return
+    if (c.loading || c.disabled) return
     let text = c.template.core_prompt
     if (c.type === 'confession') {
       try {
@@ -348,7 +368,7 @@ export default forwardRef(function ConsultationArea({ characters, trusts, update
     if (answered && onTutorialComplete) onTutorialComplete()
   }
 
-  useImperativeHandle(ref, () => ({ addTutorialConsultation }))
+  useImperativeHandle(ref, () => ({ addTutorialConsultation, enableConsultation }))
 
   return (
     <section className="mb-6">
@@ -360,7 +380,7 @@ export default forwardRef(function ConsultationArea({ characters, trusts, update
             <span>
               {c.loading ? '相談を受付中...' : `${c.char.name}から相談があります`}
             </span>
-            <button onClick={() => openPopup(c)} disabled={c.loading}>対応する</button>
+            <button onClick={() => openPopup(c)} disabled={c.loading || c.disabled}>対応する</button>
           </li>
         ))}
       </ul>

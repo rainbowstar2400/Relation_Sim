@@ -329,6 +329,7 @@ export default function App() {
 
   // 相談チュートリアル
   useEffect(() => {
+    let timer1, timer2
     if (
       view === 'main' &&
       state.tutorialStep === 4 &&
@@ -337,14 +338,26 @@ export default function App() {
     ) {
       tutorialFlags.current.step4 = true
       const character = state.characters[0]
-      const text =
-        `なにやら、${character.name} から相談が届いたようです。\n\n` +
-        'さっそく対応してみましょう。'
-      showPopup(text, () => {
+      timer1 = setTimeout(async () => {
+        let eventId = null
         if (consultRef.current) {
-          consultRef.current.addTutorialConsultation(character)
+          eventId = await consultRef.current.addTutorialConsultation(character, true)
         }
-      })
+        timer2 = setTimeout(() => {
+          const text =
+            `なにやら、${character.name} から相談が届いたようです。\n\n` +
+            'さっそく対応してみましょう。'
+          showPopup(text, () => {
+            if (consultRef.current && eventId !== null) {
+              consultRef.current.enableConsultation(eventId)
+            }
+          })
+        }, 1000)
+      }, 1000)
+    }
+    return () => {
+      if (timer1) clearTimeout(timer1)
+      if (timer2) clearTimeout(timer2)
     }
   }, [view, state.tutorialStep])
 
@@ -489,9 +502,11 @@ export default function App() {
       '信頼度が高まるほど、住人はより深い相談をしてくれるようになります。\n\n' +
       'また、相談は最大で3件まで表示され、\n' +
       '必要に応じて追加で受け付けることもできます。'
-    showPopup(message, () => {
-      setState(prev => ({ ...prev, tutorialStep: 5 }))
-    })
+    setTimeout(() => {
+      showPopup(message, () => {
+        setState(prev => ({ ...prev, tutorialStep: 5 }))
+      })
+    }, 3000)
   }
 
   const showStatus = (char) => {
