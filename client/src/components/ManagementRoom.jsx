@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { mbtiQuestions, mbtiDescriptions, mbtiTypes, calculateMbti } from '../lib/mbti.js'
 import RangeSlider from './RangeSlider.jsx'
 import { speechTemplates } from '../lib/speechTemplates.js'
@@ -21,7 +21,11 @@ export default function ManagementRoom({
   affections,
   onSaveCharacter,
   onDeleteCharacter,
-  onBack
+  onBack,
+  tutorialStep,
+  onFirstRegisterComplete,
+  onSecondRegisterStart,
+  onSecondRegisterComplete
 }) {
   const blankPersonality = { social:3, kindness:3, stubbornness:3, activity:3, expressiveness:3 }
   const [showForm, setShowForm] = useState(false)
@@ -40,6 +44,22 @@ export default function ManagementRoom({
   const [mbtiResult, setMbtiResult] = useState('')
   const [showQuestions, setShowQuestions] = useState(false)
   const [tempRelations, setTempRelations] = useState({})
+  // 「元々の関係」セクションの表示制御
+  const [showRelationSection, setShowRelationSection] = useState(characters.length > 1)
+  const relationRef = useRef(null)
+
+  useEffect(() => {
+    if (tutorialStep === 2 && characters.length === 0) {
+      // 新規開始直後はフォームを自動表示
+      setShowForm(true)
+    }
+  }, [tutorialStep, characters.length])
+
+  useEffect(() => {
+    if (characters.length > 1) {
+      setShowRelationSection(true)
+    }
+  }, [characters.length])
 
   const handleTemplateChange = (e) => {
     const value = e.target.value
@@ -106,6 +126,20 @@ export default function ManagementRoom({
     setTempRelations({})
   }
 
+  const handleStartNew = () => {
+    setShowForm(true)
+    resetForm()
+    if (tutorialStep === 2 && characters.length === 1) {
+      setShowRelationSection(true)
+      if (onSecondRegisterStart) onSecondRegisterStart()
+      setTimeout(() => {
+        relationRef.current?.scrollIntoView({ behavior: 'smooth' })
+      }, 0)
+    } else if (characters.length <= 1) {
+      setShowRelationSection(false)
+    }
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!name) return
@@ -140,9 +174,13 @@ export default function ManagementRoom({
       affs.push({ from:id, to:targetId, score:data.affectionTo, lastInteracted: now })
       affs.push({ from:targetId, to:id, score:data.affectionFrom, lastInteracted: now })
     })
+    const first = characters.length === 0 && !editingId
+    const second = characters.length === 1 && !editingId
     onSaveCharacter(char, rels, nicks, affs)
     setShowForm(false)
     resetForm()
+    if (first && onFirstRegisterComplete) onFirstRegisterComplete()
+    if (second && onSecondRegisterComplete) onSecondRegisterComplete()
   }
 
   const handleRelTargetChange = (e) => {
@@ -222,7 +260,7 @@ export default function ManagementRoom({
     <section id="management-room" className="mb-6">
       <h2 className="text-sm text-gray-300 border-b border-gray-600 pb-1 mb-2">▼ 管理室</h2>
         {!showForm && (
-        <button onClick={() => {setShowForm(true);resetForm()}}>+ 新規住人登録</button>
+        <button onClick={handleStartNew}>+ 新規住人登録</button>
         )}
       {showForm && (
         <form onSubmit={handleSubmit} className="mb-4 border p-2">
@@ -280,8 +318,10 @@ export default function ManagementRoom({
             <label className="mr-2">興味・関心:</label>
             <input className="text-black" value={interests} onChange={e=>setInterests(e.target.value)} placeholder="例: 読書, 映画鑑賞" />
           </div>
+          {showRelationSection && (
+            <>
           <h4>元々の関係</h4>
-          <div className="border p-2 mb-2">
+          <div ref={relationRef} className="border p-2 mb-2">
             <div className="mb-2">
               <label className="mr-2">相手を選択:</label>
             <select className="text-black" value={relForm.targetId} onChange={handleRelTargetChange}>
@@ -337,6 +377,8 @@ export default function ManagementRoom({
               )}
             </div>
           </div>
+            </>
+          )}
           <h4>MBTIタイプ</h4>
           <div className="mb-2">
             <button type="button" className={mbtiMode==='diag'?'font-bold mr-2':'mr-2'} onClick={()=>setMbtiMode('diag')}>診断で決定</button>
@@ -377,6 +419,8 @@ export default function ManagementRoom({
           <button type="button" className="ml-2" onClick={()=>{setShowForm(false);resetForm()}}>キャンセル</button>
         </form>
       )}
+      {characters.length > 0 && (
+        <>
       <h3 className="mb-2">▼ 住人一覧</h3>
       <ul className="list-none pl-4">
         {characters.map(c => (
@@ -389,6 +433,8 @@ export default function ManagementRoom({
           </li>
         ))}
       </ul>
+        </>
+      )}
     </section>
   )
 }
