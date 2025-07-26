@@ -49,12 +49,13 @@ export default function App() {
   const [showIntro, setShowIntro] = useState(false)
   const [state, setState] = useState(initialState)
   const stateRef = useRef(state)
+  const consultRef = useRef(null)
   const [initialized, setInitialized] = useState(false)
   const [currentChar, setCurrentChar] = useState(null)
   const [currentPair, setCurrentPair] = useState(null)
   const [currentLogId, setCurrentLogId] = useState(null)
   const [popup, setPopup] = useState(null)
-  const tutorialFlags = useRef({ step3: false })
+  const tutorialFlags = useRef({ step3: false, step4: false })
 
   // state の最新値を保持する参照
   useEffect(() => {
@@ -326,6 +327,40 @@ export default function App() {
     }
   }, [view, state.tutorialStep])
 
+  // 相談チュートリアル
+  useEffect(() => {
+    let timer1, timer2
+    if (
+      view === 'main' &&
+      state.tutorialStep === 4 &&
+      !tutorialFlags.current.step4 &&
+      state.characters.length > 0
+    ) {
+      tutorialFlags.current.step4 = true
+      const character = state.characters[0]
+      timer1 = setTimeout(async () => {
+        let eventId = null
+        if (consultRef.current) {
+          eventId = await consultRef.current.addTutorialConsultation(character, true)
+        }
+        timer2 = setTimeout(() => {
+          const text =
+            `なにやら、${character.name} から相談が届いたようです。\n\n` +
+            'さっそく対応してみましょう。'
+          showPopup(text, () => {
+            if (consultRef.current && eventId !== null) {
+              consultRef.current.enableConsultation(eventId)
+            }
+          })
+        }, 1000)
+      }, 1000)
+    }
+    return () => {
+      if (timer1) clearTimeout(timer1)
+      if (timer2) clearTimeout(timer2)
+    }
+  }, [view, state.tutorialStep])
+
   const saveCharacter = (char, rels = [], nicks = [], affs = []) => {
     setState(prev => {
       let characters = [...prev.characters]
@@ -459,6 +494,21 @@ export default function App() {
     }
   }
 
+  const handleConsultTutorialComplete = () => {
+    const message =
+      '相談に乗ることができましたね。\n\n' +
+      'うまく応じることができると、このように、\n' +
+      'その住人からの信頼度が少し上昇します。\n\n' +
+      '信頼度が高まるほど、住人はより深い相談をしてくれるようになります。\n\n' +
+      'また、相談は最大で3件まで表示され、\n' +
+      '必要に応じて追加で受け付けることもできます。'
+    setTimeout(() => {
+      showPopup(message, () => {
+        setState(prev => ({ ...prev, tutorialStep: 5 }))
+      })
+    }, 3000)
+  }
+
   const showStatus = (char) => {
     setCurrentChar(char)
     setCurrentPair(null)
@@ -492,6 +542,8 @@ export default function App() {
           />
       {view === 'main' && (
         <MainView
+          consultRef={consultRef}
+          onTutorialComplete={handleConsultTutorialComplete}
           characters={state.characters}
           logs={state.logs}
           readLogCount={state.readLogCount}

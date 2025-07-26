@@ -2,7 +2,7 @@ import React from 'react'
 import ConsultationArea from './ConsultationArea.jsx'
 import LogList from './LogList.jsx'
 
-export default function MainView({ characters, onSelect, logs, readLogCount, updateReadLogCount, trusts, addLog, removeLog, updateTrust, updateLastConsultation, relationships, emotions, affections, nicknames, updateRelationship, updateEmotion }) {
+export default function MainView({ characters, onSelect, logs, readLogCount, updateReadLogCount, trusts, addLog, removeLog, updateTrust, updateLastConsultation, relationships, emotions, affections, nicknames, updateRelationship, updateEmotion, consultRef, onTutorialComplete }) {
 
   return (
     <div>
@@ -24,6 +24,7 @@ export default function MainView({ characters, onSelect, logs, readLogCount, upd
         </div>
       </section>
       <ConsultationArea
+        ref={consultRef}
         characters={characters}
         trusts={trusts}
         updateTrust={updateTrust}
@@ -36,6 +37,7 @@ export default function MainView({ characters, onSelect, logs, readLogCount, upd
         nicknames={nicknames}
         updateRelationship={updateRelationship}
         updateEmotion={updateEmotion}
+        onTutorialComplete={onTutorialComplete}
       />
       <section className="mb-2">
         <h2 className="text-sm text-gray-300 border-b border-gray-600 pb-1 mb-2">▼ ログ</h2>
