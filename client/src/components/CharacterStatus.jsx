@@ -75,29 +75,29 @@ export default function CharacterStatus({
 
   return (
     <section id="character-status-view" className="mb-6">
-      <h2 className="text-sm text-gray-300 border-b border-gray-600 pb-1 mb-2">▼ ステータス</h2>
+      <h2 className="text-sm text-gray-300 border-b border-gray-600 pb-1 mb-2">▼ 情報</h2>
       <div className="basic-info mb-2">
         <p>名前: {char.name}</p>
         <p>年齢: {char.age ?? '不明'}</p>
         <p>性別: {char.gender || '不明'}</p>
         <p>MBTI: {char.mbti}</p>
-        <p>話し方テンプレート: {talk.template || '未設定'}</p>
-        <p>説明: {talk.description || '未設定'}</p>
+        <p>話し方: {talk.template || '未設定'}</p>
+        <p className="ml-4">特徴: {talk.description || '未設定'}</p>
         <p>現在状態: {char.condition || '活動中'}</p>
         <p>活動傾向: {char.activityPattern || '通常'}</p>
         <p>信頼度: {trust}</p>
         <p>興味関心: {(char.interests || []).length > 0 ? char.interests.join(', ') : 'なし'}</p>
       </div>
 
-      {/* 性格パラメータのバー表示 */}
-      <h3 className="text-sm text-gray-300 border-b border-gray-600 pb-1 mb-2">▼ 性格パラメータ</h3>
+      {/* 性格のバー表示 */}
+      <h3 className="text-sm text-gray-300 border-b border-gray-600 pb-1 mb-2">▼ 性格</h3>
       <ul className="mb-2 list-none p-0">
         <li className="mb-1">
           社交性:
           <progress value={p.social || 0} max="5" className="ml-2 w-40 h-2" />
         </li>
         <li className="mb-1">
-          気配り傾向:
+          気配り:
           <progress value={p.kindness || 0} max="5" className="ml-2 w-40 h-2" />
         </li>
         <li className="mb-1">
