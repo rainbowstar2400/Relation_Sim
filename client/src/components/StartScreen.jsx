@@ -11,7 +11,7 @@ export default function StartScreen({ onContinue, onNewGame }) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-4 p-4">
+    <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4 p-4">
       <h1 className="text-lg mb-4">セーブデータの選択</h1>
       <button onClick={() => fileInputRef.current?.click()}>続きからはじめる</button>
       <input
