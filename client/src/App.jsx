@@ -38,6 +38,8 @@ const initialState = {
   logs: [],          // CLI 風ログ
   readLogCount: 0,
   reports: {},       // 日報履歴
+  // チュートリアル進行度（2:住人登録チュートリアル、3以降:チュートリアル終了）
+  tutorialStep: 3,
 }
 
 export default function App() {
@@ -144,7 +146,11 @@ export default function App() {
   useEffect(() => {
     const saved = loadStateFromLocal()
     if (saved) {
-      setState(prev => ({ ...prev, ...saved }))
+      setState(prev => ({
+        ...prev,
+        ...saved,
+        tutorialStep: saved.tutorialStep ?? 3,
+      }))
       setIsStarting(false)
       setInitialized(true)
     } else {
@@ -314,7 +320,13 @@ export default function App() {
 
   const handleImport = (file) => {
     importStateFromFile(file)
-      .then(loaded => setState(prev => ({ ...prev, ...loaded })))
+      .then(loaded =>
+        setState(prev => ({
+          ...prev,
+          ...loaded,
+          tutorialStep: loaded.tutorialStep ?? 3,
+        }))
+      )
       .catch(() => alert('読み込みに失敗しました'))
   }
 
@@ -322,7 +334,11 @@ export default function App() {
   const handleLoadSaveData = (file) => {
     importStateFromFile(file)
       .then(loaded => {
-        setState(prev => ({ ...prev, ...loaded }))
+        setState(prev => ({
+          ...prev,
+          ...loaded,
+          tutorialStep: loaded.tutorialStep ?? 3,
+        }))
         setIsStarting(false)
         setInitialized(true)
       })
@@ -331,10 +347,11 @@ export default function App() {
 
   // スタート画面: 新しく始める
   const handleNewGame = () => {
-    setState(initialState)
+    setState({ ...initialState, tutorialStep: 2 })
     localStorage.removeItem('relation_sim_state')
     setIsStarting(false)
     setInitialized(true)
+    setView('management')
   }
 
   // 開発用: 手動でランダムイベントを発生させる
@@ -343,6 +360,40 @@ export default function App() {
       await triggerRandomEvent(stateRef.current, setState, addLog)
     } catch (err) {
       addLog(`イベント実行エラー: ${err.message}`, 'SYSTEM')
+    }
+  }
+
+  // チュートリアル用コールバック
+  const handleFirstRegisterComplete = () => {
+    if (state.tutorialStep === 2) {
+      alert(
+        '一人目の住人が登録できました！\n' +
+          '登録した住人は、こちらの住人一覧に表示されます。\n\n' +
+          '次は、二人目の住人を登録してみましょう。\n' +
+          '「新規住人登録」から追加することができます。'
+      )
+    }
+  }
+
+  const handleSecondRegisterStart = () => {
+    if (state.tutorialStep === 2) {
+      alert(
+        '二人目以降の住人には、他の住人との関係性を予め設定することができます。\n\n' +
+          'この「好感度」は、お互いについてどれだけ好ましく思っているかを示します。'
+      )
+    }
+  }
+
+  const handleSecondRegisterComplete = () => {
+    if (state.tutorialStep === 2) {
+      alert(
+        '二人目の住人の登録が完了しました！\n\n' +
+          'これで箱庭の暮らしが始まります。\n' +
+          'どんな関係が生まれていくのか、ぜひ見守ってみてください。\n\n' +
+          'それでは、ホームへ進みましょう。'
+      )
+      setView('main')
+      setState(prev => ({ ...prev, tutorialStep: 3 }))
     }
   }
 
@@ -398,6 +449,10 @@ export default function App() {
           relationships={state.relationships}
           nicknames={state.nicknames}
           affections={state.affections}
+          tutorialStep={state.tutorialStep}
+          onFirstRegisterComplete={handleFirstRegisterComplete}
+          onSecondRegisterStart={handleSecondRegisterStart}
+          onSecondRegisterComplete={handleSecondRegisterComplete}
           onSaveCharacter={saveCharacter}
           onDeleteCharacter={deleteCharacter}
           onBack={() => {
