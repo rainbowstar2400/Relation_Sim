@@ -1,14 +1,25 @@
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useRef, useState, useEffect, useMemo } from 'react'
 
 // スタート画面。続きから始める・新しく始めるの選択肢を表示する
 export default function StartScreen({ onContinue, onNewGame, showIntro, onIntroFinish }) {
   const fileInputRef = useRef(null)
-  const texts = [
+  // 元の導入文。句点(「。」)で区切って段落に変換する
+  const rawTexts = [
     'ようこそ、「Relation Sim」の世界へ。',
     'ここは、あなたのキャラクターたちが暮らす小さな箱庭。彼らは日々の中で、少しずつ関係を築いていきます。',
     'どんなつながりが生まれていくのかは、まだ誰にもわかりません。あなたは、その日常をそっと見守ることができます。',
     'まずは、一人目の住人を迎え入れてみましょう。',
   ]
+  // 句点ごとに区切って、1文ずつの配列に変換
+  const texts = useMemo(() => {
+    const sentences = []
+    rawTexts.forEach(p => {
+      p.split('。').forEach(s => {
+        if (s) sentences.push(s + '。')
+      })
+    })
+    return sentences
+  }, [])
 
   // 表示完了した段落の一覧
   const [finished, setFinished] = useState([])
@@ -28,7 +39,7 @@ export default function StartScreen({ onContinue, onNewGame, showIntro, onIntroF
     if (!showIntro) return
     if (finished.length >= texts.length) return
 
-    const full = texts[finished.length].replace(/。/g, '。\n')
+    const full = texts[finished.length]
     let i = 0
     setTyping('')
     const timer = setInterval(() => {
@@ -43,7 +54,7 @@ export default function StartScreen({ onContinue, onNewGame, showIntro, onIntroF
       }
     }, 50)
     return () => clearInterval(timer)
-  }, [showIntro, finished])
+  }, [showIntro, finished, texts])
 
   const handleSelectFile = (e) => {
     const file = e.target.files?.[0]
