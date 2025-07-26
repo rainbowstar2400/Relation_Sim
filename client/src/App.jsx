@@ -288,28 +288,39 @@ export default function App() {
 
   // ホーム画面に入った直後のチュートリアル
   useEffect(() => {
-    if (view === 'main' && state.tutorialStep === 3 && !tutorialFlags.current.step3 && state.characters.length >= 2) {
+    let timer
+    if (
+      view === 'main' &&
+      state.tutorialStep === 3 &&
+      !tutorialFlags.current.step3 &&
+      state.characters.length >= 2
+    ) {
       tutorialFlags.current.step3 = true
-      const firstText =
-        'ここがホームです。\n\n' +
-        'ホームでは、住人たちの会話を眺めたり、\n' +
-        '彼らからの相談に応じたりすることができます。\n\n' +
-        '……おや？'
-      showPopup(firstText, async () => {
-        const [c1, c2] = stateRef.current.characters
-        await triggerGreetingTutorial(stateRef.current, setState, addLog, c1.id, c2.id)
-        const secondText =
-          '今、二人の住人がすれ違い、挨拶を交わしたようです。\n\n' +
-          'このように、住人どうしの会話や出来事は、\n' +
-          'そのときに起こった変化とともに、ログに表示されます。\n\n' +
-          '今回は「好感度」が少し上がりましたが、\n' +
-          '場合によっては、関係性や印象が変わることもあります。\n\n' +
-          'すべての出来事は、このログから見守ることができます。\n\n' +
-          'なお、古いログは確認済みになると、順次非表示になります。'
-        showPopup(secondText, () => {
-          setState(prev => ({ ...prev, tutorialStep: 4 }))
+      timer = setTimeout(() => {
+        const firstText =
+          'ここがホームです。\n\n' +
+          'ホームでは、住人たちの会話を眺めたり、\n' +
+          '彼らからの相談に応じたりすることができます。\n\n' +
+          '……おや？'
+        showPopup(firstText, async () => {
+          const [c1, c2] = stateRef.current.characters
+          await triggerGreetingTutorial(stateRef.current, setState, addLog, c1.id, c2.id)
+          const secondText =
+            '今、二人の住人がすれ違い、挨拶を交わしたようです。\n\n' +
+            'このように、住人どうしの会話や出来事は、\n' +
+            'そのときに起こった変化とともに、ログに表示されます。\n\n' +
+            '今回は「好感度」が少し上がりましたが、\n' +
+            '場合によっては、関係性や印象が変わることもあります。\n\n' +
+            'すべての出来事は、このログから見守ることができます。\n\n' +
+            'なお、古いログは確認済みになると、順次非表示になります。'
+          showPopup(secondText, () => {
+            setState(prev => ({ ...prev, tutorialStep: 4 }))
+          })
         })
-      })
+      }, 1000)
+    }
+    return () => {
+      if (timer) clearTimeout(timer)
     }
   }, [view, state.tutorialStep])
 
