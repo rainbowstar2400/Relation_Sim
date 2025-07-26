@@ -402,6 +402,7 @@ export default function App() {
           relationships={state.relationships}
           affections={state.affections}
           emotions={state.emotions}
+          nicknames={state.nicknames}
           logs={state.logs}
           onBack={() => {
             setCurrentPair(null)

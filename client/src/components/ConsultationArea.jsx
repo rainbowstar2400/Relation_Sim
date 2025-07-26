@@ -337,7 +337,7 @@ export default function ConsultationArea({ characters, trusts, updateTrust, addL
         {consultations.map(c => (
           <li key={c.id} className="flex justify-between bg-gray-700 rounded px-2 py-1 mb-1">
             <span>
-              ・{c.loading ? '相談を受付中...' : `${c.char.name}から相談があります`}
+              {c.loading ? '相談を受付中...' : `${c.char.name}から相談があります`}
             </span>
             <button onClick={() => openPopup(c)} disabled={c.loading}>対応する</button>
           </li>
