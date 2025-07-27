@@ -779,21 +779,27 @@ export default function App() {
 
   // チュートリアル終了の案内（ステップ8）
   useEffect(() => {
+    let timer
     if (
       view === 'main' &&
       state.tutorialStep === 8 &&
       !tutorialFlags.current.step8
     ) {
-      showPopup(
-        'お疲れさまでした！\n\n' +
-          'これで、あなたはもう立派な管理人です。\n' +
-          '住人たちの毎日を、これからゆっくりと見守ってあげてくださいね。\n\n' +
-          'そして、こまめなセーブもお忘れなく。',
-        () => {
-          tutorialFlags.current.step8 = true
-          setState(prev => ({ ...prev, tutorialStep: 9 }))
-        }
-      )
+      timer = setTimeout(() => {
+        showPopup(
+          'お疲れさまでした！\n\n' +
+            'これで、あなたはもう立派な管理人です。\n' +
+            '住人たちの毎日を、これからゆっくりと見守ってあげてくださいね。\n\n' +
+            'そして、こまめなセーブもお忘れなく。',
+          () => {
+            tutorialFlags.current.step8 = true
+            setState(prev => ({ ...prev, tutorialStep: 9 }))
+          }
+        )
+      }, 1000)
+    }
+    return () => {
+      if (timer) clearTimeout(timer)
     }
   }, [view, state.tutorialStep])
 
