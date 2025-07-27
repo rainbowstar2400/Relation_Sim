@@ -36,6 +36,7 @@ export default function ManagementRoom({
   const [personality, setPersonality] = useState(blankPersonality)
   const [talkTemplate, setTalkTemplate] = useState('優しい敬語')
   const [talkDesc, setTalkDesc] = useState('')
+  const [tone, setTone] = useState('')
   const [activityPattern, setActivityPattern] = useState('通常')
   const [interests, setInterests] = useState('')
   const [mbtiMode, setMbtiMode] = useState('diag')
@@ -85,6 +86,7 @@ export default function ManagementRoom({
     setTalkTemplate(tmpl)
     const found = speechTemplates.find(t => t.template === tmpl)
     setTalkDesc(char.talkStyle?.description ?? found?.description ?? '')
+    setTone(char.tone || '')
     setActivityPattern(char.activityPattern || '通常')
     setInterests((char.interests || []).join(', '))
     setMbtiManual(char.mbti || 'INFP')
@@ -118,6 +120,7 @@ export default function ManagementRoom({
     setPersonality(blankPersonality)
     setTalkTemplate('優しい敬語')
     setTalkDesc(speechTemplates.find(t=>t.template==='優しい敬語')?.description || '')
+    setTone('')
     setActivityPattern('通常')
     setInterests('')
     setMbtiMode('diag')
@@ -179,6 +182,7 @@ export default function ManagementRoom({
       mbti: mbtiMode === 'diag' ? (mbtiResult || calculateMbti(mbtiSliders, personality)) : mbtiManual,
       mbti_slider: mbtiMode === 'diag' ? mbtiSliders : [],
       talkStyle: { template: talkTemplate, description: talkDesc },
+      tone,
       activityPattern,
       interests: interests.split(',').map(i => i.trim()).filter(i => i),
       condition: existing?.condition || '活動中',
@@ -338,13 +342,17 @@ export default function ManagementRoom({
                 </option>
               ))}
             </select>
-            {talkTemplate === 'その他' ? (
-              <input className="text-black flex-1" value={talkDesc} onChange={e=>setTalkDesc(e.target.value)} placeholder="自由記述" />
-            ) : (
-              <span>{talkDesc}</span>
-            )}
-          </div>
-          <h4>活動傾向</h4>
+          {talkTemplate === 'その他' ? (
+            <input className="text-black flex-1" value={talkDesc} onChange={e=>setTalkDesc(e.target.value)} placeholder="自由記述" />
+          ) : (
+            <span>{talkDesc}</span>
+          )}
+        </div>
+        <div className="mb-2">
+          <label className="mr-2">口調:</label>
+          <input className="text-black" value={tone} onChange={e => setTone(e.target.value)} placeholder="例: 丁寧だが砕けた" />
+        </div>
+        <h4>活動傾向</h4>
           <div className="mb-2">
             <label className="mr-2"><input type="radio" name="act" value="通常" checked={activityPattern==='通常'} onChange={e=>setActivityPattern(e.target.value)} />通常</label>
             <label className="ml-4 mr-2"><input type="radio" name="act" value="朝型" checked={activityPattern==='朝型'} onChange={e=>setActivityPattern(e.target.value)} />朝型</label>

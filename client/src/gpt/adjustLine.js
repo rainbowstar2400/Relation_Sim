@@ -9,6 +9,7 @@ function buildAdjustmentPrompt(text, char) {
 # キャラクター情報
 - 名前: ${char.name}
  - 話し方テンプレート: ${talkTemplate}
+- 口調: ${char.tone || ''}
 - style_modifiers: ${JSON.stringify(modifiers)}
 
 # セリフ

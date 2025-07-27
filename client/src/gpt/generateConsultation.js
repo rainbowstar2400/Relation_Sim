@@ -10,6 +10,7 @@ function buildConsultPrompt(character, genre, level, trust) {
     `信頼度: ${trust}\n` +
     `ジャンル: ${genre}\n` +
     `レベル: ${level}\n` +
+    `口調: ${character.tone || ''}\n` +
     `style_modifiers: ${JSON.stringify(modifiers)}\n` +
     `# 出力形式\n` +
     `{ "prompt": "相談文", "choices": ["<選択肢1>", "<選択肢2>", "<選択肢3>"], "trust_change": 0, "responses": ["<返答1>", "<返答2>", "<返答3>"] }`
