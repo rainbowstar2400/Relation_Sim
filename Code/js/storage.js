@@ -37,7 +37,12 @@ export function exportState(state) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'state.json';
+    const now = new Date();
+    // ファイル名を「YYYY-M-D-HH:MM.json」の形式で生成
+    const fileName =
+        `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}-${now.getHours()}:` +
+        `${now.getMinutes().toString().padStart(2, '0')}.json`;
+    a.download = fileName;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
