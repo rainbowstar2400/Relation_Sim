@@ -209,7 +209,7 @@ export default function ManagementRoom({
 
   const handleCancel = () => {
     // 確認ダイアログで「いいえ」を選択したら何もしない
-    if (!window.confirm('登録をキャンセルしますか？')) return
+    if (!window.confirm('登録をキャンセルしますか？</br>（OKで登録をキャンセルします）')) return
     setShowForm(false)
     resetForm()
   }

@@ -360,7 +360,7 @@ export default function App() {
     ) {
       const characterA = state.characters[0]
       const message =
-        'この「みんなの様子」では、\n' +
+        '「みんなの様子」では、\n' +
         '住人たちの現在の様子を一覧で確認することができます。\n\n' +
         `試しに、${characterA.name} の様子を見てみましょう。`
       timer = setTimeout(() => {
