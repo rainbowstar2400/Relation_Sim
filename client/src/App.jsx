@@ -436,14 +436,16 @@ export default function App() {
       !tutorialFlags.current.step7Detail
     ) {
       tutorialFlags.current.step7Detail = true
-      showPopup('このように、過去の会話を振り返ることができます。', () => {
-        timer = setTimeout(() => {
-          showPopup('では、ホームに戻りましょう。', () => {
-            setView('main')
-            setState(prev => ({ ...prev, tutorialStep: 8 }))
-          })
-        }, 3000)
-      })
+      timer = setTimeout(() => {
+        showPopup('このように、過去の会話を振り返ることができます。', () => {
+          timer = setTimeout(() => {
+            showPopup('では、ホームに戻りましょう。', () => {
+              setView('main')
+              setState(prev => ({ ...prev, tutorialStep: 8 }))
+            })
+          }, 3000)
+        })
+      }, 1000)
     }
     return () => {
       if (timer) clearTimeout(timer)
