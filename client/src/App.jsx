@@ -50,6 +50,8 @@ export default function App() {
   const [state, setState] = useState(initialState)
   const stateRef = useRef(state)
   const consultRef = useRef(null)
+  // ステップ4の相談イベントIDを保持
+  const consultEventIdRef = useRef(null)
   const [initialized, setInitialized] = useState(false)
   const [currentChar, setCurrentChar] = useState(null)
   const [currentPair, setCurrentPair] = useState(null)
@@ -310,7 +312,11 @@ export default function App() {
           '彼らからの相談に応じたりすることができます。\n\n' +
           '……おや？'
         showPopup(firstText, () => {
-          setTimeout(() => {
+          setTimeout(async () => {
+            const char = stateRef.current.characters[0]
+            if (consultRef.current) {
+              consultEventIdRef.current = await consultRef.current.addTutorialConsultation(char, true)
+            }
             const secondText =
               '今、二人の住人がすれ違い、挨拶を交わしたようです。\n\n' +
               'このように、住人どうしの会話や出来事は、\n' +
@@ -319,8 +325,11 @@ export default function App() {
               '場合によっては、関係性や印象が変わることもあります。\n\n' +
               'すべての出来事は、このログから見守ることができます。\n\n' +
               'なお、古いログは確認済みになると、順次非表示になります。'
-            showPopup(secondText)
-            setState(prev => ({ ...prev, tutorialStep: 4 }))
+            showPopup(secondText, () => {
+              setTimeout(() => {
+                setState(prev => ({ ...prev, tutorialStep: 4 }))
+              }, 3000)
+            })
           }, 5000)
         })
         const [c1, c2] = stateRef.current.characters
@@ -359,7 +368,7 @@ export default function App() {
 
   // 相談チュートリアル
   useEffect(() => {
-    let timer1, timer2
+    let timer
     if (
       view === 'main' &&
       state.tutorialStep === 4 &&
@@ -368,26 +377,22 @@ export default function App() {
     ) {
       tutorialFlags.current.step4 = true
       const character = state.characters[0]
-      timer1 = setTimeout(async () => {
-        let eventId = null
-        if (consultRef.current) {
-          eventId = await consultRef.current.addTutorialConsultation(character, true)
+      timer = setTimeout(async () => {
+        if (consultEventIdRef.current === null && consultRef.current) {
+          consultEventIdRef.current = await consultRef.current.addTutorialConsultation(character, true)
         }
-        timer2 = setTimeout(() => {
-          const text =
-            `なにやら、${character.name} から相談が届いたようです。\n\n` +
-            'さっそく対応してみましょう。'
-          showPopup(text, () => {
-            if (consultRef.current && eventId !== null) {
-              consultRef.current.enableConsultation(eventId)
-            }
-          })
-        }, 1000)
+        const text =
+          `なにやら、${character.name} から相談が届いたようです。\n\n` +
+          'さっそく対応してみましょう。'
+        showPopup(text, () => {
+          if (consultRef.current && consultEventIdRef.current !== null) {
+            consultRef.current.enableConsultation(consultEventIdRef.current)
+          }
+        })
       }, 0)
     }
     return () => {
-      if (timer1) clearTimeout(timer1)
-      if (timer2) clearTimeout(timer2)
+      if (timer) clearTimeout(timer)
     }
   }, [view, state.tutorialStep])
 
