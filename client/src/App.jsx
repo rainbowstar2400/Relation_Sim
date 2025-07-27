@@ -350,7 +350,6 @@ export default function App() {
       timer = setTimeout(() => {
         showPopup(message, () => {
           tutorialFlags.current.step5 = true
-          showStatus(characterA)
         })
       }, 3000)
     }
@@ -578,9 +577,7 @@ export default function App() {
         `試しに、${state.characters[1].name} との関係を詳しく見てみましょう。`
       showPopup(first, () => {
         timer = setTimeout(() => {
-          showPopup(second, () => {
-            showRelationDetail(state.characters[0].id, state.characters[1].id)
-          })
+          showPopup(second)
         }, 5000)
       })
     }
