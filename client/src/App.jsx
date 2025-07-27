@@ -63,7 +63,36 @@ export default function App() {
     step5: false,
     step5Status: false,
     step5Detail: false,
+    step6: false,
   })
+  const step6TimerRef = useRef(null)
+  const step6NextIndexRef = useRef(0)
+  const step6WaitingSaveRef = useRef(false)
+
+  const step6Messages = [
+    '先ほど行った住人の登録や、住人情報の編集は、\n管理室からいつでも行うことができます。',
+    '日報からは、ログに表示された会話や\n住人たちの変化を一覧できます。\nこの後、実際に見に行ってみましょう。',
+    'このゲームはオートセーブに対応しており、\nロードからファイルを読み込むことで、保存時点からプレイを再開することができます。',
+    'リセットを押すとデータを初期化できますが、\nロードからデータを復元することも可能です。',
+    '今の状態をセーブしておきましょう。',
+    '画面右上には、現在の日時が表示されています。\n時間はゲーム内でも進み、住人たちはそれぞれの生活を続けていきます。',
+    'では、日報を見てみましょう。',
+  ]
+
+  const runStep6Sequence = (idx) => {
+    step6NextIndexRef.current = idx + 1
+    showPopup(step6Messages[idx], () => {
+      const next = idx + 1
+      if (idx === 4) {
+        // セーブ完了後に次の案内を表示する
+        step6WaitingSaveRef.current = true
+      } else if (next < step6Messages.length) {
+        step6TimerRef.current = setTimeout(() => runStep6Sequence(next), 1000)
+      } else {
+        setState(prev => ({ ...prev, tutorialStep: 7 }))
+      }
+    })
+  }
 
   // state の最新値を保持する参照
   useEffect(() => {
@@ -437,6 +466,14 @@ export default function App() {
 
   const handleExport = () => {
     exportState(state)
+    if (step6WaitingSaveRef.current) {
+      step6WaitingSaveRef.current = false
+      // セーブ完了を確認したら少し待って次の案内を出す
+      step6TimerRef.current = setTimeout(
+        () => runStep6Sequence(step6NextIndexRef.current),
+        2000
+      )
+    }
   }
 
   const handleImport = (file) => {
@@ -468,8 +505,10 @@ export default function App() {
   }
 
   const closePopup = () => {
-    if (popup?.afterClose) popup.afterClose()
+    const callback = popup?.afterClose
+    // 先にポップアップを閉じてから次の処理を行う
     setPopup(null)
+    if (callback) callback()
   }
 
   // スタート画面: セーブデータを読み込む
@@ -646,6 +685,24 @@ export default function App() {
       if (timer) clearTimeout(timer)
     }
   }, [view, state.tutorialStep, currentPair])
+
+  // ホーム画面での案内（ステップ6）
+  useEffect(() => {
+    if (
+      view === 'main' &&
+      state.tutorialStep === 6 &&
+      !tutorialFlags.current.step6
+    ) {
+      tutorialFlags.current.step6 = true
+      step6TimerRef.current = setTimeout(() => runStep6Sequence(0), 1000)
+    }
+    return () => {
+      if (step6TimerRef.current) {
+        clearTimeout(step6TimerRef.current)
+        step6TimerRef.current = null
+      }
+    }
+  }, [view, state.tutorialStep])
 
   return (
     <div className="max-w-[50rem] mx-auto border border-gray-600 bg-panel p-4 rounded text-gray-100 min-h-screen">
