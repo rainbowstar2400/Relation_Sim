@@ -384,14 +384,13 @@ export default function App() {
         if (consultEventIdRef.current === null && consultRef.current) {
           consultEventIdRef.current = await consultRef.current.addTutorialConsultation(character, true)
         }
+        if (consultRef.current && consultEventIdRef.current !== null) {
+          consultRef.current.enableConsultation(consultEventIdRef.current)
+        }
         const text =
           `なにやら、${character.name} から相談が届いたようです。\n\n` +
           'さっそく対応してみましょう。'
-        showPopup(text, () => {
-          if (consultRef.current && consultEventIdRef.current !== null) {
-            consultRef.current.enableConsultation(consultEventIdRef.current)
-          }
-        })
+        showPopup(text)
       }, 0)
     }
     return () => {
