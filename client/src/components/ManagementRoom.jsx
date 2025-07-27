@@ -207,6 +207,13 @@ export default function ManagementRoom({
     if (second && onSecondRegisterComplete) onSecondRegisterComplete()
   }
 
+  const handleCancel = () => {
+    if (window.confirm('登録をキャンセルしますか？')) {
+      setShowForm(false)
+      resetForm()
+    }
+  }
+
   const handleRelTargetChange = (e) => {
     const targetId = e.target.value
     if (!targetId) {
@@ -452,7 +459,7 @@ export default function ManagementRoom({
             </div>
           )}
           <button type="submit" className="mt-2">{editingId ? '更新する' : '登録する'}</button>
-          <button type="button" className="ml-2" onClick={()=>{setShowForm(false);resetForm()}}>キャンセル</button>
+          <button type="button" className="ml-2" onClick={handleCancel}>キャンセル</button>
         </form>
       )}
       {characters.length > 0 && (
