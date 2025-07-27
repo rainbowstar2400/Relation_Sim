@@ -63,6 +63,7 @@ export default function App() {
     step5: false,
     step5Status: false,
     step5Detail: false,
+    step6: false,
   })
 
   // state の最新値を保持する参照
@@ -646,6 +647,43 @@ export default function App() {
       if (timer) clearTimeout(timer)
     }
   }, [view, state.tutorialStep, currentPair])
+
+  // ホーム画面での案内（ステップ6）
+  useEffect(() => {
+    let timer
+    if (
+      view === 'main' &&
+      state.tutorialStep === 6 &&
+      !tutorialFlags.current.step6
+    ) {
+      tutorialFlags.current.step6 = true
+      const messages = [
+        '先ほど行った住人の登録や、住人情報の編集は、\n管理室からいつでも行うことができます。',
+        '日報からは、ログに表示された会話や\n住人たちの変化を一覧できます。\nこの後、実際に見に行ってみましょう。',
+        'このゲームはオートセーブに対応しており、\nロードからファイルを読み込むことで、保存時点からプレイを再開することができます。',
+        'リセットを押すとデータを初期化できますが、\nロードからデータを復元することも可能です。',
+        '今の状態をセーブしておきましょう。',
+        '画面右上には、現在の日時が表示されています。\n時間はゲーム内でも進み、住人たちはそれぞれの生活を続けていきます。',
+        'では、日報を見てみましょう。',
+      ]
+
+      const showNext = (idx) => {
+        if (idx < messages.length - 1) {
+          showPopup(messages[idx], () => showNext(idx + 1))
+        } else {
+          showPopup(messages[idx], () => {
+            setView('daily')
+            setState(prev => ({ ...prev, tutorialStep: 7 }))
+          })
+        }
+      }
+
+      timer = setTimeout(() => showNext(0), 1000)
+    }
+    return () => {
+      if (timer) clearTimeout(timer)
+    }
+  }, [view, state.tutorialStep])
 
   return (
     <div className="max-w-[50rem] mx-auto border border-gray-600 bg-panel p-4 rounded text-gray-100 min-h-screen">
