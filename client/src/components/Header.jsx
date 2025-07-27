@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react'
 
-// 開発用イベント発生ボタンのハンドラ onDevEvent を追加
-export default function Header({ onChangeView, onSave, onLoad, onDevEvent }) {
+// ヘッダー。各画面への移動やセーブ/ロードなどを行う
+// リセットボタン用の onReset ハンドラを受け取る
+export default function Header({ onChangeView, onSave, onLoad, onReset }) {
   const [time, setTime] = useState('')
   const [date, setDate] = useState('')
   const fileInputRef = useRef(null)
@@ -23,8 +24,8 @@ export default function Header({ onChangeView, onSave, onLoad, onDevEvent }) {
       <button onClick={() => onChangeView('main')}>ホーム</button>
       <button onClick={() => onChangeView('management')}>管理室</button>
       <button onClick={() => onChangeView('daily')}>日報</button>
-      {/* 開発用: 手動でランダムイベントを発生させる */}
-      <button onClick={onDevEvent}>イベント発生（開発用）</button>
+      {/* セーブデータを初期化するリセットボタン */}
+      <button onClick={onReset}>リセット</button>
       <button onClick={onSave}>セーブ</button>
       <button onClick={() => fileInputRef.current?.click()}>ロード</button>
       <input
