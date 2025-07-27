@@ -350,6 +350,7 @@ export default function App() {
       timer = setTimeout(() => {
         showPopup(message, () => {
           tutorialFlags.current.step5 = true
+          showStatus(characterA)
         })
       }, 3000)
     }
@@ -556,6 +557,7 @@ export default function App() {
 
   // ステータス画面での説明
   useEffect(() => {
+    let timer
     if (
       view === 'status' &&
       state.tutorialStep === 5 &&
@@ -571,7 +573,19 @@ export default function App() {
         '他の住人との関係、最近の出来事などを確認できます。\n\n' +
         '関係一覧では、表示されている住人を選ぶことで、\n' +
         'それぞれとの好感度や呼び方など、大まかな関係の情報を見ることができます。'
-      showPopup(first)
+      const second =
+        '「詳細」を選ぶと、さらに詳しい情報が見られます。\n\n' +
+        `試しに、${state.characters[1].name} との関係を詳しく見てみましょう。`
+      showPopup(first, () => {
+        timer = setTimeout(() => {
+          showPopup(second, () => {
+            showRelationDetail(state.characters[0].id, state.characters[1].id)
+          })
+        }, 5000)
+      })
+    }
+    return () => {
+      if (timer) clearTimeout(timer)
     }
   }, [view, state.tutorialStep, currentChar])
 
