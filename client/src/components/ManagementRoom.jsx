@@ -167,9 +167,21 @@ export default function ManagementRoom({
     }
   }
 
+  // 登録ボタン押下時の処理
+  // 未入力項目がある場合は確認ダイアログを表示する
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!name) return
+    const hasEmpty =
+      !age ||
+      !firstPerson.trim() ||
+      !interests.trim() ||
+      (mbtiMode === 'manual' && !mbtiManual)
+
+    if (hasEmpty) {
+      const ok = window.confirm('未入力の項目が残っています。よろしいですか？')
+      if (!ok) return
+    }
     const id = editingId || 'char_' + Date.now()
     const existing = characters.find(c => c.id === id)
     const times = existing ? { sleepStart: existing.sleepStart, sleepEnd: existing.sleepEnd } : drawSleepTimes(activityPattern)
@@ -459,10 +471,18 @@ export default function ManagementRoom({
             </div>
           )}
           {mbtiMode==='manual' && (
-            <div className="mb-2">
-              <select className="text-black" value={mbtiManual} onChange={e=>setMbtiManual(e.target.value)}>
-                {mbtiTypes.map(t=> <option key={t} value={t}>{t}</option>)}
+            <div className="mb-2 flex items-center">
+              <select
+                className="text-black"
+                value={mbtiManual}
+                onChange={e => setMbtiManual(e.target.value)}
+              >
+                {mbtiTypes.map(t => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
               </select>
+              {/* 選択したMBTIの説明を右に表示 */}
+              <span className="ml-2">{mbtiDescriptions[mbtiManual]}</span>
             </div>
           )}
           <button type="submit" className="mt-2">{editingId ? '更新する' : '登録する'}</button>
