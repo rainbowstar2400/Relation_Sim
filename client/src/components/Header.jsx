@@ -24,10 +24,10 @@ export default function Header({ onChangeView, onSave, onLoad, onReset }) {
       <button onClick={() => onChangeView('main')}>ホーム</button>
       <button onClick={() => onChangeView('management')}>管理室</button>
       <button onClick={() => onChangeView('daily')}>日報</button>
-      {/* セーブデータを初期化するリセットボタン */}
-      <button onClick={onReset}>リセット</button>
       <button onClick={onSave}>セーブ</button>
       <button onClick={() => fileInputRef.current?.click()}>ロード</button>
+      {/* セーブデータを初期化するリセットボタン。ロードボタンの右隣に配置 */}
+      <button onClick={onReset}>リセット</button>
       <input
         type="file"
         accept="application/json"
