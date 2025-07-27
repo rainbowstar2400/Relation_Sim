@@ -451,6 +451,17 @@ export default function App() {
       .catch(() => alert('読み込みに失敗しました'))
   }
 
+  // セーブデータを削除してスタート画面に戻る
+  const handleReset = () => {
+    if (window.confirm('本当にリセットしてよろしいですか？')) {
+      localStorage.removeItem('relation_sim_state')
+      setState(initialState)
+      setView('main')
+      setShowIntro(false)
+      setIsStarting(true)
+    }
+  }
+
   // ポップアップ表示ヘルパー
   const showPopup = (text, afterClose) => {
     setPopup({ text, afterClose })
@@ -497,14 +508,6 @@ export default function App() {
     }, 1000)
   }
 
-  // 開発用: 手動でランダムイベントを発生させる
-  const handleDevEvent = async () => {
-    try {
-      await triggerRandomEvent(stateRef.current, setState, addLog)
-    } catch (err) {
-      addLog(`イベント実行エラー: ${err.message}`, 'SYSTEM')
-    }
-  }
 
   // チュートリアル用コールバック
   const handleFirstRegisterComplete = () => {
@@ -659,7 +662,7 @@ export default function App() {
             onChangeView={setView}
             onSave={handleExport}
             onLoad={handleImport}
-            onDevEvent={handleDevEvent}
+            onReset={handleReset}
           />
       {view === 'main' && (
         <MainView
