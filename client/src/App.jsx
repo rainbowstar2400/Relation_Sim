@@ -52,6 +52,8 @@ export default function App() {
   const consultRef = useRef(null)
   // ステップ4の相談イベントIDを保持
   const consultEventIdRef = useRef(null)
+  // 挨拶イベントのログIDを保持
+  const greetingLogIdRef = useRef(null)
   const [initialized, setInitialized] = useState(false)
   const [currentChar, setCurrentChar] = useState(null)
   const [currentPair, setCurrentPair] = useState(null)
@@ -64,6 +66,8 @@ export default function App() {
     step5Status: false,
     step5Detail: false,
     step6: false,
+    step7: false,
+    step7Detail: false,
   })
   const step6TimerRef = useRef(null)
   const step6NextIndexRef = useRef(0)
@@ -384,10 +388,51 @@ export default function App() {
           })
           const [c1, c2] = stateRef.current.characters
           triggerGreetingTutorial(stateRef.current, setState, addLog, c1.id, c2.id)
+            .then((id) => {
+              greetingLogIdRef.current = id
+            })
         }, 3000)
     }
     return () => {
       if (timer) clearTimeout(timer)
+    }
+  }, [view, state.tutorialStep])
+
+  // 日報画面の案内（ステップ7）
+  useEffect(() => {
+    if (
+      view === 'daily' &&
+      state.tutorialStep === 7 &&
+      !tutorialFlags.current.step7
+    ) {
+      tutorialFlags.current.step7 = true
+      const message =
+        'ここでは、これまでに発生した会話や、\n' +
+        'それによって起きた変化の記録を確認することができます。\n\n' +
+        '日付や住人、記録の種類などで絞り込みもできます。\n\n' +
+        'また、会話履歴からは、実際の会話そのものを振り返ることも可能です。\n\n' +
+        '試しに、先ほどの挨拶を見てみましょう。'
+      showPopup(message, () => {
+        setCurrentLogId(greetingLogIdRef.current)
+        setView('logdetail')
+      })
+    }
+  }, [view, state.tutorialStep])
+
+  // 会話詳細画面での案内（ステップ7詳細）
+  useEffect(() => {
+    if (
+      view === 'logdetail' &&
+      state.tutorialStep === 7 &&
+      !tutorialFlags.current.step7Detail
+    ) {
+      tutorialFlags.current.step7Detail = true
+      showPopup('このように、過去の会話を振り返ることができます。', () => {
+        showPopup('では、ホームに戻りましょう。', () => {
+          setView('main')
+          setState(prev => ({ ...prev, tutorialStep: 8 }))
+        })
+      })
     }
   }, [view, state.tutorialStep])
 
