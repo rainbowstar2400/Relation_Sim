@@ -575,11 +575,13 @@ export default function App() {
       const second =
         '「詳細」を選ぶと、さらに詳しい情報が見られます。\n\n' +
         `試しに、${state.characters[1].name} との関係を詳しく見てみましょう。`
-      showPopup(first, () => {
-        timer = setTimeout(() => {
-          showPopup(second)
-        }, 5000)
-      })
+      timer = setTimeout(() => {
+        showPopup(first, () => {
+          timer = setTimeout(() => {
+            showPopup(second)
+          }, 4000)
+        })
+      }, 1000)
     }
     return () => {
       if (timer) clearTimeout(timer)
@@ -603,14 +605,16 @@ export default function App() {
       const text1 =
         'この画面では、関係性や呼び方、好感度に加えて、\n' +
         '相手住人との直近の関わりや変化が表示されます。'
-      showPopup(text1, () => {
-        timer = setTimeout(() => {
-          showPopup('では、ホームに戻りましょう。', () => {
-            setView('main')
-            setState(prev => ({ ...prev, tutorialStep: 6 }))
-          })
-        }, 3000)
-      })
+      timer = setTimeout(() => {
+        showPopup(text1, () => {
+          timer = setTimeout(() => {
+            showPopup('では、ホームに戻りましょう。', () => {
+              setView('main')
+              setState(prev => ({ ...prev, tutorialStep: 6 }))
+            })
+          }, 3000)
+        })
+      }, 1000)
     }
     return () => {
       if (timer) clearTimeout(timer)
