@@ -335,6 +335,7 @@ export default function App() {
 
   // ステータス確認チュートリアル
   useEffect(() => {
+    let timer
     if (
       view === 'main' &&
       state.tutorialStep === 5 &&
@@ -346,10 +347,14 @@ export default function App() {
         'この「みんなの様子」では、\n' +
         '住人たちの現在の様子を一覧で確認することができます。\n\n' +
         `試しに、${characterA.name} の様子を見てみましょう。`
-      showPopup(message, () => {
-        tutorialFlags.current.step5 = true
-        showStatus(characterA)
-      })
+      timer = setTimeout(() => {
+        showPopup(message, () => {
+          tutorialFlags.current.step5 = true
+        })
+      }, 3000)
+    }
+    return () => {
+      if (timer) clearTimeout(timer)
     }
   }, [view, state.tutorialStep])
 
@@ -549,7 +554,7 @@ export default function App() {
     setView('relation')
   }
 
-  // ステータス画面での説明と詳細誘導
+  // ステータス画面での説明
   useEffect(() => {
     if (
       view === 'status' &&
@@ -561,26 +566,18 @@ export default function App() {
       currentChar.id === state.characters[0].id
     ) {
       tutorialFlags.current.step5Status = true
-      const characterA = currentChar
-      const characterB = state.characters[1]
       const first =
         'ここでは、その住人について登録した情報や、\n' +
         '他の住人との関係、最近の出来事などを確認できます。\n\n' +
         '関係一覧では、表示されている住人を選ぶことで、\n' +
         'それぞれとの好感度や呼び方など、大まかな関係の情報を見ることができます。'
-      const second =
-        '「詳細」を選ぶと、さらに詳しい情報が見られます。\n\n' +
-        `試しに、${characterB.name} との関係を詳しく見てみましょう。`
-      showPopup(first, () => {
-        showPopup(second, () => {
-          showRelationDetail(characterA.id, characterB.id)
-        })
-      })
+      showPopup(first)
     }
   }, [view, state.tutorialStep, currentChar])
 
-  // 関係詳細画面での締め
+  // 関係詳細画面での説明
   useEffect(() => {
+    let timer
     if (
       view === 'relation' &&
       state.tutorialStep === 5 &&
@@ -595,13 +592,17 @@ export default function App() {
       const text1 =
         'この画面では、関係性や呼び方、好感度に加えて、\n' +
         '相手住人との直近の関わりや変化が表示されます。'
-      const text2 = 'では、ホームに戻りましょう。'
       showPopup(text1, () => {
-        showPopup(text2, () => {
-          setView('main')
-          setState(prev => ({ ...prev, tutorialStep: 6 }))
-        })
+        timer = setTimeout(() => {
+          showPopup('では、ホームに戻りましょう。', () => {
+            setView('main')
+            setState(prev => ({ ...prev, tutorialStep: 6 }))
+          })
+        }, 3000)
       })
+    }
+    return () => {
+      if (timer) clearTimeout(timer)
     }
   }, [view, state.tutorialStep, currentPair])
 
