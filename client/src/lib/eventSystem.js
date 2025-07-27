@@ -149,6 +149,8 @@ export async function triggerGreetingTutorial(state, setState, addLog, idA, idB)
   setState(prev => ({ ...prev, affections, emotions, reports }))
 
   emotionLogs.forEach(l => addLog(l, 'SYSTEM', l))
+
+  return eventLogId
 }
 
 
