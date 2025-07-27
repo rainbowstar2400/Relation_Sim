@@ -55,7 +55,13 @@ export default function App() {
   const [currentPair, setCurrentPair] = useState(null)
   const [currentLogId, setCurrentLogId] = useState(null)
   const [popup, setPopup] = useState(null)
-  const tutorialFlags = useRef({ step3: false, step4: false })
+  const tutorialFlags = useRef({
+    step3: false,
+    step4: false,
+    step5: false,
+    step5Status: false,
+    step5Detail: false,
+  })
 
   // state の最新値を保持する参照
   useEffect(() => {
@@ -327,6 +333,31 @@ export default function App() {
     }
   }, [view, state.tutorialStep])
 
+  // ステータス確認チュートリアル
+  useEffect(() => {
+    let timer
+    if (
+      view === 'main' &&
+      state.tutorialStep === 5 &&
+      !tutorialFlags.current.step5 &&
+      state.characters.length >= 2
+    ) {
+      const characterA = state.characters[0]
+      const message =
+        'この「みんなの様子」では、\n' +
+        '住人たちの現在の様子を一覧で確認することができます。\n\n' +
+        `試しに、${characterA.name} の様子を見てみましょう。`
+      timer = setTimeout(() => {
+        showPopup(message, () => {
+          tutorialFlags.current.step5 = true
+        })
+      }, 3000)
+    }
+    return () => {
+      if (timer) clearTimeout(timer)
+    }
+  }, [view, state.tutorialStep])
+
   // 相談チュートリアル
   useEffect(() => {
     let timer1, timer2
@@ -522,6 +553,73 @@ export default function App() {
     setCurrentPair({ a, b })
     setView('relation')
   }
+
+  // ステータス画面での説明
+  useEffect(() => {
+    let timer
+    if (
+      view === 'status' &&
+      state.tutorialStep === 5 &&
+      tutorialFlags.current.step5 &&
+      !tutorialFlags.current.step5Status &&
+      currentChar &&
+      state.characters.length >= 2 &&
+      currentChar.id === state.characters[0].id
+    ) {
+      tutorialFlags.current.step5Status = true
+      const first =
+        'ここでは、その住人について登録した情報や、\n' +
+        '他の住人との関係、最近の出来事などを確認できます。\n\n' +
+        '関係一覧では、表示されている住人を選ぶことで、\n' +
+        'それぞれとの好感度や呼び方など、大まかな関係の情報を見ることができます。'
+      const second =
+        '「詳細」を選ぶと、さらに詳しい情報が見られます。\n\n' +
+        `試しに、${state.characters[1].name} との関係を詳しく見てみましょう。`
+      timer = setTimeout(() => {
+        showPopup(first, () => {
+          timer = setTimeout(() => {
+            showPopup(second)
+          }, 4000)
+        })
+      }, 1000)
+    }
+    return () => {
+      if (timer) clearTimeout(timer)
+    }
+  }, [view, state.tutorialStep, currentChar])
+
+  // 関係詳細画面での説明
+  useEffect(() => {
+    let timer
+    if (
+      view === 'relation' &&
+      state.tutorialStep === 5 &&
+      tutorialFlags.current.step5Status &&
+      !tutorialFlags.current.step5Detail &&
+      currentPair &&
+      state.characters.length >= 2 &&
+      currentPair.a.id === state.characters[0].id &&
+      currentPair.b.id === state.characters[1].id
+    ) {
+      tutorialFlags.current.step5Detail = true
+      const text1 =
+        'この画面では、関係性や呼び方、好感度に加えて、\n' +
+        '相手住人との直近の関わりや変化が表示されます。'
+      timer = setTimeout(() => {
+        showPopup(text1, () => {
+          timer = setTimeout(() => {
+            showPopup('では、ホームに戻りましょう。', () => {
+              setView('main')
+              setState(prev => ({ ...prev, tutorialStep: 6 }))
+            })
+          }, 3000)
+        })
+      }, 1000)
+    }
+    return () => {
+      if (timer) clearTimeout(timer)
+    }
+  }, [view, state.tutorialStep, currentPair])
 
   return (
     <div className="max-w-[50rem] mx-auto border border-gray-600 bg-panel p-4 rounded text-gray-100 min-h-screen">
