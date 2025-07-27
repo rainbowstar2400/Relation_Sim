@@ -50,6 +50,8 @@ export default function App() {
   const [state, setState] = useState(initialState)
   const stateRef = useRef(state)
   const consultRef = useRef(null)
+  // ステップ4の相談イベントIDを保持
+  const consultEventIdRef = useRef(null)
   const [initialized, setInitialized] = useState(false)
   const [currentChar, setCurrentChar] = useState(null)
   const [currentPair, setCurrentPair] = useState(null)
@@ -293,7 +295,10 @@ export default function App() {
     return () => clearInterval(timer)
   }, [])
 
-  // ホーム画面に入った直後のチュートリアル
+  // ホーム画面に入ってからのチュートリアル処理
+  // 1. ホーム遷移から3秒後に案内ポップアップを表示しつつ挨拶イベントを発生
+  // 2. ポップアップを閉じてから3秒後に次の説明を表示し、相談イベントを仕込む
+  // 3. さらにそのポップアップを閉じて3秒後にステップ4へ進む
   useEffect(() => {
     let timer
     if (
@@ -309,23 +314,32 @@ export default function App() {
           'ホームでは、住人たちの会話を眺めたり、\n' +
           '彼らからの相談に応じたりすることができます。\n\n' +
           '……おや？'
-        showPopup(firstText, async () => {
-          const [c1, c2] = stateRef.current.characters
-          await triggerGreetingTutorial(stateRef.current, setState, addLog, c1.id, c2.id)
-          const secondText =
-            '今、二人の住人がすれ違い、挨拶を交わしたようです。\n\n' +
-            'このように、住人どうしの会話や出来事は、\n' +
-            'そのときに起こった変化とともに、ログに表示されます。\n\n' +
-            '今回は「好感度」が少し上がりましたが、\n' +
-            '場合によっては、関係性や印象が変わることもあります。\n\n' +
-            'すべての出来事は、このログから見守ることができます。\n\n' +
-            'なお、古いログは確認済みになると、順次非表示になります。'
-          setTimeout(() => {
+        showPopup(firstText, () => {
+          setTimeout(async () => {
+            const char = stateRef.current.characters[0]
+            if (consultRef.current) {
+              consultEventIdRef.current = await consultRef.current.addTutorialConsultation(
+                char,
+                true,
+              )
+            }
+            const secondText =
+              '今、二人の住人がすれ違い、挨拶を交わしたようです。\n\n' +
+              'このように、住人どうしの会話や出来事は、\n' +
+              'そのときに起こった変化とともに、ログに表示されます。\n\n' +
+              '今回は「好感度」が少し上がりましたが、\n' +
+              '場合によっては、関係性や印象が変わることもあります。\n\n' +
+              'すべての出来事は、このログから見守ることができます。\n\n' +
+              'なお、古いログは確認済みになると、順次非表示になります。'
             showPopup(secondText, () => {
-              setState(prev => ({ ...prev, tutorialStep: 4 }))
+              setTimeout(() => {
+                setState(prev => ({ ...prev, tutorialStep: 4 }))
+              }, 3000)
             })
           }, 3000)
         })
+        const [c1, c2] = stateRef.current.characters
+        triggerGreetingTutorial(stateRef.current, setState, addLog, c1.id, c2.id)
       }, 3000)
     }
     return () => {
@@ -360,7 +374,7 @@ export default function App() {
 
   // 相談チュートリアル
   useEffect(() => {
-    let timer1, timer2
+    let timer
     if (
       view === 'main' &&
       state.tutorialStep === 4 &&
@@ -369,26 +383,21 @@ export default function App() {
     ) {
       tutorialFlags.current.step4 = true
       const character = state.characters[0]
-      timer1 = setTimeout(async () => {
-        let eventId = null
-        if (consultRef.current) {
-          eventId = await consultRef.current.addTutorialConsultation(character, true)
+      timer = setTimeout(async () => {
+        if (consultEventIdRef.current === null && consultRef.current) {
+          consultEventIdRef.current = await consultRef.current.addTutorialConsultation(character, true)
         }
-        timer2 = setTimeout(() => {
-          const text =
-            `なにやら、${character.name} から相談が届いたようです。\n\n` +
-            'さっそく対応してみましょう。'
-          showPopup(text, () => {
-            if (consultRef.current && eventId !== null) {
-              consultRef.current.enableConsultation(eventId)
-            }
-          })
-        }, 1000)
-      }, 1000)
+        if (consultRef.current && consultEventIdRef.current !== null) {
+          consultRef.current.enableConsultation(consultEventIdRef.current)
+        }
+        const text =
+          `なにやら、${character.name} から相談が届いたようです。\n\n` +
+          'さっそく対応してみましょう。'
+        showPopup(text)
+      }, 0)
     }
     return () => {
-      if (timer1) clearTimeout(timer1)
-      if (timer2) clearTimeout(timer2)
+      if (timer) clearTimeout(timer)
     }
   }, [view, state.tutorialStep])
 
@@ -478,6 +487,12 @@ export default function App() {
     setIsStarting(false)
     setView('management')
     setState(prev => ({ ...prev, tutorialStep: 2 }))
+    setTimeout(() => {
+      showPopup(
+        'ここで情報を入力することで、住人を迎え入れることができます。\n' +
+          'さっそく空欄を埋め、登録してみましょう。'
+      )
+    }, 1000)
   }
 
   // 開発用: 手動でランダムイベントを発生させる
@@ -492,36 +507,42 @@ export default function App() {
   // チュートリアル用コールバック
   const handleFirstRegisterComplete = () => {
     if (state.tutorialStep === 2) {
-      showPopup(
-        '一人目の住人が登録できました！\n' +
-          '登録した住人は、こちらの住人一覧に表示されます。\n\n' +
-          '次は、二人目の住人を登録してみましょう。\n' +
-          '「新規住人登録」から追加することができます。'
-      )
+      setTimeout(() => {
+        showPopup(
+          '一人目の住人が登録できました！\n' +
+            '登録した住人は、こちらの住人一覧に表示されます。\n\n' +
+            '次は、二人目の住人を登録してみましょう。\n' +
+            '「新規住人登録」から追加することができます。'
+        )
+      }, 1000)
     }
   }
 
   const handleSecondRegisterStart = () => {
     if (state.tutorialStep === 2) {
-      showPopup(
-        '二人目以降の住人には、他の住人との関係性を予め設定することができます。\n\n' +
-          'この「好感度」は、お互いについてどれだけ好ましく思っているかを示します。'
-      )
+      setTimeout(() => {
+        showPopup(
+          '二人目以降の住人には、他の住人との関係性を予め設定することができます。\n\n' +
+            'この「好感度」は、お互いについてどれだけ好ましく思っているかを示します。'
+        )
+      }, 1000)
     }
   }
 
   const handleSecondRegisterComplete = () => {
     if (state.tutorialStep === 2) {
-      showPopup(
-        '二人目の住人の登録が完了しました！\n\n' +
-          'これで箱庭の暮らしが始まります。\n' +
-          'どんな関係が生まれていくのか、ぜひ見守ってみてください。\n\n' +
-          'それでは、ホームへ進みましょう。',
-        () => {
-          setView('main')
-          setState(prev => ({ ...prev, tutorialStep: 3 }))
-        }
-      )
+      setTimeout(() => {
+        showPopup(
+          '二人目の住人の登録が完了しました！\n\n' +
+            'これで箱庭の暮らしが始まります。\n' +
+            'どんな関係が生まれていくのか、ぜひ見守ってみてください。\n\n' +
+            'それでは、ホームへ進みましょう。',
+          () => {
+            setView('main')
+            setState(prev => ({ ...prev, tutorialStep: 3 }))
+          }
+        )
+      }, 1000)
     }
   }
 
