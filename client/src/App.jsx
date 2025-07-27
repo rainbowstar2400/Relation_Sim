@@ -315,7 +315,10 @@ export default function App() {
           setTimeout(async () => {
             const char = stateRef.current.characters[0]
             if (consultRef.current) {
-              consultEventIdRef.current = await consultRef.current.addTutorialConsultation(char, true)
+              consultEventIdRef.current = await consultRef.current.addTutorialConsultation(
+                char,
+                true,
+              )
             }
             const secondText =
               '今、二人の住人がすれ違い、挨拶を交わしたようです。\n\n' +
@@ -330,7 +333,7 @@ export default function App() {
                 setState(prev => ({ ...prev, tutorialStep: 4 }))
               }, 3000)
             })
-          }, 5000)
+          }, 3000)
         })
         const [c1, c2] = stateRef.current.characters
         triggerGreetingTutorial(stateRef.current, setState, addLog, c1.id, c2.id)
