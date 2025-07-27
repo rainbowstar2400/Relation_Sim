@@ -400,27 +400,32 @@ export default function App() {
 
   // 日報画面の案内（ステップ7）
   useEffect(() => {
+    let timer
     if (
       view === 'daily' &&
       state.tutorialStep === 7 &&
       !tutorialFlags.current.step7
     ) {
-      tutorialFlags.current.step7 = true
       const message =
         'ここでは、これまでに発生した会話や、\n' +
         'それによって起きた変化の記録を確認することができます。\n\n' +
         '日付や住人、記録の種類などで絞り込みもできます。\n\n' +
         'また、会話履歴からは、実際の会話そのものを振り返ることも可能です。\n\n' +
         '試しに、先ほどの挨拶を見てみましょう。'
-      showPopup(message, () => {
-        setCurrentLogId(greetingLogIdRef.current)
-        setView('logdetail')
-      })
+      timer = setTimeout(() => {
+        showPopup(message, () => {
+          tutorialFlags.current.step7 = true
+        })
+      }, 1000)
+    }
+    return () => {
+      if (timer) clearTimeout(timer)
     }
   }, [view, state.tutorialStep])
 
   // 会話詳細画面での案内（ステップ7詳細）
   useEffect(() => {
+    let timer
     if (
       view === 'logdetail' &&
       state.tutorialStep === 7 &&
@@ -428,11 +433,16 @@ export default function App() {
     ) {
       tutorialFlags.current.step7Detail = true
       showPopup('このように、過去の会話を振り返ることができます。', () => {
-        showPopup('では、ホームに戻りましょう。', () => {
-          setView('main')
-          setState(prev => ({ ...prev, tutorialStep: 8 }))
-        })
+        timer = setTimeout(() => {
+          showPopup('では、ホームに戻りましょう。', () => {
+            setView('main')
+            setState(prev => ({ ...prev, tutorialStep: 8 }))
+          })
+        }, 3000)
       })
+    }
+    return () => {
+      if (timer) clearTimeout(timer)
     }
   }, [view, state.tutorialStep])
 
