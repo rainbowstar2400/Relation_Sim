@@ -469,8 +469,10 @@ export default function App() {
   }
 
   const closePopup = () => {
-    if (popup?.afterClose) popup.afterClose()
+    const callback = popup?.afterClose
+    // 先にポップアップを閉じてから次の処理を行う
     setPopup(null)
+    if (callback) callback()
   }
 
   // スタート画面: セーブデータを読み込む
