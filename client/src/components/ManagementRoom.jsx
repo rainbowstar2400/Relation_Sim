@@ -36,6 +36,7 @@ export default function ManagementRoom({
   const [personality, setPersonality] = useState(blankPersonality)
   const [talkTemplate, setTalkTemplate] = useState('優しい敬語')
   const [talkDesc, setTalkDesc] = useState('')
+  const [firstPerson, setFirstPerson] = useState('')
   const [activityPattern, setActivityPattern] = useState('通常')
   const [interests, setInterests] = useState('')
   const [mbtiMode, setMbtiMode] = useState('diag')
@@ -85,6 +86,7 @@ export default function ManagementRoom({
     setTalkTemplate(tmpl)
     const found = speechTemplates.find(t => t.template === tmpl)
     setTalkDesc(char.talkStyle?.description ?? found?.description ?? '')
+    setFirstPerson(char.talkStyle?.firstPerson ?? '')
     setActivityPattern(char.activityPattern || '通常')
     setInterests((char.interests || []).join(', '))
     setMbtiManual(char.mbti || 'INFP')
@@ -118,6 +120,7 @@ export default function ManagementRoom({
     setPersonality(blankPersonality)
     setTalkTemplate('優しい敬語')
     setTalkDesc(speechTemplates.find(t=>t.template==='優しい敬語')?.description || '')
+    setFirstPerson('')
     setActivityPattern('通常')
     setInterests('')
     setMbtiMode('diag')
@@ -178,7 +181,7 @@ export default function ManagementRoom({
       personality,
       mbti: mbtiMode === 'diag' ? (mbtiResult || calculateMbti(mbtiSliders, personality)) : mbtiManual,
       mbti_slider: mbtiMode === 'diag' ? mbtiSliders : [],
-      talkStyle: { template: talkTemplate, description: talkDesc },
+      talkStyle: { template: talkTemplate, description: talkDesc, firstPerson },
       activityPattern,
       interests: interests.split(',').map(i => i.trim()).filter(i => i),
       condition: existing?.condition || '活動中',
@@ -343,6 +346,10 @@ export default function ManagementRoom({
             ) : (
               <span>{talkDesc}</span>
             )}
+          </div>
+          <div className="mb-2">
+            <label className="mr-2">一人称:</label>
+            <input className="text-black" value={firstPerson} onChange={e => setFirstPerson(e.target.value)} placeholder="例: 私" />
           </div>
           <h4>活動傾向</h4>
           <div className="mb-2">

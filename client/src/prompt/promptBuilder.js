@@ -92,7 +92,9 @@ export function buildPrompt(eventType, characterA, characterB, context) {
   const talkA = characterA.talkStyle || {}
   const talkB = characterB.talkStyle || {}
   core += `\n${characterA.name}の話し方: テンプレート「${talkA.template || '不明'}」 ${talkA.description || ''}`
+  core += `\n${characterA.name}の一人称は「${talkA.firstPerson || '私'}」。この一人称を必ず使うこと。`
   core += `\n${characterB.name}の話し方: テンプレート「${talkB.template || '不明'}」 ${talkB.description || ''}`
+  core += `\n${characterB.name}の一人称は「${talkB.firstPerson || '私'}」。この一人称を必ず使うこと。`
 
   const interestsA = (characterA.interests || []).join('、') || '特になし'
   const interestsB = (characterB.interests || []).join('、') || '特になし'

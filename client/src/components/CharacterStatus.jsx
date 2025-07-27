@@ -83,6 +83,7 @@ export default function CharacterStatus({
         <p>MBTI: {char.mbti}</p>
         <p>話し方: {talk.template || '未設定'}</p>
         <p className="ml-4">特徴: {talk.description || '未設定'}</p>
+        <p className="ml-4">一人称: {talk.firstPerson || '未設定'}</p>
         <p>現在状態: {char.condition || '活動中'}</p>
         <p>活動傾向: {char.activityPattern || '通常'}</p>
         <p>信頼度: {trust}</p>
