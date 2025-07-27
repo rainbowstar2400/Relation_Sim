@@ -146,11 +146,15 @@ export default function ManagementRoom({
 
   // 入力欄を離れたときにチュートリアル用ポップアップを表示
   const handleNameBlur = () => {
+    // no-op for now
+  }
+
+  const handleInterestsBlur = () => {
     if (
       tutorialStep === 2 &&
       characters.length === 1 &&
       !secondStartShown &&
-      name.trim()
+      interests.trim()
     ) {
       setSecondStartShown(true)
       if (onSecondRegisterStart) onSecondRegisterStart()
@@ -342,7 +346,13 @@ export default function ManagementRoom({
           <h4>興味関心ジャンル</h4>
           <div className="mb-2">
             <label className="mr-2">興味・関心:</label>
-            <input className="text-black" value={interests} onChange={e=>setInterests(e.target.value)} placeholder="例: 読書, 映画鑑賞" />
+            <input
+              className="text-black"
+              value={interests}
+              onChange={e => setInterests(e.target.value)}
+              onBlur={handleInterestsBlur}
+              placeholder="例: 読書, 映画鑑賞"
+            />
           </div>
           {showRelationSection && (
             <>

@@ -309,23 +309,22 @@ export default function App() {
           'ホームでは、住人たちの会話を眺めたり、\n' +
           '彼らからの相談に応じたりすることができます。\n\n' +
           '……おや？'
-        showPopup(firstText, async () => {
-          const [c1, c2] = stateRef.current.characters
-          await triggerGreetingTutorial(stateRef.current, setState, addLog, c1.id, c2.id)
-          const secondText =
-            '今、二人の住人がすれ違い、挨拶を交わしたようです。\n\n' +
-            'このように、住人どうしの会話や出来事は、\n' +
-            'そのときに起こった変化とともに、ログに表示されます。\n\n' +
-            '今回は「好感度」が少し上がりましたが、\n' +
-            '場合によっては、関係性や印象が変わることもあります。\n\n' +
-            'すべての出来事は、このログから見守ることができます。\n\n' +
-            'なお、古いログは確認済みになると、順次非表示になります。'
+        showPopup(firstText, () => {
           setTimeout(() => {
-            showPopup(secondText, () => {
-              setState(prev => ({ ...prev, tutorialStep: 4 }))
-            })
-          }, 3000)
+            const secondText =
+              '今、二人の住人がすれ違い、挨拶を交わしたようです。\n\n' +
+              'このように、住人どうしの会話や出来事は、\n' +
+              'そのときに起こった変化とともに、ログに表示されます。\n\n' +
+              '今回は「好感度」が少し上がりましたが、\n' +
+              '場合によっては、関係性や印象が変わることもあります。\n\n' +
+              'すべての出来事は、このログから見守ることができます。\n\n' +
+              'なお、古いログは確認済みになると、順次非表示になります。'
+            showPopup(secondText)
+            setState(prev => ({ ...prev, tutorialStep: 4 }))
+          }, 5000)
         })
+        const [c1, c2] = stateRef.current.characters
+        triggerGreetingTutorial(stateRef.current, setState, addLog, c1.id, c2.id)
       }, 3000)
     }
     return () => {
@@ -384,7 +383,7 @@ export default function App() {
             }
           })
         }, 1000)
-      }, 1000)
+      }, 0)
     }
     return () => {
       if (timer1) clearTimeout(timer1)
@@ -478,6 +477,12 @@ export default function App() {
     setIsStarting(false)
     setView('management')
     setState(prev => ({ ...prev, tutorialStep: 2 }))
+    setTimeout(() => {
+      showPopup(
+        'ここで情報を入力することで、住人を迎え入れることができます。\n' +
+          'さっそく空欄を埋め、登録してみましょう。'
+      )
+    }, 1000)
   }
 
   // 開発用: 手動でランダムイベントを発生させる
@@ -492,36 +497,42 @@ export default function App() {
   // チュートリアル用コールバック
   const handleFirstRegisterComplete = () => {
     if (state.tutorialStep === 2) {
-      showPopup(
-        '一人目の住人が登録できました！\n' +
-          '登録した住人は、こちらの住人一覧に表示されます。\n\n' +
-          '次は、二人目の住人を登録してみましょう。\n' +
-          '「新規住人登録」から追加することができます。'
-      )
+      setTimeout(() => {
+        showPopup(
+          '一人目の住人が登録できました！\n' +
+            '登録した住人は、こちらの住人一覧に表示されます。\n\n' +
+            '次は、二人目の住人を登録してみましょう。\n' +
+            '「新規住人登録」から追加することができます。'
+        )
+      }, 1000)
     }
   }
 
   const handleSecondRegisterStart = () => {
     if (state.tutorialStep === 2) {
-      showPopup(
-        '二人目以降の住人には、他の住人との関係性を予め設定することができます。\n\n' +
-          'この「好感度」は、お互いについてどれだけ好ましく思っているかを示します。'
-      )
+      setTimeout(() => {
+        showPopup(
+          '二人目以降の住人には、他の住人との関係性を予め設定することができます。\n\n' +
+            'この「好感度」は、お互いについてどれだけ好ましく思っているかを示します。'
+        )
+      }, 1000)
     }
   }
 
   const handleSecondRegisterComplete = () => {
     if (state.tutorialStep === 2) {
-      showPopup(
-        '二人目の住人の登録が完了しました！\n\n' +
-          'これで箱庭の暮らしが始まります。\n' +
-          'どんな関係が生まれていくのか、ぜひ見守ってみてください。\n\n' +
-          'それでは、ホームへ進みましょう。',
-        () => {
-          setView('main')
-          setState(prev => ({ ...prev, tutorialStep: 3 }))
-        }
-      )
+      setTimeout(() => {
+        showPopup(
+          '二人目の住人の登録が完了しました！\n\n' +
+            'これで箱庭の暮らしが始まります。\n' +
+            'どんな関係が生まれていくのか、ぜひ見守ってみてください。\n\n' +
+            'それでは、ホームへ進みましょう。',
+          () => {
+            setView('main')
+            setState(prev => ({ ...prev, tutorialStep: 3 }))
+          }
+        )
+      }, 1000)
     }
   }
 
