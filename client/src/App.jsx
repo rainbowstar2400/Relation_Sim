@@ -468,7 +468,11 @@ export default function App() {
     exportState(state)
     if (step6WaitingSaveRef.current) {
       step6WaitingSaveRef.current = false
-      step6TimerRef.current = setTimeout(() => runStep6Sequence(step6NextIndexRef.current), 1000)
+      // セーブ完了を確認したら少し待って次の案内を出す
+      step6TimerRef.current = setTimeout(
+        () => runStep6Sequence(step6NextIndexRef.current),
+        2000
+      )
     }
   }
 
