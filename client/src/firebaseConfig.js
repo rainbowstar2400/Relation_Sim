@@ -18,6 +18,8 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-signInAnonymously(auth).catch(console.error);
+signInAnonymously(auth)
+  .then(() => console.log("匿名ログイン成功", auth.currentUser.uid))
+  .catch((err) => console.error("匿名ログイン失敗", err));
 
 export { db, auth };
