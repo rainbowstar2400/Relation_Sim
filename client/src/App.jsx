@@ -1,11 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { triggerRandomEvent, initEventSystem, triggerGreetingTutorial } from './lib/eventSystem.js'
 import {
-  loadStateFromLocal,
-  saveStateToLocal,
   exportState,
   importStateFromFile,
 } from './lib/storage.js'
+import {
+  loadGameData,
+  saveGameData,
+  deleteGameData,
+} from './lib/cloudStorage.js'
+import { auth } from './firebaseConfig.js'
+import { onAuthStateChanged } from 'firebase/auth'
 import Header from './components/Header.jsx'
 import MainView from './components/MainView.jsx'
 import ManagementRoom from './components/ManagementRoom.jsx'
@@ -48,6 +53,7 @@ export default function App() {
   const [isStarting, setIsStarting] = useState(true)
   const [showIntro, setShowIntro] = useState(false)
   const [state, setState] = useState(initialState)
+  const [userId, setUserId] = useState(null)
   const stateRef = useRef(state)
   const consultRef = useRef(null)
   // ステップ4の相談イベントIDを保持
@@ -117,8 +123,16 @@ export default function App() {
     'セーブできましたね。\n定期的にセーブを行うことをおすすめします。',
     '画面右上には、現在の日時が表示されています。\n\n'+
     'ゲーム内の時間は、現実世界の時間と連動しており、\n何もしなくても、住人たちはそれぞれの生活を続けていきます。',
-    'では、「日報」を見てみましょう。',
+  'では、「日報」を見てみましょう。',
   ]
+
+  // Firebaseのログイン状態を取得
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, user => {
+      if (user) setUserId(user.uid)
+    })
+    return unsub
+  }, [])
 
   const runStep6Sequence = (idx) => {
     step6NextIndexRef.current = idx + 1
@@ -225,22 +239,24 @@ export default function App() {
     })
   }
 
-  // localStorageから読み込み
+  // Firestoreから読み込み
   useEffect(() => {
-    const saved = loadStateFromLocal()
-    if (saved) {
-      setState(prev => ({
-        ...prev,
-        ...saved,
-        tutorialStep: saved.tutorialStep ?? 3,
-      }))
-      applyTutorialFlags(saved.tutorialStep ?? 3)
-      setIsStarting(false)
-      setInitialized(true)
-    } else {
-      setIsStarting(true)
-    }
-  }, [])
+    if (!userId) return
+    loadGameData(userId).then(saved => {
+      if (saved) {
+        setState(prev => ({
+          ...prev,
+          ...saved,
+          tutorialStep: saved.tutorialStep ?? 3,
+        }))
+        applyTutorialFlags(saved.tutorialStep ?? 3)
+        setIsStarting(false)
+        setInitialized(true)
+      } else {
+        setIsStarting(true)
+      }
+    })
+  }, [userId])
 
   // 時間帯補正テーブルを読み込む
   useEffect(() => {
@@ -249,10 +265,10 @@ export default function App() {
 
   // 保存（初期化後に実行）
   useEffect(() => {
-    if (initialized) {
-      saveStateToLocal(state)
+    if (initialized && userId) {
+      saveGameData(userId, state)
     }
-  }, [state, initialized])
+  }, [state, initialized, userId])
 
   // 一定間隔でランダムイベントを発生させる
   useEffect(() => {
@@ -593,7 +609,7 @@ export default function App() {
   const handleReset = () => {
     if (window.confirm('本当にリセットしてよろしいですか？')) {
       resetTutorialFlags()
-      localStorage.removeItem('relation_sim_state')
+      if (userId) deleteGameData(userId)
       setState(initialState)
       setView('main')
       setShowIntro(false)
@@ -634,7 +650,7 @@ export default function App() {
   const handleNewGame = () => {
     resetTutorialFlags()
     setState({ ...initialState, tutorialStep: 1 })
-    localStorage.removeItem('relation_sim_state')
+    if (userId) deleteGameData(userId)
     setInitialized(true)
     setShowIntro(true)
   }
