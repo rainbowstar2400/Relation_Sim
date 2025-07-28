@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 
 // ヘッダー。各画面への移動やセーブ/ロードなどを行う
 // リセットボタン用の onReset ハンドラを受け取る
-export default function Header({ onChangeView, onSave, onLoad, onReset, tutorialStep }) {
+export default function Header({ onChangeView, onSave, onLoad, onReset, tutorialStep, step6Index }) {
   const [time, setTime] = useState('')
   const [date, setDate] = useState('')
   const fileInputRef = useRef(null)
@@ -23,26 +23,36 @@ export default function Header({ onChangeView, onSave, onLoad, onReset, tutorial
       {/* どの画面からでもメイン画面に戻るためのボタン */}
       <button
         onClick={() => onChangeView('main')}
-        disabled={!([3, 4, 5, 6, 7, 8].includes(tutorialStep) || tutorialStep > 8)}
+        disabled={tutorialStep < 3}
       >
         ホーム
       </button>
       <button
         onClick={() => onChangeView('management')}
-        disabled={!(tutorialStep === 2 || tutorialStep >= 6)}
+        disabled={!(tutorialStep === 2 || tutorialStep >= 9)}
       >
         管理室
       </button>
       <button
         onClick={() => onChangeView('daily')}
-        disabled={!(tutorialStep === 7 || tutorialStep > 8)}
+        disabled={!(tutorialStep === 7 || tutorialStep >= 9)}
       >
         日報
       </button>
-      <button onClick={onSave} disabled={tutorialStep < 6}>セーブ</button>
-      <button onClick={() => fileInputRef.current?.click()} disabled={tutorialStep < 6}>ロード</button>
+      <button
+        onClick={onSave}
+        disabled={!((tutorialStep === 6 && step6Index >= 4) || tutorialStep >= 9)}
+      >
+        セーブ
+      </button>
+      <button
+        onClick={() => fileInputRef.current?.click()}
+        disabled={tutorialStep < 9}
+      >
+        ロード
+      </button>
       {/* セーブデータを初期化するリセットボタン。ロードボタンの右隣に配置 */}
-      <button onClick={onReset} disabled={tutorialStep < 6}>リセット</button>
+      <button onClick={onReset} disabled={tutorialStep < 9}>リセット</button>
       <input
         type="file"
         accept="application/json"

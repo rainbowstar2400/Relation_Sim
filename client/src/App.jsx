@@ -73,6 +73,7 @@ export default function App() {
   const step6TimerRef = useRef(null)
   const step6NextIndexRef = useRef(0)
   const step6WaitingSaveRef = useRef(false)
+  const [step6Index, setStep6Index] = useState(-1)
 
   const step6Messages = [
     '先ほど行った住人の登録や、住人情報の編集は、\n管理室からいつでも行うことができます。',
@@ -98,6 +99,7 @@ export default function App() {
   ]
 
   const runStep6Sequence = (idx) => {
+    setStep6Index(idx)
     step6NextIndexRef.current = idx + 1
     showPopup(step6Messages[idx], () => {
       const next = idx + 1
@@ -107,6 +109,7 @@ export default function App() {
       } else if (next < step6Messages.length) {
         step6TimerRef.current = setTimeout(() => runStep6Sequence(next), 1000)
       } else {
+        setStep6Index(-1)
         setState(prev => ({ ...prev, tutorialStep: 7 }))
       }
     })
@@ -770,6 +773,8 @@ export default function App() {
     ) {
       tutorialFlags.current.step6 = true
       step6TimerRef.current = setTimeout(() => runStep6Sequence(0), 1000)
+    } else if (state.tutorialStep !== 6) {
+      setStep6Index(-1)
     }
     return () => {
       if (step6TimerRef.current) {
@@ -820,8 +825,9 @@ export default function App() {
             onChangeView={setView}
             onSave={handleExport}
             onLoad={handleImport}
-            onReset={handleReset}
+          onReset={handleReset}
             tutorialStep={state.tutorialStep}
+            step6Index={step6Index}
           />
       {view === 'main' && (
         <MainView
