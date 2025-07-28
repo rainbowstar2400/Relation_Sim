@@ -105,7 +105,7 @@ export default function App() {
         // セーブ完了後に次の案内を表示する
         step6WaitingSaveRef.current = true
       } else if (next < step6Messages.length) {
-        step6TimerRef.current = setTimeout(() => runStep6Sequence(next), 1000)
+        step6TimerRef.current = setTimeout(() => runStep6Sequence(next), 500)
       } else {
         setState(prev => ({ ...prev, tutorialStep: 7 }))
       }
@@ -375,7 +375,7 @@ export default function App() {
               showPopup(secondText, () => {
                 setTimeout(() => {
                   setState(prev => ({ ...prev, tutorialStep: 4 }))
-                }, 3000)
+                }, 1500)
               })
               setTimeout(async () => {
                 if (consultRef.current) {
@@ -385,14 +385,14 @@ export default function App() {
                   )
                 }
               }, 0)
-            }, 3000)
+            }, 1500)
           })
           const [c1, c2] = stateRef.current.characters
           triggerGreetingTutorial(stateRef.current, setState, addLog, c1.id, c2.id)
             .then((id) => {
               greetingLogIdRef.current = id
             })
-        }, 3000)
+        }, 1500)
     }
     return () => {
       if (timer) clearTimeout(timer)
@@ -420,7 +420,7 @@ export default function App() {
         showPopup(message, () => {
           tutorialFlags.current.step7 = true
         })
-      }, 1000)
+      }, 500)
     }
     return () => {
       if (timer) clearTimeout(timer)
@@ -443,9 +443,9 @@ export default function App() {
               setView('main')
               setState(prev => ({ ...prev, tutorialStep: 8 }))
             })
-          }, 3000)
+          }, 1500)
         })
-      }, 1000)
+      }, 500)
     }
     return () => {
       if (timer) clearTimeout(timer)
@@ -471,7 +471,7 @@ export default function App() {
         showPopup(message, () => {
           tutorialFlags.current.step5 = true
         })
-      }, 3000)
+      }, 1500)
     }
     return () => {
       if (timer) clearTimeout(timer)
@@ -546,7 +546,7 @@ export default function App() {
       // セーブ完了を確認したら少し待って次の案内を出す
       step6TimerRef.current = setTimeout(
         () => runStep6Sequence(step6NextIndexRef.current),
-        2000
+        1000
       )
     }
   }
@@ -619,7 +619,7 @@ export default function App() {
         'ここで情報を入力することで、住人を迎え入れることができます。\n' +
           'さっそく空欄を埋め、登録してみましょう。'
       )
-    }, 1000)
+    }, 500)
   }
 
 
@@ -633,7 +633,7 @@ export default function App() {
             '次は、二人目の住人を登録してみましょう。\n' +
             '「新規住人登録」から追加することができます。'
         )
-      }, 1000)
+      }, 500)
     }
   }
 
@@ -644,7 +644,7 @@ export default function App() {
           '二人目以降の住人には、他の住人との関係性を予め設定することができます。\n\n' +
             'この「好感度」は、お互いについてどれだけ好ましく思っているかを示します。'
         )
-      }, 1000)
+      }, 500)
     }
   }
 
@@ -661,7 +661,7 @@ export default function App() {
             setState(prev => ({ ...prev, tutorialStep: 3 }))
           }
         )
-      }, 1000)
+      }, 500)
     }
   }
 
@@ -677,7 +677,7 @@ export default function App() {
       showPopup(message, () => {
         setState(prev => ({ ...prev, tutorialStep: 5 }))
       })
-    }, 3000)
+    }, 1500)
   }
 
   const showStatus = (char) => {
@@ -719,9 +719,9 @@ export default function App() {
         showPopup(first, () => {
           timer = setTimeout(() => {
             showPopup(second)
-          }, 4000)
+          }, 2000)
         })
-      }, 1000)
+      }, 500)
     }
     return () => {
       if (timer) clearTimeout(timer)
@@ -752,9 +752,9 @@ export default function App() {
               setView('main')
               setState(prev => ({ ...prev, tutorialStep: 6 }))
             })
-          }, 3000)
+          }, 1500)
         })
-      }, 1000)
+      }, 500)
     }
     return () => {
       if (timer) clearTimeout(timer)
@@ -769,7 +769,7 @@ export default function App() {
       !tutorialFlags.current.step6
     ) {
       tutorialFlags.current.step6 = true
-      step6TimerRef.current = setTimeout(() => runStep6Sequence(0), 1000)
+      step6TimerRef.current = setTimeout(() => runStep6Sequence(0), 500)
     }
     return () => {
       if (step6TimerRef.current) {
@@ -798,7 +798,7 @@ export default function App() {
             setState(prev => ({ ...prev, tutorialStep: 9 }))
           }
         )
-      }, 1000)
+      }, 500)
     }
     return () => {
       if (timer) clearTimeout(timer)
