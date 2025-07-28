@@ -1,5 +1,3 @@
-console.log("✅ TEST:", import.meta.env.VITE_TEST_MESSAGE);
-
 import React, { useState, useEffect, useRef } from 'react'
 import { triggerRandomEvent, initEventSystem, triggerGreetingTutorial } from './lib/eventSystem.js'
 import {

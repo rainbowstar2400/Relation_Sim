@@ -1,5 +1,3 @@
-console.log("🔍 Firebase APIキー:", import.meta.env.VITE_FIREBASE_API_KEY);
-
 import { initializeApp } from "firebase/app";
 import { getAuth, signInAnonymously } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
