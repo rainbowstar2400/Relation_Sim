@@ -22,7 +22,7 @@ import {
   getCharacterCondition,
   getDateString
 } from './lib/timeUtils.js'
-const EVENT_INTERVAL_MS = 1800000 // 30分ごと
+const EVENT_INTERVAL_MS = 900000 // 15分ごと
 const EVENT_PROBABILITY = 0.7
 
 // 初期状態を Code/js/state.js の構造に合わせて定義
