@@ -837,7 +837,7 @@ export default function App() {
       {view === 'main' && (
         <MainView
           consultRef={consultRef}
-          onTutorialComplete={handleConsultTutorialComplete}
+          onTutorialComplete={state.tutorialStep === 4 ? handleConsultTutorialComplete : null}
           characters={state.characters}
           logs={state.logs}
           readLogCount={state.readLogCount}
