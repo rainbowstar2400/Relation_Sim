@@ -70,6 +70,29 @@ export default function App() {
     step7Detail: false,
     step8: false,
   })
+  // チュートリアルフラグを全てリセット
+  const resetTutorialFlags = () => {
+    for (const key of Object.keys(tutorialFlags.current)) {
+      tutorialFlags.current[key] = false
+    }
+  }
+
+  // チュートリアル進行度に応じてフラグを再設定
+  const applyTutorialFlags = (step) => {
+    if (step >= 4) tutorialFlags.current.step3 = true
+    if (step >= 5) tutorialFlags.current.step4 = true
+    if (step >= 6) {
+      tutorialFlags.current.step5 = true
+      tutorialFlags.current.step5Status = true
+      tutorialFlags.current.step5Detail = true
+    }
+    if (step >= 7) tutorialFlags.current.step6 = true
+    if (step >= 8) {
+      tutorialFlags.current.step7 = true
+      tutorialFlags.current.step7Detail = true
+    }
+    if (step >= 9) tutorialFlags.current.step8 = true
+  }
   const step6TimerRef = useRef(null)
   const step6NextIndexRef = useRef(0)
   const step6WaitingSaveRef = useRef(false)
@@ -211,6 +234,7 @@ export default function App() {
         ...saved,
         tutorialStep: saved.tutorialStep ?? 3,
       }))
+      applyTutorialFlags(saved.tutorialStep ?? 3)
       setIsStarting(false)
       setInitialized(true)
     } else {
@@ -552,20 +576,23 @@ export default function App() {
   }
 
   const handleImport = (file) => {
+    resetTutorialFlags()
     importStateFromFile(file)
-      .then(loaded =>
+      .then(loaded => {
         setState(prev => ({
           ...prev,
           ...loaded,
           tutorialStep: loaded.tutorialStep ?? 3,
         }))
-      )
+        applyTutorialFlags(loaded.tutorialStep ?? 3)
+      })
       .catch(() => alert('読み込みに失敗しました'))
   }
 
   // セーブデータを削除してスタート画面に戻る
   const handleReset = () => {
     if (window.confirm('本当にリセットしてよろしいですか？')) {
+      resetTutorialFlags()
       localStorage.removeItem('relation_sim_state')
       setState(initialState)
       setView('main')
@@ -588,6 +615,7 @@ export default function App() {
 
   // スタート画面: セーブデータを読み込む
   const handleLoadSaveData = (file) => {
+    resetTutorialFlags()
     importStateFromFile(file)
       .then(loaded => {
         setState(prev => ({
@@ -595,6 +623,7 @@ export default function App() {
           ...loaded,
           tutorialStep: loaded.tutorialStep ?? 3,
         }))
+        applyTutorialFlags(loaded.tutorialStep ?? 3)
         setIsStarting(false)
         setInitialized(true)
       })
@@ -603,6 +632,7 @@ export default function App() {
 
   // スタート画面: 新しく始める
   const handleNewGame = () => {
+    resetTutorialFlags()
     setState({ ...initialState, tutorialStep: 1 })
     localStorage.removeItem('relation_sim_state')
     setInitialized(true)
