@@ -622,6 +622,17 @@ export default function App() {
     }, 500)
   }
 
+  const handleSkipTutorial = () => {
+    setShowIntro(false)
+    setIsStarting(false)
+    setView('main')
+    setInitialized(true)
+    for (const key of Object.keys(tutorialFlags.current)) {
+      tutorialFlags.current[key] = true
+    }
+    setState(prev => ({ ...prev, tutorialStep: 9 }))
+  }
+
 
   // チュートリアル用コールバック
   const handleFirstRegisterComplete = () => {
@@ -813,6 +824,7 @@ export default function App() {
           onNewGame={handleNewGame}
           showIntro={showIntro}
           onIntroFinish={handleIntroFinish}
+          onSkipTutorial={handleSkipTutorial}
         />
       ) : (
         <>

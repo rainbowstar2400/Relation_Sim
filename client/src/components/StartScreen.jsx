@@ -1,7 +1,13 @@
 import React, { useRef, useState, useEffect, useMemo } from 'react'
 
 // スタート画面。続きから始める・新しく始めるの選択肢を表示する
-export default function StartScreen({ onContinue, onNewGame, showIntro, onIntroFinish }) {
+export default function StartScreen({
+  onContinue,
+  onNewGame,
+  showIntro,
+  onIntroFinish,
+  onSkipTutorial,
+}) {
   const fileInputRef = useRef(null)
   // 元の導入文。句点(「。」)で区切って段落に変換する
   const rawTexts = [
@@ -86,7 +92,10 @@ export default function StartScreen({ onContinue, onNewGame, showIntro, onIntroF
             <p className="mb-4 whitespace-pre-wrap font-mono">{typing}</p>
           )}
           {finished.length === texts.length && !typing && (
-            <button onClick={onIntroFinish}>▶ はじめる</button>
+            <>
+              <button onClick={onIntroFinish}>▶ はじめる</button>
+              <button onClick={onSkipTutorial} className="mt-2">チュートリアルをスキップ</button>
+            </>
           )}
         </>
       )}
