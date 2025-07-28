@@ -821,6 +821,7 @@ export default function App() {
             onSave={handleExport}
             onLoad={handleImport}
             onReset={handleReset}
+            tutorialStep={state.tutorialStep}
           />
       {view === 'main' && (
         <MainView
