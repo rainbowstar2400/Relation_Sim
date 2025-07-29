@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 const todayStr = () => new Date().toISOString().split('T')[0]
 
 // reports: state.reports を想定
-export default function DailyReport({ reports = {}, characters = [], onBack, onOpenLog }) {
+export default function DailyReport({ reports = {}, characters = [], onOpenLog }) {
   // 現在の日付を初期値とする
   const [date, setDate] = useState(todayStr())
   const [events, setEvents] = useState([])

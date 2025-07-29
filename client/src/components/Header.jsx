@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react'
+import { Link } from 'react-router-dom'
 
 // ヘッダー。各画面への移動やセーブ/ロードなどを行う
 // リセットボタン用の onReset ハンドラを受け取る
-export default function Header({ onChangeView, onSave, onLoad, onReset }) {
+export default function Header({ onSave, onLoad, onReset }) {
   const [time, setTime] = useState('')
   const [date, setDate] = useState('')
   const fileInputRef = useRef(null)
@@ -21,9 +22,9 @@ export default function Header({ onChangeView, onSave, onLoad, onReset }) {
   return (
     <header className="flex items-center gap-2 pb-4 mb-5 border-b border-gray-600">
       {/* どの画面からでもメイン画面に戻るためのボタン */}
-      <button onClick={() => onChangeView('main')}>ホーム</button>
-      <button onClick={() => onChangeView('management')}>管理室</button>
-      <button onClick={() => onChangeView('daily')}>日報</button>
+      <Link to="/">ホーム</Link>
+      <Link to="/management">管理室</Link>
+      <Link to="/daily">日報</Link>
       <button onClick={onSave}>セーブ</button>
       <button onClick={() => fileInputRef.current?.click()}>ロード</button>
       {/* セーブデータを初期化するリセットボタン。ロードボタンの右隣に配置 */}

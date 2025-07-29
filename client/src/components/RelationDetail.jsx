@@ -1,4 +1,5 @@
 import React from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 import { getEmotionLabel } from '../lib/emotionLabel.js'
 import AffectionBar from './AffectionBar.jsx'
 
@@ -16,15 +17,18 @@ function parseLog(line) {
 // charA, charB: 対象キャラオブジェクト
 // relationships, affections, emotions: 全体の状態
 export default function RelationDetail({
-  charA,
-  charB,
+  characters = [],
   relationships = [],
   affections = [],
   emotions = [],
   nicknames = [],
   logs = [],
-  onBack,
 }) {
+  const { idA, idB } = useParams()
+  const navigate = useNavigate()
+  const charA = characters.find(c => c.id === idA)
+  const charB = characters.find(c => c.id === idB)
+  if (!charA || !charB) return null
   const pair = [charA.id, charB.id].sort()
   const relRec = relationships.find(r => r.pair[0] === pair[0] && r.pair[1] === pair[1])
   const label = relRec ? relRec.label : 'なし'
@@ -97,7 +101,7 @@ export default function RelationDetail({
           ))
         )}
       </ul>
-      <button className="mt-4" onClick={onBack}>戻る</button>
+      <button className="mt-4" onClick={() => navigate(-1)}>戻る</button>
     </section>
   )
 }
