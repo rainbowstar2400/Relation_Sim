@@ -1,4 +1,5 @@
 import React from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 import { getEmotionLabel } from '../lib/emotionLabel.js'
 import RelationItem from './RelationItem.jsx'
 
@@ -17,7 +18,6 @@ function parseLog(line) {
 // logs: これまでのログ
 // 関係情報も受け取れるように引数を拡張
 export default function CharacterStatus({
-  char,
   characters = [],
   logs = [],
   trusts = [],
@@ -25,9 +25,12 @@ export default function CharacterStatus({
   nicknames = [],
   affections = [],
   emotions = [],
-  onBack,
   onOpenRelation,
 }) {
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const char = characters.find(c => c.id === id)
+  if (!char) return null
   const p = char.personality || {}
   const talk = char.talkStyle || {}
   const trustRec = trusts.find(t => t.id === char.id)

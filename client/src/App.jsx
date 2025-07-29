@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom'
 import { triggerRandomEvent, initEventSystem, triggerGreetingTutorial } from './lib/eventSystem.js'
 import {
   exportState,
@@ -49,7 +50,9 @@ const initialState = {
 }
 
 export default function App() {
-  const [view, setView] = useState('main')
+  const navigate = useNavigate()
+  const location = useLocation()
+
   const [isStarting, setIsStarting] = useState(true)
   const [showIntro, setShowIntro] = useState(false)
   const [state, setState] = useState(initialState)
@@ -61,9 +64,6 @@ export default function App() {
   // 挨拶イベントのログIDを保持
   const greetingLogIdRef = useRef(null)
   const [initialized, setInitialized] = useState(false)
-  const [currentChar, setCurrentChar] = useState(null)
-  const [currentPair, setCurrentPair] = useState(null)
-  const [currentLogId, setCurrentLogId] = useState(null)
   const [popup, setPopup] = useState(null)
   const tutorialFlags = useRef({
     step3: false,
@@ -76,6 +76,31 @@ export default function App() {
     step7Detail: false,
     step8: false,
   })
+
+  // 現在のパスから画面名を判定
+  const view = (() => {
+    const path = location.pathname
+    if (path.startsWith('/management')) return 'management'
+    if (path.startsWith('/status')) return 'status'
+    if (path.startsWith('/relation')) return 'relation'
+    if (path.startsWith('/daily/log')) return 'logdetail'
+    if (path.startsWith('/daily')) return 'daily'
+    return 'main'
+  })()
+
+  // URL パラメータから対象を取得
+  const statusMatch = location.pathname.match(/^\/status\/([^/]+)/)
+  const relationMatch = location.pathname.match(/^\/relation\/([^/]+)\/([^/]+)/)
+  const logMatch = location.pathname.match(/^\/daily\/log\/([^/]+)/)
+  const currentChar = statusMatch
+    ? state.characters.find(c => c.id === statusMatch[1])
+    : null
+  const currentPair = relationMatch
+    ? {
+        a: state.characters.find(c => c.id === relationMatch[1]),
+        b: state.characters.find(c => c.id === relationMatch[2]),
+      }
+    : null
   // チュートリアルフラグを全てリセット
   const resetTutorialFlags = () => {
     for (const key of Object.keys(tutorialFlags.current)) {
@@ -480,7 +505,7 @@ export default function App() {
         showPopup('このように、過去の会話を振り返ることができます。', () => {
           timer = setTimeout(() => {
             showPopup('では、ホームに戻りましょう。', () => {
-              setView('main')
+              navigate('/')
               setState(prev => ({ ...prev, tutorialStep: 8 }))
             })
           }, 1500)
@@ -611,7 +636,7 @@ export default function App() {
       resetTutorialFlags()
       if (userId) deleteGameData(userId)
       setState(initialState)
-      setView('main')
+      navigate('/')
       setShowIntro(false)
       setIsStarting(true)
     }
@@ -658,7 +683,7 @@ export default function App() {
   const handleIntroFinish = () => {
     setShowIntro(false)
     setIsStarting(false)
-    setView('management')
+    navigate('/management')
     setState(prev => ({ ...prev, tutorialStep: 2 }))
     setTimeout(() => {
       showPopup(
@@ -671,7 +696,7 @@ export default function App() {
   const handleSkipTutorial = () => {
     setShowIntro(false)
     setIsStarting(false)
-    setView('main')
+    navigate('/')
     setInitialized(true)
     for (const key of Object.keys(tutorialFlags.current)) {
       tutorialFlags.current[key] = true
@@ -714,7 +739,7 @@ export default function App() {
             'どんな関係が生まれていくのか、ぜひ見守ってみてください。\n\n' +
             'それでは、ホームへ進みましょう。',
           () => {
-            setView('main')
+            navigate('/')
             setState(prev => ({ ...prev, tutorialStep: 3 }))
           }
         )
@@ -738,17 +763,14 @@ export default function App() {
   }
 
   const showStatus = (char) => {
-    setCurrentChar(char)
-    setCurrentPair(null)
-    setView('status')
+    navigate(`/status/${char.id}`)
   }
 
   const showRelationDetail = (idA, idB) => {
     const a = state.characters.find(c => c.id === idA)
     const b = state.characters.find(c => c.id === idB)
     if (!a || !b) return
-    setCurrentPair({ a, b })
-    setView('relation')
+    navigate(`/relation/${a.id}/${b.id}`)
   }
 
   // ステータス画面での説明
@@ -806,7 +828,7 @@ export default function App() {
         showPopup(text1, () => {
           timer = setTimeout(() => {
             showPopup('では、ホームに戻りましょう。', () => {
-              setView('main')
+              navigate('/')
               setState(prev => ({ ...prev, tutorialStep: 6 }))
             })
           }, 1500)
@@ -874,104 +896,93 @@ export default function App() {
         />
       ) : (
         <>
-          <Header
-            onChangeView={setView}
-            onSave={handleExport}
-            onLoad={handleImport}
-            onReset={handleReset}
-          />
-      {view === 'main' && (
-        <MainView
-          consultRef={consultRef}
-          onTutorialComplete={handleConsultTutorialComplete}
-          characters={state.characters}
-          logs={state.logs}
-          readLogCount={state.readLogCount}
-          onSelect={showStatus}
-          addLog={addLog}
-          removeLog={removeLog}
-          updateTrust={updateTrust}
-          updateReadLogCount={updateReadLogCount}
-          updateLastConsultation={updateLastConsultation}
-          trusts={state.trusts}
-          relationships={state.relationships}
-          emotions={state.emotions}
-          affections={state.affections}
-          nicknames={state.nicknames}
-          updateRelationship={updateRelationship}
-          updateEmotion={updateEmotion}
-        />
-      )}
-      {view === 'management' && (
-        <ManagementRoom
-          characters={state.characters}
-          relationships={state.relationships}
-          nicknames={state.nicknames}
-          affections={state.affections}
-          tutorialStep={state.tutorialStep}
-          onFirstRegisterComplete={handleFirstRegisterComplete}
-          onSecondRegisterStart={handleSecondRegisterStart}
-          onSecondRegisterComplete={handleSecondRegisterComplete}
-          onSaveCharacter={saveCharacter}
-          onDeleteCharacter={deleteCharacter}
-          onBack={() => {
-            setCurrentPair(null)
-            setView('main')
-          }}
-        />
-      )}
-      {view === 'status' && currentChar && (
-        <CharacterStatus
-          char={currentChar}
-          characters={state.characters}
-          logs={state.logs}
-          trusts={state.trusts}
-          relationships={state.relationships}
-          nicknames={state.nicknames}
-          affections={state.affections}
-          emotions={state.emotions}
-          onBack={() => {
-            setCurrentPair(null)
-            setView('main')
-          }}
-          onOpenRelation={showRelationDetail}
-        />
-      )}
-      {view === 'relation' && currentPair && (
-        <RelationDetail
-          charA={currentPair.a}
-          charB={currentPair.b}
-          relationships={state.relationships}
-          affections={state.affections}
-          emotions={state.emotions}
-          nicknames={state.nicknames}
-          logs={state.logs}
-          onBack={() => {
-            setCurrentPair(null)
-            setView('status')
-          }}
-        />
-      )}
-      {view === 'daily' && (
-        <DailyReport
-          reports={state.reports}
-          characters={state.characters}
-          onBack={() => setView('main')}
-          onOpenLog={(id) => {
-            setCurrentLogId(id)
-            setView('logdetail')
-          }}
-        />
-      )}
-      {view === 'logdetail' && (
-        <LogDetail
-          log={state.logs.find(l => l.id === currentLogId)}
-          onBack={() => setView('daily')}
-        />
-      )}
-      {popup && (
-        <Popup message={popup.text} onClose={closePopup} />
-      )}
+          <Header onSave={handleExport} onLoad={handleImport} onReset={handleReset} />
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <MainView
+                  consultRef={consultRef}
+                  onTutorialComplete={handleConsultTutorialComplete}
+                  characters={state.characters}
+                  logs={state.logs}
+                  readLogCount={state.readLogCount}
+                  onSelect={showStatus}
+                  addLog={addLog}
+                  removeLog={removeLog}
+                  updateTrust={updateTrust}
+                  updateReadLogCount={updateReadLogCount}
+                  updateLastConsultation={updateLastConsultation}
+                  trusts={state.trusts}
+                  relationships={state.relationships}
+                  emotions={state.emotions}
+                  affections={state.affections}
+                  nicknames={state.nicknames}
+                  updateRelationship={updateRelationship}
+                  updateEmotion={updateEmotion}
+                />
+              }
+            />
+            <Route
+              path="/management"
+              element={
+                <ManagementRoom
+                  characters={state.characters}
+                  relationships={state.relationships}
+                  nicknames={state.nicknames}
+                  affections={state.affections}
+                  tutorialStep={state.tutorialStep}
+                  onFirstRegisterComplete={handleFirstRegisterComplete}
+                  onSecondRegisterStart={handleSecondRegisterStart}
+                  onSecondRegisterComplete={handleSecondRegisterComplete}
+                  onSaveCharacter={saveCharacter}
+                  onDeleteCharacter={deleteCharacter}
+                />
+              }
+            />
+            <Route
+              path="/status/:id"
+              element={
+                <CharacterStatus
+                  characters={state.characters}
+                  logs={state.logs}
+                  trusts={state.trusts}
+                  relationships={state.relationships}
+                  nicknames={state.nicknames}
+                  affections={state.affections}
+                  emotions={state.emotions}
+                  onOpenRelation={showRelationDetail}
+                />
+              }
+            />
+            <Route
+              path="/relation/:idA/:idB"
+              element={
+                <RelationDetail
+                  characters={state.characters}
+                  relationships={state.relationships}
+                  affections={state.affections}
+                  emotions={state.emotions}
+                  nicknames={state.nicknames}
+                  logs={state.logs}
+                />
+              }
+            />
+            <Route
+              path="/daily"
+              element={
+                <DailyReport
+                  reports={state.reports}
+                  characters={state.characters}
+                />
+              }
+            />
+            <Route
+              path="/daily/log/:logId"
+              element={<LogDetail logs={state.logs} />}
+            />
+          </Routes>
+          {popup && <Popup message={popup.text} onClose={closePopup} />}
         </>
       )}
     </div>
