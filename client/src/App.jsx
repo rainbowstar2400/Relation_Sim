@@ -897,7 +897,7 @@ export default function App() {
         />
       ) : (
         <>
-          <Header onSave={handleExport} onLoad={handleImport} onReset={handleReset} />
+          <Header />
           <Routes>
             <Route
               path="/"
@@ -982,7 +982,16 @@ export default function App() {
               path="/daily/log/:logId"
               element={<LogDetail logs={state.logs} />}
             />
-            <Route path="/settings" element={<SettingsPage />} />
+            <Route
+              path="/settings"
+              element={
+                <SettingsPage
+                  onSave={handleExport}
+                  onLoad={handleImport}
+                  onReset={handleReset}
+                />
+              }
+            />
           </Routes>
           {popup && <Popup message={popup.text} onClose={closePopup} />}
         </>
