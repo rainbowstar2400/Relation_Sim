@@ -1,12 +1,10 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
-// ヘッダー。各画面への移動やセーブ/ロードなどを行う
-// リセットボタン用の onReset ハンドラを受け取る
-export default function Header({ onSave, onLoad, onReset }) {
+// ヘッダー。各画面への移動ボタンと時刻表示のみを扱う
+export default function Header() {
   const [time, setTime] = useState('')
   const [date, setDate] = useState('')
-  const fileInputRef = useRef(null)
 
   useEffect(() => {
     const update = () => {
@@ -25,23 +23,8 @@ export default function Header({ onSave, onLoad, onReset }) {
       <Link to="/">ホーム</Link>
       <Link to="/management">管理室</Link>
       <Link to="/daily">日報</Link>
-      <button onClick={onSave}>セーブ</button>
-      <button onClick={() => fileInputRef.current?.click()}>ロード</button>
-      {/* セーブデータを初期化するリセットボタン。ロードボタンの右隣に配置 */}
-      <button onClick={onReset}>リセット</button>
       {/* 設定画面へのリンクを追加 */}
       <Link to="/settings">設定</Link>
-      <input
-        type="file"
-        accept="application/json"
-        className="hidden"
-        ref={fileInputRef}
-        onChange={(e) => {
-          const file = e.target.files?.[0]
-          if (file) onLoad(file)
-          e.target.value = ''
-        }}
-      />
       <div className="ml-auto text-right">
         <span id="time" className="font-bold mr-1">{time}</span>
         <span id="date">{date}</span>
