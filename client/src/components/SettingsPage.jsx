@@ -26,6 +26,8 @@ export default function SettingsPage({ onSave, onLoad, onReset }) {
     try {
       await linkWithPopup(auth.currentUser, new GoogleAuthProvider())
       setUser(auth.currentUser)
+      // 連携成功後に画面を更新
+      window.location.reload()
     } catch (e) {
       if (e.code === 'auth/email-already-in-use' || e.code === 'auth/credential-already-in-use') {
         alert('すでに使用されている認証情報です')
@@ -40,6 +42,8 @@ export default function SettingsPage({ onSave, onLoad, onReset }) {
     try {
       await auth.currentUser.unlink('google.com')
       setUser(auth.currentUser)
+      // 連携解除後に画面を更新
+      window.location.reload()
     } catch (e) {
       console.error(e)
     }
@@ -53,6 +57,8 @@ export default function SettingsPage({ onSave, onLoad, onReset }) {
       setUser(auth.currentUser)
       setEmail('')
       setPassword('')
+      // 連携成功後に画面を更新
+      window.location.reload()
     } catch (e) {
       if (e.code === 'auth/email-already-in-use' || e.code === 'auth/credential-already-in-use') {
         alert('このメールアドレスは既に使用されています')
@@ -67,6 +73,8 @@ export default function SettingsPage({ onSave, onLoad, onReset }) {
     try {
       await auth.currentUser.unlink('password')
       setUser(auth.currentUser)
+      // 連携解除後に画面を更新
+      window.location.reload()
     } catch (e) {
       console.error(e)
     }
@@ -77,11 +85,22 @@ export default function SettingsPage({ onSave, onLoad, onReset }) {
   const providerIds = user.providerData?.map(p => p.providerId) || []
   const linkedGoogle = providerIds.includes('google.com')
   const linkedEmail = providerIds.includes('password')
+  const getShortName = info => {
+    const name = info?.displayName || info?.email || ''
+    return name.slice(0, 3)
+  }
+  const googleInfo = user.providerData.find(p => p.providerId === 'google.com')
+  const emailInfo = user.providerData.find(p => p.providerId === 'password')
+  const shortGoogle = getShortName(googleInfo)
+  const shortEmail = getShortName(emailInfo)
 
   return (
     <section className="p-2">
       <h1 className="text-xl font-bold mb-4">設定</h1>
-      <h2 className="text-lg mb-2">セーブデータ</h2>
+      {/* セーブデータ関連の見出しを軽く装飾 */}
+      <h2 className="text-lg mb-2 font-semibold border-b border-gray-300 pb-1">
+        セーブデータ管理
+      </h2>
       <div className="flex flex-col gap-2 mb-4 w-fit">
         <button onClick={onSave}>セーブ</button>
         <button onClick={() => fileInputRef.current?.click()}>ロード</button>
@@ -98,14 +117,20 @@ export default function SettingsPage({ onSave, onLoad, onReset }) {
           }}
         />
       </div>
-      <h2 className="text-lg mb-2">アカウント連携</h2>
+      {/* アカウント連携の見出しを軽く装飾 */}
+      <h2 className="text-lg mb-2 font-semibold border-b border-gray-300 pb-1">
+        アカウント連携
+      </h2>
       <div className="flex flex-col gap-2 w-fit">
         {user.isAnonymous && !linkedGoogle && (
           <button onClick={handleLinkGoogle}>Googleアカウントと連携する</button>
         )}
         {linkedGoogle && (
           <div className="flex flex-col gap-1">
-            <p>Googleアカウントと連携済みです</p>
+            <p>
+              Googleアカウント({shortGoogle}...)
+              と連携済みです
+            </p>
             <button onClick={handleUnlinkGoogle}>連携を解除する</button>
           </div>
         )}
@@ -130,7 +155,10 @@ export default function SettingsPage({ onSave, onLoad, onReset }) {
         )}
         {linkedEmail && (
           <div className="flex flex-col gap-1">
-            <p>メールアドレスと連携済みです</p>
+            <p>
+              メールアドレス({shortEmail}...)
+              と連携済みです
+            </p>
             <button onClick={handleUnlinkEmail}>連携を解除する</button>
           </div>
         )}
