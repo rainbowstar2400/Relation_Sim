@@ -88,7 +88,7 @@ export default function SettingsPage({ onSave, onLoad, onReset }) {
     try {
       await signInWithPopup(auth, new GoogleAuthProvider())
       if (!auth.currentUser.isAnonymous) {
-        window.location.reload()
+        navigate('/settings', { replace: true })
       }
     } catch (e) {
       alert('ログインに失敗しました')
@@ -101,7 +101,7 @@ export default function SettingsPage({ onSave, onLoad, onReset }) {
       const cred = EmailAuthProvider.credential(loginEmail, loginPassword)
       await signInWithCredential(auth, cred)
       if (!auth.currentUser.isAnonymous) {
-        window.location.reload()
+        navigate('/settings', { replace: true })
       }
     } catch (e) {
       alert('ログインに失敗しました')
