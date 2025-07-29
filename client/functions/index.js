@@ -7,23 +7,23 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-const {setGlobalOptions} = require("firebase-functions");
-// 変更点 1: functionsモジュール全体を読み込む
-const functions = require("firebase-functions");
+const {setGlobalOptions} = require("firebase-functions/v2");
+// 変更点: v2のonRequestをインポート
+const {onRequest} = require("firebase-functions/v2/https");
 const logger = require("firebase-functions/logger");
 const admin = require("firebase-admin");
 
 admin.initializeApp();
 const db = admin.firestore();
 
-// For cost control...
+
+// グローバルオプションでmaxInstancesを設定
 setGlobalOptions({ maxInstances: 10 });
 
-// ...
 
 // Cloud Scheduler から 15 分ごとに呼び出される予定の関数
-// 変更点 2: .region("asia-northeast1") を追加
-exports.generateAutoEvents = functions.region("asia-northeast1").https.onRequest(async (_req, res) => {
+// 変更点: onRequestの第一引数にリージョンを指定
+exports.generateAutoEvents = onRequest({ region: "asia-northeast1" }, async (_req, res) => {
   try {
     const users = await db.collection("saves").get();
     const timestamp = Date.now();
