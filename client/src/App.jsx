@@ -19,6 +19,7 @@ import CharacterStatus from './components/CharacterStatus.jsx'
 import RelationDetail from './components/RelationDetail.jsx'
 import DailyReport from './components/DailyReport.jsx'
 import LogDetail from './components/LogDetail.jsx'
+import SettingsPage from './components/SettingsPage.jsx'
 import StartScreen from './components/StartScreen.jsx'
 import Popup from './components/Popup.jsx'
 import { addReportChange } from './lib/reportUtils.js'
@@ -981,6 +982,7 @@ export default function App() {
               path="/daily/log/:logId"
               element={<LogDetail logs={state.logs} />}
             />
+            <Route path="/settings" element={<SettingsPage />} />
           </Routes>
           {popup && <Popup message={popup.text} onClose={closePopup} />}
         </>

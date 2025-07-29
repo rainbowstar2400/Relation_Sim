@@ -29,6 +29,8 @@ export default function Header({ onSave, onLoad, onReset }) {
       <button onClick={() => fileInputRef.current?.click()}>ロード</button>
       {/* セーブデータを初期化するリセットボタン。ロードボタンの右隣に配置 */}
       <button onClick={onReset}>リセット</button>
+      {/* 設定画面へのリンクを追加 */}
+      <Link to="/settings">設定</Link>
       <input
         type="file"
         accept="application/json"
