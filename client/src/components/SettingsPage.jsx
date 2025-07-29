@@ -5,6 +5,8 @@ import {
   EmailAuthProvider,
   linkWithPopup,
   linkWithCredential,
+  signInWithPopup,
+  signInWithCredential,
   onAuthStateChanged
 } from 'firebase/auth'
 import { auth } from '../firebaseConfig.js'
@@ -14,6 +16,8 @@ export default function SettingsPage({ onSave, onLoad, onReset }) {
   const [user, setUser] = useState(auth.currentUser)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [loginEmail, setLoginEmail] = useState('')
+  const [loginPassword, setLoginPassword] = useState('')
   const fileInputRef = useRef(null)
 
   useEffect(() => {
@@ -80,6 +84,31 @@ export default function SettingsPage({ onSave, onLoad, onReset }) {
     }
   }
 
+  const handleLoginGoogle = async () => {
+    try {
+      await signInWithPopup(auth, new GoogleAuthProvider())
+      if (!auth.currentUser.isAnonymous) {
+        window.location.reload()
+      }
+    } catch (e) {
+      alert('ログインに失敗しました')
+      console.error(e)
+    }
+  }
+
+  const handleLoginEmail = async () => {
+    try {
+      const cred = EmailAuthProvider.credential(loginEmail, loginPassword)
+      await signInWithCredential(auth, cred)
+      if (!auth.currentUser.isAnonymous) {
+        window.location.reload()
+      }
+    } catch (e) {
+      alert('ログインに失敗しました')
+      console.error(e)
+    }
+  }
+
   if (!user) return null
 
   const providerIds = user.providerData?.map(p => p.providerId) || []
@@ -117,6 +146,36 @@ export default function SettingsPage({ onSave, onLoad, onReset }) {
           }}
         />
       </div>
+
+      {user.isAnonymous && (
+        <>
+          {/* ログインセクション */}
+          <h2 className="text-lg mb-2 font-semibold border-b border-gray-300 pb-1">
+            ログイン
+          </h2>
+          <p className="mb-2">既にアカウントをお持ちの方はこちらからログインしてください</p>
+          <div className="flex flex-col gap-2 mb-4 w-fit">
+            <button onClick={handleLoginGoogle}>Googleでログイン</button>
+            <div className="flex flex-col gap-2 w-fit">
+              <input
+                type="email"
+                className="text-black p-1 w-60"
+                placeholder="メールアドレス"
+                value={loginEmail}
+                onChange={e => setLoginEmail(e.target.value)}
+              />
+              <input
+                type="password"
+                className="text-black p-1 w-60"
+                placeholder="パスワード"
+                value={loginPassword}
+                onChange={e => setLoginPassword(e.target.value)}
+              />
+              <button onClick={handleLoginEmail}>メールアドレスでログイン</button>
+            </div>
+          </div>
+        </>
+      )}
       {/* アカウント連携の見出しを軽く装飾 */}
       <h2 className="text-lg mb-2 font-semibold border-b border-gray-300 pb-1">
         アカウント連携
