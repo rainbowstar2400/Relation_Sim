@@ -749,6 +749,8 @@ export default function App() {
   }
 
   const handleConsultTutorialComplete = () => {
+    // チュートリアルのステップ4以外では処理を行わない
+    if (stateRef.current.tutorialStep !== 4) return
     const message =
       '相談に乗ることができましたね。\n\n' +
       'うまく応じることができると、このように、\n' +
