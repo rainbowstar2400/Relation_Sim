@@ -9,6 +9,7 @@ import {
   signInWithCredential,
   onAuthStateChanged
 } from 'firebase/auth'
+import { getFunctions, httpsCallable } from 'firebase/functions'
 import { auth } from '../firebaseConfig.js'
 
 export default function SettingsPage({ onSave, onLoad, onReset }) {
@@ -85,11 +86,29 @@ export default function SettingsPage({ onSave, onLoad, onReset }) {
   }
 
   const handleLoginGoogle = async () => {
+    // 現在のユーザーが匿名か確認し、UIDを控えておく
+    const prevAnonymousUid = auth.currentUser?.isAnonymous
+      ? auth.currentUser.uid
+      : null
     try {
+      // Googleアカウントでログイン
       await signInWithPopup(auth, new GoogleAuthProvider())
-    if (!auth.currentUser.isAnonymous) {
-      navigate('/', { replace: true }) // ホームページに遷移
-    }
+
+      // ログイン後、以前の匿名アカウントがあれば削除を依頼
+      if (prevAnonymousUid) {
+        try {
+          const functions = getFunctions()
+          const deleteAnon = httpsCallable(functions, 'deleteAnonymousUser')
+          await deleteAnon({ uid: prevAnonymousUid })
+        } catch (err) {
+          console.error('匿名アカウントの削除に失敗しました', err)
+        }
+      }
+
+      // 匿名ユーザーでなければホーム画面へ
+      if (!auth.currentUser.isAnonymous) {
+        navigate('/', { replace: true }) // ホームページに遷移
+      }
     } catch (e) {
       alert('ログインに失敗しました')
       console.error(e)
