@@ -114,9 +114,11 @@ export default function SettingsPage({ onSave, onLoad, onReset }) {
   const providerIds = user.providerData?.map(p => p.providerId) || []
   const linkedGoogle = providerIds.includes('google.com')
   const linkedEmail = providerIds.includes('password')
+  // メールアドレスの @ より前の部分を取得し、先頭3文字だけ返す
   const getShortName = info => {
-    const name = info?.displayName || info?.email || ''
-    return name.slice(0, 3)
+    const email = info?.email || ''
+    const account = email.split('@')[0]
+    return account.slice(0, 3)
   }
   const googleInfo = user.providerData.find(p => p.providerId === 'google.com')
   const emailInfo = user.providerData.find(p => p.providerId === 'password')
