@@ -4,15 +4,21 @@ import { getStyleModifiers } from '../prompt/styleModifiers.js'
 // 入力情報から相談イベントを生成するプロンプトを作成
 function buildConsultPrompt(character, genre, level, trust) {
   const modifiers = getStyleModifiers(character.personality || {})
-  return `以下の条件でプレイヤーに相談する文章を1件生成してください。\n` +
+  const talk = character.talkStyle || {}
+  return (
+    `以下の条件でプレイヤーに相談する文章を1件生成してください。\n` +
     `# キャラクター\n` +
     `名前: ${character.name}\n` +
+    `話し方テンプレート: ${talk.template || ''}\n` +
+    `話し方説明: ${talk.description || ''}\n` +
+    `一人称: ${talk.firstPerson || '私'}\n` +
     `信頼度: ${trust}\n` +
     `ジャンル: ${genre}\n` +
     `レベル: ${level}\n` +
     `style_modifiers: ${JSON.stringify(modifiers)}\n` +
     `# 出力形式\n` +
     `{ "prompt": "相談文", "choices": ["<選択肢1>", "<選択肢2>", "<選択肢3>"], "trust_change": 0, "responses": ["<返答1>", "<返答2>", "<返答3>"] }`
+  )
 }
 
 /**
