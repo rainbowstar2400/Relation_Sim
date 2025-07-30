@@ -52,6 +52,9 @@ const initialState = {
 
 export default function App() {
   const navigate = useNavigate()
+  const handleOpenLog = (logId) => {
+    navigate(`/daily/log/${logId}`)
+  }
   const location = useLocation()
 
   const [isStarting, setIsStarting] = useState(true)
@@ -977,6 +980,7 @@ export default function App() {
                 <DailyReport
                   reports={state.reports}
                   characters={state.characters}
+                  onOpenLog={handleOpenLog}
                 />
               }
             />
