@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, signInAnonymously } from "firebase/auth";
+import { getAuth, onAuthStateChanged, signInAnonymously } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 // functions を利用するためにインポート
 import { getFunctions } from "firebase/functions";
@@ -20,9 +20,14 @@ const db = getFirestore(app);
 // functions を初期化（リージョンはFunction側と合わせます）
 const functions = getFunctions(app, "asia-northeast1");
 
-signInAnonymously(auth)
-  .then(() => console.log("匿名ログイン成功", auth.currentUser.uid))
-  .catch((err) => console.error("匿名ログイン失敗", err));
+// 既存のユーザーがいないときのみ匿名ログインを実行
+onAuthStateChanged(auth, user => {
+  if (!user) {
+    signInAnonymously(auth)
+      .then(() => console.log("匿名ログイン成功", auth.currentUser.uid))
+      .catch(err => console.error("匿名ログイン失敗", err));
+  }
+});
 
 // functions をエクスポートに追加
 export { db, auth, functions };
