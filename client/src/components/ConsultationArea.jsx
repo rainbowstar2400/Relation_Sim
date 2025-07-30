@@ -11,6 +11,7 @@ import { getEventMood, evaluateConfessionResult, generateConfessionDialogue } fr
 // addLog: ログ追加用関数
 export default forwardRef(function ConsultationArea({ characters, trusts, updateTrust, addLog, removeLog, updateLastConsultation, relationships, emotions, affections, nicknames, updateRelationship, updateEmotion, onTutorialComplete }, ref) {
   const [confessTemplates, setConfessTemplates] = useState([])
+  const [troubleTemplates, setTroubleTemplates] = useState([])
   const [consultations, setConsultations] = useState([])
   const [current, setCurrent] = useState(null)
   const [selected, setSelected] = useState('')
@@ -41,6 +42,17 @@ export default forwardRef(function ConsultationArea({ characters, trusts, update
       })
       .then(data => setConfessTemplates(data))
       .catch(err => console.error('告白テンプレートの取得に失敗しました', err))
+  }, [])
+
+  // 困りごとテンプレートも取得
+  useEffect(() => {
+    fetch('/data/trouble_prompt_templates.json')
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        return res.json()
+      })
+      .then(data => setTroubleTemplates(data))
+      .catch(err => console.error('困りごとテンプレートの取得に失敗しました', err))
   }, [])
 
   // 自動生成のスケジューラ（困りごと・告白をまとめて処理）
@@ -99,8 +111,6 @@ export default forwardRef(function ConsultationArea({ characters, trusts, update
 
       if (ev.type === 'trouble') {
         const trust = trusts.find(t => t.id === ev.char.id)?.score || 50
-        const level = chooseLevel(trust)
-        const genre = chooseGenre()
         const id = Date.now()
         const timeout = setTimeout(() => {
           setConsultations(p => p.filter(c => c.id !== id))
@@ -108,13 +118,28 @@ export default forwardRef(function ConsultationArea({ characters, trusts, update
         updateLastConsultation(ev.char.id)
         setConsultations(prev => [...prev, { id, type: 'trouble', char: ev.char, loading: true, timeout }])
         try {
-          const res = await generateConsultation({ character: ev.char, genre, level, trust })
-          const template = {
-            form: res.choices ? 'choice' : 'fill',
-            core_prompt: res.prompt,
-            choices: res.choices || [],
-            responses: res.responses || [],
-            trust_change: res.trust_change || 0
+          let template
+          if (trust <= 20 && troubleTemplates.length > 0) {
+            const low = troubleTemplates.filter(t => t.id.startsWith('L-'))
+            const pick = low[Math.floor(Math.random() * low.length)]
+            template = {
+              form: pick.form,
+              core_prompt: pick.core_prompt,
+              choices: pick.choices || [],
+              responses: pick.responses || [],
+              trust_change: pick.trust_change || 0
+            }
+          } else {
+            const level = chooseLevel(trust)
+            const genre = chooseGenre()
+            const res = await generateConsultation({ character: ev.char, genre, level, trust })
+            template = {
+              form: res.choices ? 'choice' : 'fill',
+              core_prompt: res.prompt,
+              choices: res.choices || [],
+              responses: res.responses || [],
+              trust_change: res.trust_change || 0
+            }
           }
           setConsultations(prev => prev.map(c => c.id === id ? { ...c, template, loading: false } : c))
         } catch (err) {
@@ -131,7 +156,7 @@ export default forwardRef(function ConsultationArea({ characters, trusts, update
       }
     }, AUTO_INTERVAL_MS)
     return () => clearInterval(timer)
-  }, [confessTemplates, characters, relationships, emotions, affections, trusts, consultations])
+  }, [confessTemplates, troubleTemplates, characters, relationships, emotions, affections, trusts, consultations])
 
   // 相談イベントを追加
   const addConsultation = async () => {
@@ -187,8 +212,6 @@ export default forwardRef(function ConsultationArea({ characters, trusts, update
     const ev = options[Math.floor(Math.random() * options.length)]
     if (ev.type === 'trouble') {
       const trust = trusts.find(t => t.id === ev.char.id)?.score || 50
-      const level = chooseLevel(trust)
-      const genre = chooseGenre()
       const id = Date.now()
       const timeout = setTimeout(() => {
         setConsultations(prev => prev.filter(e => e.id !== id))
@@ -196,13 +219,28 @@ export default forwardRef(function ConsultationArea({ characters, trusts, update
       setConsultations(prev => [...prev, { id, type: 'trouble', char: ev.char, loading: true, timeout }])
       updateLastConsultation(ev.char.id)
       try {
-        const res = await generateConsultation({ character: ev.char, genre, level, trust })
-        const template = {
-          form: res.choices ? 'choice' : 'fill',
-          core_prompt: res.prompt,
-          choices: res.choices || [],
-          responses: res.responses || [],
-          trust_change: res.trust_change || 0
+        let template
+        if (trust <= 20 && troubleTemplates.length > 0) {
+          const low = troubleTemplates.filter(t => t.id.startsWith('L-'))
+          const pick = low[Math.floor(Math.random() * low.length)]
+          template = {
+            form: pick.form,
+            core_prompt: pick.core_prompt,
+            choices: pick.choices || [],
+            responses: pick.responses || [],
+            trust_change: pick.trust_change || 0
+          }
+        } else {
+          const level = chooseLevel(trust)
+          const genre = chooseGenre()
+          const res = await generateConsultation({ character: ev.char, genre, level, trust })
+          template = {
+            form: res.choices ? 'choice' : 'fill',
+            core_prompt: res.prompt,
+            choices: res.choices || [],
+            responses: res.responses || [],
+            trust_change: res.trust_change || 0
+          }
         }
         setConsultations(prev => prev.map(e => e.id === id ? { ...e, template, loading: false } : e))
       } catch (err) {
@@ -235,13 +273,26 @@ export default forwardRef(function ConsultationArea({ characters, trusts, update
     ])
     updateLastConsultation(char.id)
     try {
-      const res = await generateConsultation({ character: char, genre, level, trust })
-      const template = {
-        form: res.choices ? 'choice' : 'fill',
-        core_prompt: res.prompt,
-        choices: res.choices || [],
-        responses: res.responses || [],
-        trust_change: 5
+      let template
+      if (trust <= 20 && troubleTemplates.length > 0) {
+        const low = troubleTemplates.filter(t => t.id.startsWith('L-'))
+        const pick = low[Math.floor(Math.random() * low.length)]
+        template = {
+          form: pick.form,
+          core_prompt: pick.core_prompt,
+          choices: pick.choices || [],
+          responses: pick.responses || [],
+          trust_change: 5
+        }
+      } else {
+        const res = await generateConsultation({ character: char, genre, level, trust })
+        template = {
+          form: res.choices ? 'choice' : 'fill',
+          core_prompt: res.prompt,
+          choices: res.choices || [],
+          responses: res.responses || [],
+          trust_change: 5
+        }
       }
       setConsultations(prev =>
         prev.map(e => (e.id === id ? { ...e, template, loading: false } : e))
