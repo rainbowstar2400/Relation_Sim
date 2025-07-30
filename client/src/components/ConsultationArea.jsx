@@ -260,12 +260,11 @@ export default forwardRef(function ConsultationArea({ characters, trusts, update
   const openPopup = async (c) => {
     if (c.loading || c.disabled) return
     let text = c.template.core_prompt
-    if (c.type === 'confession') {
-      try {
-        text = await adjustLineByPersonality(text, c.char)
-      } catch (err) {
-        console.error('line adjust error', err)
-      }
+    // 口調をキャラクターに合わせる
+    try {
+      text = await adjustLineByPersonality(text, c.char)
+    } catch (err) {
+      console.error('line adjust error', err)
     }
     const modified = { ...c, template: { ...c.template, core_prompt: text } }
     setCurrent(modified)
@@ -347,7 +346,13 @@ export default forwardRef(function ConsultationArea({ characters, trusts, update
       if (idx < 0) idx = 0
     }
     updateTrust(current.char.id, current.template.trust_change || 0)
-    setReplyText(current.template.responses?.[idx] || '')
+    let reply = current.template.responses?.[idx] || ''
+    try {
+      reply = await adjustLineByPersonality(reply, current.char)
+    } catch (err) {
+      console.error('line adjust error', err)
+    }
+    setReplyText(reply)
     updateLastConsultation(current.char.id)
     clearTimeout(current.timeout)
     setAnswered(true)
