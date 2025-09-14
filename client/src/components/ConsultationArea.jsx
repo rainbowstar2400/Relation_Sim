@@ -1,4 +1,4 @@
-import React, { useEffect, useState, forwardRef, useImperativeHandle } from 'react'
+import React, { useEffect, useState, forwardRef, useImperativeHandle, useRef } from 'react'
 
 import { adjustLineByPersonality } from '../gpt/adjustLine.js'
 
@@ -18,6 +18,8 @@ export default forwardRef(function ConsultationArea({ characters, trusts, update
   const [answered, setAnswered] = useState(false)
   const [replyText, setReplyText] = useState('')
   const [logId, setLogId] = useState(null)
+  // 相談件数の参照を保持
+  const consultationsCountRef = useRef(0)
   const AUTO_INTERVAL_MS = 3600000 // 1時間ごと
   const MAX_AUTO_CONSULTATIONS = 2 // 自動生成時の上限
   const MAX_TOTAL_CONSULTATIONS = 3 // 手動追加も含めた上限
@@ -55,10 +57,15 @@ export default forwardRef(function ConsultationArea({ characters, trusts, update
       .catch(err => console.error('困りごとテンプレートの取得に失敗しました', err))
   }, [])
 
+  // 相談件数が変化したら件数を更新
+  useEffect(() => {
+    consultationsCountRef.current = consultations.length
+  }, [consultations.length])
+
   // 自動生成のスケジューラ（困りごと・告白をまとめて処理）
   useEffect(() => {
     const timer = setInterval(async () => {
-      if (consultations.length >= MAX_AUTO_CONSULTATIONS) return
+      if (consultationsCountRef.current >= MAX_AUTO_CONSULTATIONS) return
 
       const eventOptions = []
 
@@ -156,7 +163,7 @@ export default forwardRef(function ConsultationArea({ characters, trusts, update
       }
     }, AUTO_INTERVAL_MS)
     return () => clearInterval(timer)
-  }, [confessTemplates, troubleTemplates, characters, relationships, emotions, affections, trusts, consultations])
+  }, [confessTemplates, troubleTemplates, characters, relationships, emotions, affections, trusts])
 
   // 相談イベントを追加
   const addConsultation = async () => {
