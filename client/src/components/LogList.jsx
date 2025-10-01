@@ -1,18 +1,30 @@
 import React, { useEffect, useRef, useState } from 'react'
 
+// 文字列の内容から安定したハッシュ値を生成してIDとして利用する
+function generateId(text) {
+  let hash = 0
+  for (let i = 0; i < text.length; i++) {
+    hash = (hash << 5) - hash + text.charCodeAt(i)
+    hash |= 0 // 32bit整数に変換
+  }
+  return Math.abs(hash).toString(36)
+}
+
 function parseLog(line) {
   if (typeof line === 'string') {
     const m = line.match(/^\[(.*?)\]\s*(EVENT|SYSTEM):\s*(.*)$/)
     if (m) {
       return { id: m[1] + m[2], time: m[1], type: m[2], text: m[3], detail: m[3] }
     }
-    return { id: Date.now().toString(36), time: '', type: 'EVENT', text: line, detail: line }
+    // 正規表現にマッチしない場合はハッシュ値をIDにする
+    return { id: generateId(line), time: '', type: 'EVENT', text: line, detail: line }
   }
   return { ...line, detail: line.detail || line.text }
 }
 
 function LogLine({ line }) {
-  const { time, type, text, detail } = parseLog(line)
+  // ここではすでに解析済みのログオブジェクトを受け取る
+  const { time, type, text, detail } = line
   const [shown, setShown] = useState('')
 
   useEffect(() => {
@@ -146,12 +158,15 @@ export default function LogList({ logs = [], readLogCount = 0, updateReadLogCoun
         ref={logRef}
         className="h-[32rem] overflow-y-auto bg-black border border-gray-600 p-3 font-mono rounded text-gray-100"
       >
-        {ordered.map((line, idx) => (
-          <React.Fragment key={parseLog(line).id}>
-            <LogLine line={line} />
-            {idx === boundaryIndex - 1 && <div ref={readEndRef} />}
-          </React.Fragment>
-        ))}
+        {ordered.map((line, idx) => {
+          const parsed = parseLog(line)
+          return (
+            <React.Fragment key={parsed.id}>
+              <LogLine line={parsed} />
+              {idx === boundaryIndex - 1 && <div ref={readEndRef} />}
+            </React.Fragment>
+          )
+        })}
       </div>
       {showBanner && (
         <div
