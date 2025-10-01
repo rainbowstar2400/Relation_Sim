@@ -42,8 +42,8 @@ export function drawMood(state, idA, idB) {
   const affectionAvg = Math.round((affAtoB + affBtoA) / 2)
 
   let baseMood = 0
-  if (affectionAvg <= -30) baseMood = -2
-  else if (affectionAvg < 0) baseMood = -1
+  if (affectionAvg < -30) baseMood = -2
+  else if (affectionAvg <= 0) baseMood = -1
   else if (affectionAvg <= 30) baseMood = 0
   else if (affectionAvg <= 60) baseMood = 1
   else baseMood = 2
