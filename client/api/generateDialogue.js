@@ -21,7 +21,7 @@ export default async function handler(req, res) {
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-5-chat-latest',
         messages: [
           { role: 'system', content: 'あなたは登場人物のセリフを書き出すAIです。' },
           { role: 'user', content: prompt }
