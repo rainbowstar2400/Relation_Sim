@@ -8,30 +8,31 @@
  */
 
 const {setGlobalOptions} = require("firebase-functions/v2");
-// 変更点: onCall をインポート
-const {onRequest, onCall} = require("firebase-functions/v2/https");
+const {onCall} = require("firebase-functions/v2/https");
+const {onSchedule} = require("firebase-functions/v2/scheduler");
+const functions = require("firebase-functions");
 const logger = require("firebase-functions/logger");
 const admin = require("firebase-admin");
 
 
 admin.initializeApp();
-const db = admin.firestore();
 
 
-// グローバルオプションでmaxInstancesを設定
-setGlobalOptions({ maxInstances: 10 });
+// グローバルオプションでリージョンとmaxInstancesを設定
+setGlobalOptions({ region: "asia-northeast1", maxInstances: 10 });
 
 
-// Cloud Scheduler から 15 分ごとに呼び出される予定の関数
-// 変更点: onRequestの第一引数にリージョンを指定
-exports.generateAutoEvents = onRequest({ region: "asia-northeast1" }, async (_req, res) => {
+// Cloud Scheduler から 15 分ごとに自動実行される関数
+exports.generateAutoEvents = onSchedule("every 15 minutes", async () => {
+  const db = admin.firestore();
+
   try {
     const users = await db.collection("saves").get();
     const timestamp = Date.now();
-    const results = [];
 
-    for (const doc of users.docs) {
+    const promises = users.docs.map(async (doc) => {
       const userId = doc.id;
+
       try {
         await db
           .collection("logs")
@@ -43,17 +44,17 @@ exports.generateAutoEvents = onRequest({ region: "asia-northeast1" }, async (_re
             type: "AUTO",
             message: "自動イベントが発生しました",
           });
-        results.push({ userId, status: "ok" });
       } catch (err) {
         logger.error(`ユーザー ${userId} の書き込みに失敗`, err);
-        results.push({ userId, status: "error", error: err.message });
+        throw err;
       }
-    }
+    });
 
-    res.status(200).json({ results });
+    await Promise.all(promises);
+    logger.log(`自動イベントを ${users.size} 件作成しました。`);
   } catch (err) {
-    logger.error("generateAutoEvents 全体でエラー発生", err);
-    res.status(500).json({ error: "Internal Server Error" });
+    logger.error("generateAutoEvents 実行中にエラーが発生しました", err);
+    throw err;
   }
 });
 
