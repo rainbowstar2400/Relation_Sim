@@ -1,4 +1,4 @@
-import { doc, setDoc, getDoc, deleteDoc } from 'firebase/firestore'
+import { doc, setDoc, getDocFromServer, deleteDoc } from 'firebase/firestore'
 import { db } from '../firebaseConfig.js'
 
 const COLLECTION = 'saves'
@@ -17,7 +17,11 @@ export async function loadGameData(userId) {
   if (!userId) return null
   try {
     const ref = doc(db, COLLECTION, userId)
-    const snap = await getDoc(ref)
+    // getDoc では WebChannel を介したリアルタイム接続が張られ、
+    // 環境によっては `Listen/channel` の 400 エラーがコンソールに表示される。
+    // 一度きりの読み込みで十分なため REST ベースの getDocFromServer を利用し、
+    // 不要なリッスン接続を避ける。
+    const snap = await getDocFromServer(ref)
     return snap.exists() ? snap.data() : null
   } catch (e) {
     console.error('ゲームデータの読み込みに失敗しました', e)
